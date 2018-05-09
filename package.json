@@ -9,6 +9,7 @@
     "node": "6.* || 8.* || 9.* || >= 10"
   },
   "scripts": {
+    "lint:js": "eslint .",
     "test": "qunit tests/**/*-test.js"
   },
   "files": [
