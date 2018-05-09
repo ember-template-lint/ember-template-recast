@@ -28,23 +28,24 @@ function wrapNode(node, nearestNodeWithLoc, parseResult) {
 
     set(target, property, value) {
       let original = clonedNearestNodeWithLoc;
-      let updated = nearestNodeWithLoc;
+      let updatedValue = nearestNodeWithLoc;
 
       if (propertyProxyMap.has(property)) {
         let propertyProxy = propertyProxyMap.get(property);
         original = propertyProxy[CLONED_NEAREST_NODE_WITH_LOC];
-        updated = propertyProxy[NEAREST_NODE_WITH_LOC];
+        updatedValue = propertyProxy[NEAREST_NODE_WITH_LOC];
 
-        if (updated === Reflect.get(target, property)) {
-          updated = value;
+        if (updatedValue === Reflect.get(target, property)) {
+          updatedValue = value;
         }
       }
 
       Reflect.set(target, property, value);
 
       parseResult.modifications.push({
-        original,
-        updated,
+        start: original.loc.start,
+        end: original.loc.end,
+        value: updatedValue,
       });
     },
   });
@@ -79,21 +80,18 @@ class ParseResult {
 
     let sortedModifications = modifications
       .sort(function(a, b) {
-        return (
-          a.original.loc.line - b.original.loc.line || a.original.loc.column - b.original.loc.column
-        );
+        return a.start.line - b.start.line || a.start.column - b.start.column;
       })
       .reverse();
 
-    sortedModifications.forEach(mod => {
-      let loc = mod.original.loc;
-      let printed = _print(mod.updated);
+    sortedModifications.forEach(({ start, end, value }) => {
+      let printed = _print(value);
 
-      if (loc.start.line === loc.end.line) {
-        let lineToUpdate = loc.start.line - 1;
+      if (start.line === end.line) {
+        let lineToUpdate = start.line - 1;
         let lineContents = this.source[lineToUpdate];
         let updateContents =
-          lineContents.slice(0, loc.start.column) + printed + lineContents.slice(loc.end.column);
+          lineContents.slice(0, start.column) + printed + lineContents.slice(end.column);
 
         this.source[lineToUpdate] = updateContents;
       } else {
