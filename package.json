@@ -1,0 +1,26 @@
+{
+  "name": "ember-template-recast",
+  "version": "1.0.0",
+  "description": "Non-destructive template transformer.",
+  "main": "src/index.js",
+  "author": "Robert Jackson <me@rwjblue.com>",
+  "license": "MIT",
+  "engines": {
+    "node": "6.* || 8.* || 9.* || >= 10"
+  },
+  "scripts": {
+    "test": "qunit tests/**/*-test.js"
+  },
+  "files": [
+    "src/"
+  ],
+  "devDependencies": {
+    "common-tags": "^1.7.2",
+    "eslint": "^4.19.1",
+    "eslint-config-prettier": "^2.9.0",
+    "eslint-plugin-node": "^6.0.1",
+    "eslint-plugin-prettier": "^2.6.0",
+    "prettier": "^1.12.1",
+    "qunit": "^2.6.0"
+  }
+}
