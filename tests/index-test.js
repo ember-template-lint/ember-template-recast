@@ -1,4 +1,5 @@
 const { parse, print } = require('..');
+const { builders } = require('@glimmer/syntax');
 const { stripIndent } = require('common-tags');
 
 QUnit.module('ember-template-recast', function() {
@@ -26,6 +27,26 @@ QUnit.module('ember-template-recast', function() {
       stripIndent`
         {{foo-bar
           derp="stuff"
+          other='single quote'
+        }}`
+    );
+  });
+
+  QUnit.test('rename component', function(assert) {
+    let template = stripIndent`
+      {{foo-bar
+        baz="stuff"
+        other='single quote'
+      }}`;
+
+    let ast = parse(template);
+    ast.body[0].path = builders.path('baz-derp');
+
+    assert.equal(
+      print(ast),
+      stripIndent`
+        {{baz-derp
+          baz="stuff"
           other='single quote'
         }}`
     );

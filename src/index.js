@@ -3,13 +3,19 @@ const { preprocess, print: _print } = require('@glimmer/syntax');
 const reLines = /(.*?(?:\r\n?|\n|$))/gm;
 
 const PARSE_RESULT = Symbol('PARSE_RESULT');
-function wrapNode(node, parseResult) {
+const NEAREST_NODE_WITH_LOC = Symbol('NEAREST_NODE_WITH_LOC');
+const CLONED_NEAREST_NODE_WITH_LOC = Symbol('CLONED_NEAREST_NODE_WITH_LOC');
+function wrapNode(node, nearestNodeWithLoc, parseResult) {
   let propertyProxyMap = new Map();
-  let original = JSON.parse(JSON.stringify(node));
+  let clonedNearestNodeWithLoc = JSON.parse(JSON.stringify(nearestNodeWithLoc));
 
   let proxy = new Proxy(node, {
     get(target, property) {
-      if (property === PARSE_RESULT) {
+      if (property === NEAREST_NODE_WITH_LOC) {
+        return nearestNodeWithLoc;
+      } else if (property === CLONED_NEAREST_NODE_WITH_LOC) {
+        return clonedNearestNodeWithLoc;
+      } else if (property === PARSE_RESULT) {
         return parseResult;
       }
 
@@ -17,25 +23,43 @@ function wrapNode(node, parseResult) {
         return propertyProxyMap.get(property);
       }
 
-      let value = Reflect.get(node, property);
-      if (typeof value === 'object') {
-        let propertyProxy = wrapNode(value, parseResult);
-        propertyProxyMap.set(property, propertyProxy);
-        return propertyProxy;
-      }
-
-      return value;
+      return Reflect.get(target, property);
     },
 
     set(target, property, value) {
+      let original = clonedNearestNodeWithLoc;
+      let updated = nearestNodeWithLoc;
+
+      if (propertyProxyMap.has(property)) {
+        let propertyProxy = propertyProxyMap.get(property);
+        original = propertyProxy[CLONED_NEAREST_NODE_WITH_LOC];
+        updated = propertyProxy[NEAREST_NODE_WITH_LOC];
+
+        if (updated === Reflect.get(target, property)) {
+          updated = value;
+        }
+      }
+
       Reflect.set(target, property, value);
 
       parseResult.modifications.push({
         original,
-        updated: JSON.parse(JSON.stringify(target)),
+        updated,
       });
     },
   });
+
+  for (let key in node) {
+    let value = node[key];
+    if (typeof value === 'object' && value !== null) {
+      let propertyProxy = wrapNode(
+        value,
+        value.loc ? value : node.loc ? node : nearestNodeWithLoc,
+        parseResult
+      );
+      propertyProxyMap.set(key, propertyProxy);
+    }
+  }
 
   return proxy;
 }
@@ -46,7 +70,7 @@ class ParseResult {
     this.modifications = [];
 
     let ast = preprocess(template);
-    this.ast = wrapNode(ast, this);
+    this.ast = wrapNode(ast, ast, this);
   }
 
   applyModifications() {
