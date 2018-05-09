@@ -16,6 +16,7 @@ QUnit.module('ember-template-recast', function() {
     let template = stripIndent`
       {{foo-bar
         baz="stuff"
+        other='single quote'
       }}`;
     let ast = parse(template);
     ast.body[0].hash.pairs[0].key = 'derp';
@@ -25,6 +26,7 @@ QUnit.module('ember-template-recast', function() {
       stripIndent`
         {{foo-bar
           derp="stuff"
+          other='single quote'
         }}`
     );
   });
