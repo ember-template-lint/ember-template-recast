@@ -1,34 +1,88 @@
-const { preprocess } = require('@glimmer/syntax');
+const { preprocess, print: _print } = require('@glimmer/syntax');
 
 const reLines = /(.*?(?:\r\n?|\n|$))/gm;
 
-const PARSE_RESULT_TO_AST_NODE = new WeakMap();
+const PARSE_RESULT = Symbol('PARSE_RESULT');
+function wrapNode(node, parseResult) {
+  let propertyProxyMap = new Map();
+  let original = JSON.parse(JSON.stringify(node));
+
+  let proxy = new Proxy(node, {
+    get(target, property) {
+      if (property === PARSE_RESULT) {
+        return parseResult;
+      }
+
+      if (propertyProxyMap.has(property)) {
+        return propertyProxyMap.get(property);
+      }
+
+      let value = Reflect.get(node, property);
+      if (typeof value === 'object') {
+        let propertyProxy = wrapNode(value, parseResult);
+        propertyProxyMap.set(property, propertyProxy);
+        return propertyProxy;
+      }
+
+      return value;
+    },
+
+    set(target, property, value) {
+      Reflect.set(target, property, value);
+
+      parseResult.modifications.push({
+        original,
+        updated: JSON.parse(JSON.stringify(target)),
+      });
+    },
+  });
+
+  return proxy;
+}
+
 class ParseResult {
   constructor(template) {
-    let parseResultContext = this;
     this.source = template.match(reLines);
+    this.modifications = [];
 
-    this.ast = preprocess(template, {
-      plugins: {
-        ast: [
-          () => {
-            return {
-              name: 'associate-with-result',
-              visitor: {
-                All(node) {
-                  PARSE_RESULT_TO_AST_NODE.set(node, parseResultContext);
-                },
-              },
-            };
-          },
-        ],
-      },
+    let ast = preprocess(template);
+    this.ast = wrapNode(ast, this);
+  }
+
+  applyModifications() {
+    let { modifications } = this;
+    this.modifications = Object.freeze([]);
+
+    let sortedModifications = modifications
+      .sort(function(a, b) {
+        return (
+          a.original.loc.line - b.original.loc.line || a.original.loc.column - b.original.loc.column
+        );
+      })
+      .reverse();
+
+    sortedModifications.forEach(mod => {
+      let loc = mod.original.loc;
+      let printed = _print(mod.updated);
+
+      if (loc.start.line === loc.end.line) {
+        let lineToUpdate = loc.start.line - 1;
+        let lineContents = this.source[lineToUpdate];
+        let updateContents =
+          lineContents.slice(0, loc.start.column) + printed + lineContents.slice(loc.end.column);
+
+        this.source[lineToUpdate] = updateContents;
+      } else {
+        throw new Error('not implemented multi-line replacements');
+      }
     });
   }
 
   // mostly copy/pasta from tildeio/htmlbars with a few tweaks:
   // https://github.com/tildeio/htmlbars/blob/v0.4.17/packages/htmlbars-syntax/lib/parser.js#L59-L90
   print(node) {
+    this.applyModifications();
+
     if (!node.loc) {
       return;
     }
@@ -67,7 +121,7 @@ function parse(template) {
 }
 
 function print(ast) {
-  let parseResult = PARSE_RESULT_TO_AST_NODE.get(ast);
+  let parseResult = ast[PARSE_RESULT];
   return parseResult.print(ast);
 }
 
