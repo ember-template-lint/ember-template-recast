@@ -1,4 +1,4 @@
-const { preprocess, print: _print, builders } = require('@glimmer/syntax');
+const { preprocess, print: _print } = require('@glimmer/syntax');
 
 const reLines = /(.*?(?:\r\n?|\n|$))/gm;
 
