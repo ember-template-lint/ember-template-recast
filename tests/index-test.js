@@ -75,4 +75,24 @@ QUnit.module('ember-template-recast', function() {
         {{/baz-derp}}`
     );
   });
+
+  QUnit.test('rename inline helper', function(assert) {
+    let template = stripIndent`
+      {{foo-bar
+        baz=(stuff
+          goes='here')
+      }}`;
+
+    let ast = parse(template);
+    ast.body[0].hash.pairs[0].value.path = builders.path('zomg');
+
+    assert.equal(
+      print(ast),
+      stripIndent`
+        {{foo-bar
+          baz=(zomg
+            goes='here')
+        }}`
+    );
+  });
 });
