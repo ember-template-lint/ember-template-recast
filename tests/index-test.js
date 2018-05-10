@@ -76,6 +76,22 @@ QUnit.module('ember-template-recast', function() {
     );
   });
 
+  QUnit.test('rename element tagname', function(assert) {
+    let template = stripIndent`
+      <div data-foo='single quoted'>
+        </div>`;
+
+    let ast = parse(template);
+    ast.body[0].tag = 'a';
+
+    assert.equal(
+      print(ast),
+      stripIndent`
+        <a data-foo='single quoted'>
+          </a>`
+    );
+  });
+
   QUnit.test('rename inline helper', function(assert) {
     let template = stripIndent`
       {{foo-bar

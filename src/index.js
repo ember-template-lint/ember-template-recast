@@ -1,4 +1,4 @@
-const { preprocess, print: _print } = require('@glimmer/syntax');
+const { preprocess, print: _print, builders } = require('@glimmer/syntax');
 
 const reLines = /(.*?(?:\r\n?|\n|$))/gm;
 
@@ -43,11 +43,39 @@ function wrapNode(node, parentNode, nearestNodeWithLoc, parseResult) {
 
       Reflect.set(target, property, value);
 
-      parseResult.modifications.push({
-        start: original.loc.start,
-        end: original.loc.end,
-        value: updatedValue,
-      });
+      if (node.type === 'ElementNode' && property === 'tag') {
+        updatedValue = value;
+        parseResult.modifications.push({
+          start: {
+            line: original.loc.start.line,
+            column: original.loc.start.column + 1,
+          },
+          end: {
+            line: original.loc.start.line,
+            column: original.loc.start.column + 1 + original.tag.length,
+          },
+          value: updatedValue,
+        });
+
+        let start = {
+          line: node.loc.end.line,
+          column: node.loc.end.column - 1 - original.tag.length,
+        };
+        parseResult.modifications.push({
+          start,
+          end: {
+            line: node.loc.end.line,
+            column: node.loc.end.column - 1,
+          },
+          value: updatedValue,
+        });
+      } else {
+        parseResult.modifications.push({
+          start: original.loc.start,
+          end: original.loc.end,
+          value: updatedValue,
+        });
+      }
 
       if (property === 'path' && node.type === 'BlockStatement') {
         let start = {
@@ -102,7 +130,7 @@ class ParseResult {
       .reverse();
 
     sortedModifications.forEach(({ start, end, value }) => {
-      let printed = _print(value);
+      let printed = typeof value === 'string' ? value : _print(value);
 
       if (start.line === end.line) {
         let lineToUpdate = start.line - 1;
