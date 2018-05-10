@@ -5,7 +5,8 @@ const reLines = /(.*?(?:\r\n?|\n|$))/gm;
 const PARSE_RESULT = Symbol('PARSE_RESULT');
 const NEAREST_NODE_WITH_LOC = Symbol('NEAREST_NODE_WITH_LOC');
 const CLONED_NEAREST_NODE_WITH_LOC = Symbol('CLONED_NEAREST_NODE_WITH_LOC');
-function wrapNode(node, nearestNodeWithLoc, parseResult) {
+
+function wrapNode(node, parentNode, nearestNodeWithLoc, parseResult) {
   let propertyProxyMap = new Map();
   let clonedNearestNodeWithLoc = JSON.parse(JSON.stringify(nearestNodeWithLoc));
 
@@ -47,6 +48,21 @@ function wrapNode(node, nearestNodeWithLoc, parseResult) {
         end: original.loc.end,
         value: updatedValue,
       });
+
+      if (property === 'path' && node.type === 'BlockStatement') {
+        let start = {
+          line: node.loc.end.line,
+          column: node.loc.end.column - 1 - node.path.original.length,
+        };
+        parseResult.modifications.push({
+          start,
+          end: {
+            line: node.loc.end.line,
+            column: node.loc.end.column - 2,
+          },
+          value: updatedValue,
+        });
+      }
     },
   });
 
@@ -55,6 +71,7 @@ function wrapNode(node, nearestNodeWithLoc, parseResult) {
     if (typeof value === 'object' && value !== null) {
       let propertyProxy = wrapNode(
         value,
+        node,
         value.loc ? value : node.loc ? node : nearestNodeWithLoc,
         parseResult
       );
@@ -71,7 +88,7 @@ class ParseResult {
     this.modifications = [];
 
     let ast = preprocess(template);
-    this.ast = wrapNode(ast, ast, this);
+    this.ast = wrapNode(ast, null, ast, this);
   }
 
   applyModifications() {
@@ -100,41 +117,10 @@ class ParseResult {
     });
   }
 
-  // mostly copy/pasta from tildeio/htmlbars with a few tweaks:
-  // https://github.com/tildeio/htmlbars/blob/v0.4.17/packages/htmlbars-syntax/lib/parser.js#L59-L90
-  print(node) {
+  print() {
     this.applyModifications();
 
-    if (!node.loc) {
-      return;
-    }
-
-    let firstLine = node.loc.start.line - 1;
-    let lastLine = node.loc.end.line - 1;
-    let currentLine = firstLine - 1;
-    let firstColumn = node.loc.start.column;
-    let lastColumn = node.loc.end.column;
-    let string = [];
-    let line;
-
-    while (currentLine < lastLine) {
-      currentLine++;
-      line = this.source[currentLine];
-
-      if (currentLine === firstLine) {
-        if (firstLine === lastLine) {
-          string.push(line.slice(firstColumn, lastColumn));
-        } else {
-          string.push(line.slice(firstColumn));
-        }
-      } else if (currentLine === lastLine) {
-        string.push(line.slice(0, lastColumn));
-      } else {
-        string.push(line);
-      }
-    }
-
-    return string.join('');
+    return this.source.join('');
   }
 }
 
@@ -144,7 +130,7 @@ function parse(template) {
 
 function print(ast) {
   let parseResult = ast[PARSE_RESULT];
-  return parseResult.print(ast);
+  return parseResult.print();
 }
 
 module.exports = {
