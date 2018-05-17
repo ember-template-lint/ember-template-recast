@@ -10,7 +10,8 @@
   },
   "scripts": {
     "lint:js": "eslint .",
-    "test": "qunit tests/**/*-test.js"
+    "test": "qunit tests/**/*-test.js",
+    "changelog": "lerna-changelog"
   },
   "files": [
     "src/"
@@ -21,11 +22,22 @@
     "eslint-config-prettier": "^2.9.0",
     "eslint-plugin-node": "^6.0.1",
     "eslint-plugin-prettier": "^2.6.0",
+    "lerna-changelog": "^0.7.0",
     "prettier": "^1.12.1",
     "qunit": "^2.6.0"
   },
   "dependencies": {
     "@glimmer/compiler": "^0.34.2",
     "@glimmer/syntax": "^0.34.2"
+  },
+  "changelog": {
+    "repo": "ember-template-lint/ember-template-recast",
+    "labels": {
+      "breaking": ":boom: Breaking Change",
+      "enhancement": ":rocket: Enhancement",
+      "bug": ":bug: Bug Fix",
+      "documentation": ":memo: Documentation",
+      "internal": ":house: Internal"
+    }
   }
 }
