@@ -139,16 +139,22 @@ class ParseResult {
 
     sortedModifications.forEach(({ start, end, value }) => {
       let printed = typeof value === 'string' ? value : _print(value);
-
+      let lineToUpdate = start.line - 1;
       if (start.line === end.line) {
-        let lineToUpdate = start.line - 1;
         let lineContents = this.source[lineToUpdate];
         let updateContents =
           lineContents.slice(0, start.column) + printed + lineContents.slice(end.column);
 
         this.source[lineToUpdate] = updateContents;
       } else {
-        throw new Error('not implemented multi-line replacements');
+        let newLines = printed.match(reLines).filter(line => line !== '');
+        let newSize = newLines.length;
+        let oldSize = end.line - start.line + 1;
+
+        if (newSize < oldSize) {
+          this.source.splice(lineToUpdate, newSize, newLines);
+          this.source.splice(lineToUpdate + newSize, oldSize);
+        }
       }
     });
   }

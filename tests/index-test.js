@@ -204,3 +204,103 @@ QUnit.module('transform', () => {
     assert.equal(code, '{{wat-wat}}');
   });
 });
+
+QUnit.module('multi-line', function(hooks) {
+  let i = 0;
+  hooks.beforeEach(() => (i = 0));
+  function funkyIf(b) {
+    return b.block(
+      'if',
+      [b.sexpr(b.path('a'))],
+      null,
+      b.program([b.text('\n'), b.text('  '), b.mustache(`${i++}`), b.text('\n'), b.text('\n')])
+    );
+  }
+
+  QUnit.test('supports multi-line replacements', function(assert) {
+    let template = stripIndent`
+      {{bar}}
+
+      {{foo}}`;
+    let { code } = transform(template, function(env) {
+      let { builders: b } = env.syntax;
+      return {
+        MustacheStatement(node) {
+          if (node.loc.source === '(synthetic)') return node;
+          return funkyIf(b);
+        },
+      };
+    });
+
+    assert.equal(
+      code,
+      stripIndent`
+      {{#if (a)}}
+        {{0}}
+
+      {{/if}}
+
+      {{#if (a)}}
+        {{1}}
+
+      {{/if}}
+    `
+    );
+  });
+
+  QUnit.test('collapsing lines', function(assert) {
+    let template = `
+    here
+    is
+    some
+    multiline
+    string
+    `;
+    let { code } = transform(template, env => {
+      let { builders: b } = env.syntax;
+
+      return {
+        TextNode() {
+          return b.text(`here is a single line string`);
+        },
+      };
+    });
+
+    assert.equal(code, 'here is a single line string');
+  });
+
+  QUnit.test('supports multi-line replacements with interleaving', function(assert) {
+    let template = stripIndent`
+      <br>
+      {{bar}}
+      <div></div>
+      {{foo}}
+      <hr>`;
+    let { code } = transform(template, function(env) {
+      let { builders: b } = env.syntax;
+      return {
+        MustacheStatement(node) {
+          if (node.loc.source === '(synthetic)') return node;
+          return funkyIf(b);
+        },
+      };
+    });
+
+    assert.equal(
+      code,
+      stripIndent`
+      <br>
+      {{#if (a)}}
+        {{0}}
+
+      {{/if}}
+      <div></div>
+      {{#if (a)}}
+        {{1}}
+
+      {{/if}}
+      <hr>
+    `
+    );
+  });
+});
