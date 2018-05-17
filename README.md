@@ -43,6 +43,37 @@ templateRecast.print(ast);
 
 Used to easily traverse (and possibly mutate) a given template. Returns the
 resulting AST and the printed template.
+
+The plugin argument has roughly the following interface:
+
+```ts
+export interface ASTPluginBuilder {
+  (env: ASTPluginEnvironment): ASTPlugin;
+}
+
+export interface ASTPluginEnvironment {
+  meta?: any;
+  syntax: Syntax;
+}
+
+export interface ASTPlugin {
+  name: string;
+  visitor: NodeVisitor;
+}
+
+export interface Syntax {
+  parse: typeof preprocess;
+  builders: typeof builders;
+  print: typeof print;
+  traverse: typeof traverse;
+  Walker: typeof Walker;
+}
+```
+
+The list of known builders on the `env.syntax.builders` are [found
+here](https://github.com/glimmerjs/glimmer-vm/blob/master/packages/@glimmer/syntax/lib/builders.ts#L308-L337)
+
+Example:
 ```js
 const templateRecast = require('ember-template-recast');
 const template = `
