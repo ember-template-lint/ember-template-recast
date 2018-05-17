@@ -248,7 +248,7 @@ QUnit.module('multi-line', function(hooks) {
     );
   });
 
-  QUnit.test('collapsing lines', function(assert) {
+  QUnit.test('collapsing lines (full line replacment)', function(assert) {
     let template = `
     here
     is
@@ -267,6 +267,71 @@ QUnit.module('multi-line', function(hooks) {
     });
 
     assert.equal(code, 'here is a single line string');
+  });
+
+  QUnit.test('collapsing lines when start line has non-replaced content', function(assert) {
+    let template = `
+    <div data-foo="bar"></div>here
+    is
+    some
+    multiline
+    string
+    `;
+    let { code } = transform(template, env => {
+      let { builders: b } = env.syntax;
+
+      return {
+        TextNode() {
+          return b.text(`here is a single line string`);
+        },
+      };
+    });
+
+    assert.equal(code, '<div data-foo="bar"></div>here is a single line string');
+  });
+
+  QUnit.test('collapsing lines when end line has non-replaced content', function(assert) {
+    let template = `
+    <div data-foo="bar"></div>here
+    is
+    some
+    multiline
+    string<div data-foo="bar"></div>
+    `;
+    let { code } = transform(template, env => {
+      let { builders: b } = env.syntax;
+
+      return {
+        TextNode() {
+          return b.text(`here is a single line string<div data-foo="bar"></div>`);
+        },
+      };
+    });
+
+    assert.equal(code, '<div data-foo="bar"></div>here is a single line string');
+  });
+
+  QUnit.test('collapsing lines when start and end lines have non-replaced content', function(
+    assert
+  ) {
+    let template = `
+    {{foo}}here
+    is
+    some
+    multiline
+    string{{bar}}
+    `;
+    let { code } = transform(template, env => {
+      let { builders: b } = env.syntax;
+
+      return {
+        TextNode() {
+          return b.text(`{{foo}}here is a single line string{{bar}}`);
+        },
+      };
+    });
+
+    assert.equal(code, '<div data-foo="bar"></div>here is a single line string');
   });
 
   QUnit.test('supports multi-line replacements with interleaving', function(assert) {
