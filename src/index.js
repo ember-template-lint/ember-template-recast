@@ -174,7 +174,7 @@ function transform(template, plugin) {
   if (typeof template === 'string') {
     ast = parse(template);
   } else {
-    // assumer we were passed an ast
+    // assume we were passed an ast
     ast = template;
   }
   let syntax = {
