@@ -1,4 +1,4 @@
-const { parse, print } = require('..');
+const { parse, print, transform } = require('..');
 const { builders } = require('@glimmer/syntax');
 const { stripIndent } = require('common-tags');
 
@@ -110,5 +110,97 @@ QUnit.module('ember-template-recast', function() {
             goes='here')
         }}`
     );
+  });
+});
+
+QUnit.module('transform', () => {
+  QUnit.test('basic traversal', function(assert) {
+    let template = '{{foo-bar bar=foo}}';
+    let paths = [];
+    transform(template, function() {
+      return {
+        PathExpression(node) {
+          paths.push(node.original);
+        },
+      };
+    });
+
+    assert.deepEqual(paths, ['foo-bar', 'foo']);
+  });
+
+  QUnit.test('can accept an AST', function(assert) {
+    let template = '{{foo-bar bar=foo}}';
+    let paths = [];
+    let ast = parse(template);
+    transform(ast, function() {
+      return {
+        PathExpression(node) {
+          paths.push(node.original);
+        },
+      };
+    });
+
+    assert.deepEqual(paths, ['foo-bar', 'foo']);
+  });
+
+  QUnit.test('returns code and ast', function(assert) {
+    let template = '{{foo-bar}}';
+    let paths = [];
+    let { ast, code } = transform(template, function() {
+      return {
+        PathExpression(node) {
+          paths.push(node.original);
+        },
+      };
+    });
+
+    assert.ok(ast);
+    assert.ok(code);
+  });
+
+  QUnit.test('mutations', function(assert) {
+    let template = '{{foo-bar bar=foo}}';
+    let { code } = transform(template, () => {
+      return {
+        PathExpression(node) {
+          if (node.original === 'foo') {
+            node.original = 'bar';
+          }
+          return node;
+        },
+      };
+    });
+
+    assert.equal(code, '{{foo-bar bar=bar}}');
+  });
+
+  QUnit.test('mutations retain formatting', function(assert) {
+    let template = '{{foo-bar   bar= foo}}';
+    let { code } = transform(template, () => {
+      return {
+        PathExpression(node) {
+          if (node.original === 'foo') {
+            node.original = 'bar';
+          }
+          return node;
+        },
+      };
+    });
+
+    assert.equal(code, '{{foo-bar   bar= bar}}');
+  });
+
+  QUnit.test('replacement', function(assert) {
+    let template = '{{foo-bar bar=foo}}';
+    let { code } = transform(template, env => {
+      let { builders: b } = env.syntax;
+      return {
+        MustacheStatement() {
+          return b.mustache(b.path('wat-wat'));
+        },
+      };
+    });
+
+    assert.equal(code, '{{wat-wat}}');
   });
 });

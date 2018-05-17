@@ -1,4 +1,10 @@
-const { preprocess, print: _print } = require('@glimmer/syntax');
+const {
+  preprocess,
+  print: _print,
+  traverse: _traverse,
+  builders,
+  Walker,
+} = require('@glimmer/syntax');
 
 const reLines = /(.*?(?:\r\n?|\n|$))/gm;
 
@@ -91,6 +97,8 @@ function wrapNode(node, parentNode, nearestNodeWithLoc, parseResult) {
           value: updatedValue,
         });
       }
+
+      return true;
     },
   });
 
@@ -161,7 +169,29 @@ function print(ast) {
   return parseResult.print();
 }
 
+function transform(template, plugin) {
+  let ast;
+  if (typeof template === 'string') {
+    ast = parse(template);
+  } else {
+    // assumer we were passed an ast
+    ast = template;
+  }
+  let syntax = {
+    parse,
+    builders,
+    print,
+    traverse: _traverse,
+    Walker,
+  };
+  let env = { syntax };
+  let visitor = plugin(env);
+  _traverse(ast, visitor);
+  return { ast, code: print(ast) };
+}
+
 module.exports = {
   parse,
   print,
+  transform,
 };
