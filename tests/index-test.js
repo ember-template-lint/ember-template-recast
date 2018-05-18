@@ -261,12 +261,12 @@ QUnit.module('multi-line', function(hooks) {
 
       return {
         TextNode() {
-          return b.text(`here is a single line string`);
+          return b.text(`x`);
         },
       };
     });
 
-    assert.equal(code, 'here is a single line string');
+    assert.equal(code, 'x');
   });
 
   QUnit.test('collapsing lines when start line has non-replaced content', function(assert) {
@@ -282,12 +282,36 @@ QUnit.module('multi-line', function(hooks) {
 
       return {
         TextNode() {
-          return b.text(`here is a single line string`);
+          return b.text(`x`);
         },
       };
     });
 
-    assert.equal(code, '<div data-foo="bar"></div>here is a single line string');
+    assert.equal(code, 'x<div data-foo=x></div>x');
+  });
+
+  QUnit.test('Can handle multi-line column expansion', function(assert) {
+    let template = `
+    <div data-foo="bar"></div>here
+    is
+    some
+    multiline
+    string
+    `;
+    let { code } = transform(template, env => {
+      let { builders: b } = env.syntax;
+
+      return {
+        TextNode() {
+          return b.text(`${Array(10).join('x')}`);
+        },
+      };
+    });
+
+    assert.equal(
+      code,
+      `${Array(10).join('x')}<div data-foo=${Array(10).join('x')}></div>${Array(10).join('x')}`
+    );
   });
 
   QUnit.test('collapsing lines when end line has non-replaced content', function(assert) {
@@ -296,19 +320,18 @@ QUnit.module('multi-line', function(hooks) {
     is
     some
     multiline
-    string<div data-foo="bar"></div>
-    `;
+    string<div data-bar="bar"></div>`;
     let { code } = transform(template, env => {
       let { builders: b } = env.syntax;
 
       return {
         TextNode() {
-          return b.text(`here is a single line string<div data-foo="bar"></div>`);
+          return b.text(`x`);
         },
       };
     });
 
-    assert.equal(code, '<div data-foo="bar"></div>here is a single line string');
+    assert.equal(code, 'x<div data-foo=x></div>x<div data-bar=x></div>');
   });
 
   QUnit.test('collapsing lines when start and end lines have non-replaced content', function(
@@ -326,12 +349,12 @@ QUnit.module('multi-line', function(hooks) {
 
       return {
         TextNode() {
-          return b.text(`{{foo}}here is a single line string{{bar}}`);
+          return b.text(`x`);
         },
       };
     });
 
-    assert.equal(code, '<div data-foo="bar"></div>here is a single line string');
+    assert.equal(code, 'x{{foo}}x{{bar}}x');
   });
 
   QUnit.test('supports multi-line replacements with interleaving', function(assert) {

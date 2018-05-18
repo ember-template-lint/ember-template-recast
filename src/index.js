@@ -49,6 +49,8 @@ function wrapNode(node, parentNode, nearestNodeWithLoc, parseResult) {
 
       Reflect.set(target, property, value);
 
+      if (Array.isArray(target) && property === 'length') return true;
+
       if (node.type === 'ElementNode' && property === 'tag') {
         updatedValue = value;
         parseResult.modifications.push({
@@ -120,7 +122,7 @@ function wrapNode(node, parentNode, nearestNodeWithLoc, parseResult) {
 
 class ParseResult {
   constructor(template) {
-    this.source = template.match(reLines);
+    this.source = template.match(reLines).filter(l => l !== '');
     this.modifications = [];
 
     let ast = preprocess(template);
@@ -140,20 +142,44 @@ class ParseResult {
     sortedModifications.forEach(({ start, end, value }) => {
       let printed = typeof value === 'string' ? value : _print(value);
       let lineToUpdate = start.line - 1;
+      let lineContents = this.source[lineToUpdate];
+
       if (start.line === end.line) {
-        let lineContents = this.source[lineToUpdate];
         let updateContents =
           lineContents.slice(0, start.column) + printed + lineContents.slice(end.column);
-
         this.source[lineToUpdate] = updateContents;
       } else {
-        let newLines = printed.match(reLines).filter(line => line !== '');
-        let newSize = newLines.length;
-        let oldSize = end.line - start.line + 1;
+        let col = end.column;
+        let charsLeft = printed.length;
+        let parts = this.source[end.line - 1].split('');
 
-        if (newSize < oldSize) {
-          this.source.splice(lineToUpdate, newSize, newLines);
-          this.source.splice(lineToUpdate + newSize, oldSize);
+        // Fill the tail of the modification
+        while (col !== 0) {
+          parts[col - 1] = printed[charsLeft - 1];
+          charsLeft--;
+          col--;
+        }
+        this.source[end.line - 1] = parts.filter(Boolean).join('');
+
+        // Consumne the head of the line
+        this.source[start.line - 1] = lineContents.slice(0, start.column);
+
+        // If new lines added, prepend them
+        if (start.line === 1 && charsLeft > 0) {
+          this.source.unshift(printed.slice(0, charsLeft));
+          charsLeft = 0;
+        }
+
+        // Interleave
+        let startLine = start.line + 1;
+        while (startLine !== end.line) {
+          if (charsLeft > 0) {
+            this.source[startLine - 1] = printed.slice(charsLeft - 1, charsLeft.length);
+            charsLeft = 0;
+          } else {
+            this.source[startLine - 1] = '';
+          }
+          startLine++;
         }
       }
     });
