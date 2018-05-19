@@ -2,39 +2,39 @@
 # yarn lockfile v1
 
 
-"@glimmer/compiler@^0.34.2":
-  version "0.34.2"
-  resolved "https://registry.yarnpkg.com/@glimmer/compiler/-/compiler-0.34.2.tgz#3adddb7f9e380260532fbf7e5be8ce6713f29330"
+"@glimmer/compiler@^0.34.3":
+  version "0.34.3"
+  resolved "https://registry.yarnpkg.com/@glimmer/compiler/-/compiler-0.34.3.tgz#4fcfb1e22566336ae4b43aa32394b44335f83724"
   dependencies:
-    "@glimmer/interfaces" "^0.34.2"
-    "@glimmer/syntax" "^0.34.2"
-    "@glimmer/util" "^0.34.2"
-    "@glimmer/wire-format" "^0.34.2"
+    "@glimmer/interfaces" "^0.34.3"
+    "@glimmer/syntax" "^0.34.3"
+    "@glimmer/util" "^0.34.3"
+    "@glimmer/wire-format" "^0.34.3"
 
-"@glimmer/interfaces@^0.34.2":
-  version "0.34.2"
-  resolved "https://registry.yarnpkg.com/@glimmer/interfaces/-/interfaces-0.34.2.tgz#f988e7699469e56dbebed0228b7999bdaf86a3a3"
+"@glimmer/interfaces@^0.34.3":
+  version "0.34.3"
+  resolved "https://registry.yarnpkg.com/@glimmer/interfaces/-/interfaces-0.34.3.tgz#d95b19f18523379f6efac24f1ae77af3a83d8fc3"
   dependencies:
-    "@glimmer/wire-format" "^0.34.2"
+    "@glimmer/wire-format" "^0.34.3"
 
-"@glimmer/syntax@^0.34.2":
-  version "0.34.2"
-  resolved "https://registry.yarnpkg.com/@glimmer/syntax/-/syntax-0.34.2.tgz#ebb129f317c5ac94d2a371d041764dddffcef929"
+"@glimmer/syntax@^0.34.3":
+  version "0.34.3"
+  resolved "https://registry.yarnpkg.com/@glimmer/syntax/-/syntax-0.34.3.tgz#6071c1ae506c11f0adc13192df552c650d22dc15"
   dependencies:
-    "@glimmer/interfaces" "^0.34.2"
-    "@glimmer/util" "^0.34.2"
+    "@glimmer/interfaces" "^0.34.3"
+    "@glimmer/util" "^0.34.3"
     handlebars "^4.0.6"
     simple-html-tokenizer "^0.5.1"
 
-"@glimmer/util@^0.34.2":
-  version "0.34.2"
-  resolved "https://registry.yarnpkg.com/@glimmer/util/-/util-0.34.2.tgz#16b8573bffc4177e229be764c166cbad3d9665cd"
+"@glimmer/util@^0.34.3":
+  version "0.34.3"
+  resolved "https://registry.yarnpkg.com/@glimmer/util/-/util-0.34.3.tgz#4754f2b821daea1af3d01b6c4bb0a2c03f766aaa"
 
-"@glimmer/wire-format@^0.34.2":
-  version "0.34.2"
-  resolved "https://registry.yarnpkg.com/@glimmer/wire-format/-/wire-format-0.34.2.tgz#7a11042746f291fb8040d13aa6ee86d45b397bf4"
+"@glimmer/wire-format@^0.34.3":
+  version "0.34.3"
+  resolved "https://registry.yarnpkg.com/@glimmer/wire-format/-/wire-format-0.34.3.tgz#be01956ffb0cfe007c73d6c403041e4e3f6c68b8"
   dependencies:
-    "@glimmer/util" "^0.34.2"
+    "@glimmer/util" "^0.34.3"
 
 abbrev@1:
   version "1.1.1"

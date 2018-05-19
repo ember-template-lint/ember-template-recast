@@ -27,8 +27,8 @@
     "qunit": "^2.6.0"
   },
   "dependencies": {
-    "@glimmer/compiler": "^0.34.2",
-    "@glimmer/syntax": "^0.34.2"
+    "@glimmer/compiler": "^0.34.3",
+    "@glimmer/syntax": "^0.34.3"
   },
   "changelog": {
     "repo": "ember-template-lint/ember-template-recast",
