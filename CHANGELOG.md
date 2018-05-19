@@ -1,5 +1,13 @@
 # Change Log
 
+## v1.1.2 (2018-05-19)
+
+#### :bug: Bug Fix
+* [#4](https://github.com/ember-template-lint/ember-template-recast/pull/4) Update @glimmer/syntax. ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 1
+- Robert Jackson ([rwjblue](https://github.com/rwjblue))
+
 ## v1.1.1 (2018-05-19)
 
 #### :rocket: Enhancement
