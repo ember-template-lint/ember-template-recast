@@ -13,6 +13,19 @@ QUnit.module('ember-template-recast', function() {
     assert.equal(print(ast), template);
   });
 
+  QUnit.test('basic parse + print (no modification) preserves blank lines', function(assert) {
+    let template = stripIndent`
+      {{foo-bar
+        baz="stuff"
+      }}
+
+
+`;
+    let ast = parse(template);
+
+    assert.equal(print(ast), template);
+  });
+
   QUnit.test('basic parse -> mutation -> print', function(assert) {
     let template = stripIndent`
       {{foo-bar

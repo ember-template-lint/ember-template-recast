@@ -12,6 +12,14 @@ const PARSE_RESULT = Symbol('PARSE_RESULT');
 const NEAREST_NODE_WITH_LOC = Symbol('NEAREST_NODE_WITH_LOC');
 const CLONED_NEAREST_NODE_WITH_LOC = Symbol('CLONED_NEAREST_NODE_WITH_LOC');
 
+function linesFrom(string) {
+  // split the strip up by \n or \r\n
+  let lines = string.match(reLines);
+
+  // the split above always results in an extra empty line at the end remove it
+  return lines.slice(0, -1);
+}
+
 function wrapNode(node, parentNode, nearestNodeWithLoc, parseResult) {
   let propertyProxyMap = new Map();
   let clonedNearestNodeWithLoc = JSON.parse(JSON.stringify(nearestNodeWithLoc));
@@ -122,7 +130,7 @@ function wrapNode(node, parentNode, nearestNodeWithLoc, parseResult) {
 
 class ParseResult {
   constructor(template) {
-    this.source = template.match(reLines).filter(l => l !== '');
+    this.source = linesFrom(template);
     this.modifications = [];
 
     let ast = preprocess(template);
