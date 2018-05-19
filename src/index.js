@@ -149,47 +149,33 @@ class ParseResult {
 
     sortedModifications.forEach(({ start, end, value }) => {
       let printed = typeof value === 'string' ? value : _print(value);
-      let lineToUpdate = start.line - 1;
-      let lineContents = this.source[lineToUpdate];
+      let firstIndexToUpdate = start.line - 1;
+      let lastIndexToUpdate = end.line - 1;
+      let firstLineContents = this.source[firstIndexToUpdate];
+      let lastLineContents = this.source[lastIndexToUpdate];
+      let replacementLines = linesFrom(printed);
 
-      if (start.line === end.line) {
-        let updateContents =
-          lineContents.slice(0, start.column) + printed + lineContents.slice(end.column);
-        this.source[lineToUpdate] = updateContents;
-      } else {
-        let col = end.column;
-        let charsLeft = printed.length;
-        let parts = this.source[end.line - 1].split('');
+      let mergedReplacementLines = replacementLines.map((line, index) => {
+        let isFirstLine = index === 0;
+        let isLastLine = index === replacementLines.length - 1;
+        let updatedLine = line;
 
-        // Fill the tail of the modification
-        while (col !== 0) {
-          parts[col - 1] = printed[charsLeft - 1];
-          charsLeft--;
-          col--;
-        }
-        this.source[end.line - 1] = parts.filter(Boolean).join('');
-
-        // Consumne the head of the line
-        this.source[start.line - 1] = lineContents.slice(0, start.column);
-
-        // If new lines added, prepend them
-        if (start.line === 1 && charsLeft > 0) {
-          this.source.unshift(printed.slice(0, charsLeft));
-          charsLeft = 0;
+        if (isFirstLine) {
+          updatedLine = firstLineContents.slice(0, start.column) + line;
         }
 
-        // Interleave
-        let startLine = start.line + 1;
-        while (startLine !== end.line) {
-          if (charsLeft > 0) {
-            this.source[startLine - 1] = printed.slice(charsLeft - 1, charsLeft.length);
-            charsLeft = 0;
-          } else {
-            this.source[startLine - 1] = '';
-          }
-          startLine++;
+        if (isLastLine) {
+          updatedLine += lastLineContents.slice(end.column);
         }
-      }
+
+        return updatedLine;
+      });
+
+      this.source.splice(
+        firstIndexToUpdate,
+        1 /* always replace at least one line */ + lastIndexToUpdate - firstIndexToUpdate,
+        ...mergedReplacementLines
+      );
     });
   }
 
