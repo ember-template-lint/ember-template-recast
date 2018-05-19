@@ -168,7 +168,9 @@ QUnit.module('ember-template-recast', function() {
     assert.equal(code, 'hello world\n{{other-stuff}}');
   });
 
-  QUnit.todo('MustacheStatements retain whitespace when multiline replacements occur', function(assert) {
+  QUnit.todo('MustacheStatements retain whitespace when multiline replacements occur', function(
+    assert
+  ) {
     let template = stripIndent`
     <p></p>
     {{ other-stuff }}
