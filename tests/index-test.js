@@ -13,6 +13,19 @@ QUnit.module('ember-template-recast', function() {
     assert.equal(print(ast), template);
   });
 
+  QUnit.test('basic parse + print (no modification) preserves blank lines', function(assert) {
+    let template = stripIndent`
+      {{foo-bar
+        baz="stuff"
+      }}
+
+
+`;
+    let ast = parse(template);
+
+    assert.equal(print(ast), template);
+  });
+
   QUnit.test('basic parse -> mutation -> print', function(assert) {
     let template = stripIndent`
       {{foo-bar
@@ -202,5 +215,194 @@ QUnit.module('transform', () => {
     });
 
     assert.equal(code, '{{wat-wat}}');
+  });
+});
+
+QUnit.module('multi-line', function(hooks) {
+  let i = 0;
+  hooks.beforeEach(() => (i = 0));
+  function funkyIf(b) {
+    return b.block(
+      'if',
+      [b.sexpr(b.path('a'))],
+      null,
+      b.program([b.text('\n'), b.text('  '), b.mustache(`${i++}`), b.text('\n'), b.text('\n')])
+    );
+  }
+
+  QUnit.test('supports multi-line replacements', function(assert) {
+    let template = stripIndent`
+      {{bar}}
+
+      {{foo}}`;
+    let { code } = transform(template, function(env) {
+      let { builders: b } = env.syntax;
+      return {
+        MustacheStatement(node) {
+          if (node.loc.source === '(synthetic)') return node;
+          return funkyIf(b);
+        },
+      };
+    });
+
+    assert.equal(
+      code,
+      stripIndent`
+      {{#if (a)}}
+        {{0}}
+
+      {{/if}}
+
+      {{#if (a)}}
+        {{1}}
+
+      {{/if}}
+    `
+    );
+  });
+
+  QUnit.test('collapsing lines (full line replacment)', function(assert) {
+    let template = `
+    here
+    is
+    some
+    multiline
+    string
+    `;
+    let { code } = transform(template, env => {
+      let { builders: b } = env.syntax;
+
+      return {
+        TextNode() {
+          return b.text(`here is a single line string`);
+        },
+      };
+    });
+
+    assert.equal(code, 'here is a single line string');
+  });
+
+  QUnit.test('collapsing lines when start line has non-replaced content', function(assert) {
+    let template = stripIndent`
+      <div
+         data-foo={{baz}}></div>here
+      is
+      some
+      multiline
+      string`;
+    let { code } = transform(template, env => {
+      let { builders: b } = env.syntax;
+
+      return {
+        TextNode() {
+          return b.text(`here is a single line string`);
+        },
+      };
+    });
+
+    assert.equal(code, '<div\n   data-foo={{baz}}></div>here is a single line string');
+  });
+
+  QUnit.test('collapsing lines when end line has non-replaced content', function(assert) {
+    let template = stripIndent`
+      here
+      is
+      some
+      multiline
+      string<div
+      data-foo={{bar}}></div>`;
+
+    let { code } = transform(template, env => {
+      let { builders: b } = env.syntax;
+
+      return {
+        TextNode() {
+          return b.text(`here is a single line string`);
+        },
+      };
+    });
+
+    assert.equal(code, 'here is a single line string<div\ndata-foo={{bar}}></div>');
+  });
+
+  QUnit.test('collapsing lines when start and end lines have non-replaced content', function(
+    assert
+  ) {
+    let template = stripIndent`{{ foo }}
+      here
+      is
+      some
+      multiline
+      string{{ bar }}`;
+    let { code } = transform(template, env => {
+      let { builders: b } = env.syntax;
+
+      return {
+        TextNode() {
+          return b.text(`here is a single line string`);
+        },
+      };
+    });
+
+    assert.equal(code, '{{ foo }}here is a single line string{{ bar }}');
+  });
+
+  QUnit.test('Can handle multi-line column expansion', function(assert) {
+    let template = `
+    <div data-foo="bar"></div>here
+    is
+    some
+    multiline
+    string
+    `;
+    let { code } = transform(template, env => {
+      let { builders: b } = env.syntax;
+
+      return {
+        TextNode() {
+          return b.text(`${Array(10).join('x')}`);
+        },
+      };
+    });
+
+    assert.equal(
+      code,
+      `${Array(10).join('x')}<div data-foo=${Array(10).join('x')}></div>${Array(10).join('x')}`
+    );
+  });
+
+  QUnit.test('supports multi-line replacements with interleaving', function(assert) {
+    let template = stripIndent`
+      <br>
+      {{bar}}
+      <div></div>
+      {{foo}}
+      <hr>`;
+    let { code } = transform(template, function(env) {
+      let { builders: b } = env.syntax;
+      return {
+        MustacheStatement(node) {
+          if (node.loc.source === '(synthetic)') return node;
+          return funkyIf(b);
+        },
+      };
+    });
+
+    assert.equal(
+      code,
+      stripIndent`
+      <br>
+      {{#if (a)}}
+        {{0}}
+
+      {{/if}}
+      <div></div>
+      {{#if (a)}}
+        {{1}}
+
+      {{/if}}
+      <hr>
+    `
+    );
   });
 });
