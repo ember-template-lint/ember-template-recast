@@ -124,6 +124,42 @@ QUnit.module('ember-template-recast', function() {
         }}`
     );
   });
+
+  QUnit.todo('can remove during traversal by returning `null`', function(assert) {
+    let template = stripIndent`
+    <p>here is some multiline string</p>
+    {{ other-stuff }}
+    `;
+    let { code } = transform(template, () => {
+      return {
+        ElementNode() {
+          return null;
+        },
+      };
+    });
+
+    assert.equal(code, '\n{{ other-stuff }}');
+  });
+
+  QUnit.todo('can replace with many items during traversal by returning an array', function(
+    assert
+  ) {
+    let template = stripIndent`
+    <p>here is some multiline string</p>
+    {{ other-stuff }}
+    `;
+    let { code } = transform(template, env => {
+      let { builders: b } = env.syntax;
+
+      return {
+        ElementNode() {
+          return [b.text('hello '), b.text('world')];
+        },
+      };
+    });
+
+    assert.equal(code, 'hello world\n{{ other-stuff }}');
+  });
 });
 
 QUnit.module('transform', () => {
