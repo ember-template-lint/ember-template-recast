@@ -2,15 +2,6 @@
 # yarn lockfile v1
 
 
-"@glimmer/compiler@^0.34.3":
-  version "0.34.3"
-  resolved "https://registry.yarnpkg.com/@glimmer/compiler/-/compiler-0.34.3.tgz#4fcfb1e22566336ae4b43aa32394b44335f83724"
-  dependencies:
-    "@glimmer/interfaces" "^0.34.3"
-    "@glimmer/syntax" "^0.34.3"
-    "@glimmer/util" "^0.34.3"
-    "@glimmer/wire-format" "^0.34.3"
-
 "@glimmer/interfaces@^0.34.3":
   version "0.34.3"
   resolved "https://registry.yarnpkg.com/@glimmer/interfaces/-/interfaces-0.34.3.tgz#d95b19f18523379f6efac24f1ae77af3a83d8fc3"
