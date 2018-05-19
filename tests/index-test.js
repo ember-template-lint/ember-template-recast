@@ -148,12 +148,12 @@ QUnit.module('ember-template-recast', function() {
     assert.equal(code, '\n{{ other-stuff }}');
   });
 
-  QUnit.todo('can replace with many items during traversal by returning an array', function(
+  QUnit.test('can replace with many items during traversal by returning an array', function(
     assert
   ) {
     let template = stripIndent`
     <p>here is some multiline string</p>
-    {{ other-stuff }}
+    {{other-stuff}}
     `;
     let { code } = transform(template, env => {
       let { builders: b } = env.syntax;
@@ -165,7 +165,27 @@ QUnit.module('ember-template-recast', function() {
       };
     });
 
-    assert.equal(code, 'hello world\n{{ other-stuff }}');
+    assert.equal(code, 'hello world\n{{other-stuff}}');
+  });
+
+  QUnit.todo('MustacheStatements retain whitespace when multiline replacements occur', function(
+    assert
+  ) {
+    let template = stripIndent`
+    <p></p>
+    {{ other-stuff }}
+    `;
+    let { code } = transform(template, env => {
+      let { builders: b } = env.syntax;
+
+      return {
+        ElementNode() {
+          return [b.text('x'), b.text('y')];
+        },
+      };
+    });
+
+    assert.equal(code, 'xy\n{{ other-stuff }}');
   });
 });
 

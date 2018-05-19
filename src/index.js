@@ -160,11 +160,11 @@ class ParseResult {
         let isLastLine = index === replacementLines.length - 1;
         let updatedLine = line;
 
-        if (isFirstLine) {
+        if (isFirstLine && firstLineContents) {
           updatedLine = firstLineContents.slice(0, start.column) + line;
         }
 
-        if (isLastLine) {
+        if (isLastLine && lastLineContents) {
           updatedLine += lastLineContents.slice(end.column);
         }
 
