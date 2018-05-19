@@ -1,6 +1,6 @@
 {
   "name": "ember-template-recast",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Non-destructive template transformer.",
   "main": "src/index.js",
   "author": "Robert Jackson <me@rwjblue.com>",
