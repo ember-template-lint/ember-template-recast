@@ -156,15 +156,15 @@ class ParseResult {
       let replacementLines = linesFrom(printed);
 
       let mergedReplacementLines = replacementLines.map((line, index) => {
-        let isFirstLine = firstLineContents && index === 0;
-        let isLastLine = lastLineContents && index === replacementLines.length - 1;
+        let isFirstLine = index === 0;
+        let isLastLine = index === replacementLines.length - 1;
         let updatedLine = line;
 
-        if (isFirstLine) {
+        if (isFirstLine && firstLineContents) {
           updatedLine = firstLineContents.slice(0, start.column) + line;
         }
 
-        if (isLastLine) {
+        if (isLastLine && lastLineContents) {
           updatedLine += lastLineContents.slice(end.column);
         }
 
