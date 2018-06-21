@@ -1,7 +1,13 @@
 const { fork } = require('child_process');
+const http = require('http');
+const https = require('https');
+const { writeFile } = require('fs');
 const { resolve, extname, join } = require('path');
 const colors = require('colors/safe');
 const globby = require('globby');
+const tmp = require('tmp');
+
+tmp.setGracefulCleanup();
 
 class NoFilesError extends Error {}
 
@@ -101,12 +107,42 @@ module.exports = function run(transformFile, filePaths, options) {
 };
 
 /**
- * TODO: Support loading remote files.
+ * Returns the location of the transform module on disk.
  * @param {string} transformFile
  * @returns {Promise<string>}
  */
 function loadTransform(transformFile) {
-  return resolve(process.cwd(), transformFile);
+  const isRemote = transformFile.startsWith('http');
+
+  if (!isRemote) {
+    return resolve(process.cwd(), transformFile);
+  }
+
+  return new Promise((resolve, reject) => {
+    downloadFile(transformFile).then(contents => {
+      const filePath = tmp.fileSync();
+      writeFile(filePath.name, contents, 'utf8', err => {
+        err ? reject(err) : resolve(filePath.name);
+      });
+    });
+  });
+}
+
+/**
+ * @param {string} url
+ * @returns {Promise<string>}
+ */
+function downloadFile(url) {
+  return new Promise((resolve, reject) => {
+    const transport = url.startsWith('https') ? https : http;
+
+    let contents = '';
+    transport
+      .get(url, res =>
+        res.on('data', data => (contents += data.toString())).on('end', () => resolve(contents))
+      )
+      .on('error', err => reject(err));
+  });
 }
 
 /**

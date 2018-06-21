@@ -29,14 +29,14 @@
     "fixturify": "^0.3.4",
     "lerna-changelog": "^0.7.0",
     "prettier": "^1.12.1",
-    "qunit": "^2.6.0",
-    "tmp": "^0.0.33"
+    "qunit": "^2.6.0"
   },
   "dependencies": {
     "@glimmer/syntax": "^0.34.3",
     "colors": "^1.3.0",
     "globby": "^8.0.1",
-    "nomnom": "^1.8.1"
+    "nomnom": "^1.8.1",
+    "tmp": "^0.0.33"
   },
   "changelog": {
     "repo": "ember-template-lint/ember-template-recast",
