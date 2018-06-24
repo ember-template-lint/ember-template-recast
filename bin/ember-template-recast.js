@@ -1,51 +1,30 @@
 #!/usr/bin/env node
 
 const os = require('os');
-const nomnom = require('nomnom');
+const program = require('commander');
 const pkg = require('../package.json');
 const run = require('../src/runner');
 
-const opts = nomnom
-  .script('ember-template-recast')
-  .options({
-    paths: {
-      position: 0,
-      help: 'Files or directories to transform',
-      list: true,
-      metavar: 'FILE',
-      required: true,
-    },
-    transform: {
-      abbr: 't',
-      default: './transform.js',
-      help: 'Path to the transform file. Can be either a local path or url',
-      metavar: 'FILE',
-    },
-    cpus: {
-      abbr: 'c',
-      help: 'Determines the number of processes started.',
-      default: Math.max(os.cpus().length - 1, 1),
-    },
-    dry: {
-      abbr: 'd',
-      flag: true,
-      help: 'Dry run (no changes are made to files)',
-    },
-    silent: {
-      abbr: 's',
-      flag: true,
-      default: false,
-      full: 'silent',
-      help: 'No output',
-    },
-    version: {
-      flag: true,
-      help: 'Print version and exit',
-      callback: function() {
-        return `ember-template-recast: ${pkg.version}`;
-      },
-    },
-  })
-  .parse();
+program
+  .version(pkg.version)
+  .usage('<files> -t transform-plugin.js')
+  .option(
+    '-t, --transform <file>',
+    'path to the transform file. Can be either a local path or url',
+    './transform.js'
+  )
+  .option(
+    '-c, --cpus <count>',
+    'determines the number of processes started.',
+    Math.max(os.cpus().length - 1, 1),
+    parseInt
+  )
+  .option('-d, --dry', 'dry run: no changes are made to files', false)
+  .option('-s, --silent', 'no output', false)
+  .parse(process.argv);
 
-run(opts.transform, opts.paths, opts).then(process.exit);
+if (program.args.length < 1 || !program.transform) {
+  program.help();
+} else {
+  run(program.transform, program.args, program).then(process.exit);
+}
