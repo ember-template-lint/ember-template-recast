@@ -1,4 +1,5 @@
 const fs = require('fs');
+const workerpool = require('workerpool');
 const { parse, transform } = require('./index');
 
 /**
@@ -13,69 +14,28 @@ const { parse, transform } = require('./index');
  * @property {boolean} dry
  */
 
-class ProcessAPI {
-  constructor(transformPath) {
-    try {
-      const module = require(transformPath);
-      this.plugin = typeof module.default === 'function' ? module.default : module;
-    } catch (e) {
-      this.notify('loadError', { error: e.stack });
-      this.finish();
-    }
-
-    process.on('message', data => this.run(data));
-  }
-
-  run(data) {
-    run(this.plugin, data.files, data.options, this);
-  }
-
-  notify(type, data = {}) {
-    process.send(Object.assign({ type }, data));
-  }
-
-  fileUpdate(file, status) {
-    this.notify('update', { file, status });
-  }
-
-  error(file, error) {
-    this.notify('error', { file, error });
-  }
-
-  free() {
-    this.notify('waiting');
-  }
-
-  finish() {
-    setImmediate(() => process.disconnect());
-  }
-}
-
-new ProcessAPI(process.argv[2]);
-
 /**
- * @param {Function} plugin
- * @param {string[]} files
+ * @param {string} pluginPath
+ * @param {string} filePath
  * @param {TransformOptions} options
- * @param {ProcessAPI} api
  */
-function run(plugin, files, options, api) {
-  if (files.length < 1) {
-    api.finish();
-    return;
-  }
+function run(pluginPath, filePath, options) {
+  const module = require(pluginPath);
+  const plugin = typeof module.default === 'function' ? module.default : module;
 
-  const operations = files.map(file =>
-    readFile(file)
-      .then(contents => applyTransform(plugin, file, contents))
-      .then(output => writeFile(file, output, options))
-      .then(output =>
-        api.fileUpdate(file, output.skipped ? 'skipped' : output.changed ? 'ok' : 'nochange')
-      )
-      .catch(error => api.error(file, error.stack))
-  );
-
-  Promise.all(operations).then(() => api.free());
+  return readFile(filePath)
+    .then(contents => applyTransform(plugin, filePath, contents))
+    .then(output => writeFile(filePath, output, options))
+    .then(output => ({
+      type: 'update',
+      file: filePath,
+      status: output.skipped ? 'skipped' : output.changed ? 'ok' : 'nochange',
+    }))
+    .catch(err => ({
+      type: 'error',
+      file: filePath,
+      error: err.stack,
+    }));
 }
 
 /**
@@ -138,3 +98,7 @@ function writeFile(filePath, output, options) {
     });
   });
 }
+
+workerpool.worker({
+  run,
+});

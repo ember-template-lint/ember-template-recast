@@ -1,11 +1,13 @@
-const { fork } = require('child_process');
 const http = require('http');
 const https = require('https');
 const { writeFile } = require('fs');
 const { resolve, extname, join } = require('path');
 const colors = require('colors/safe');
 const globby = require('globby');
+const ora = require('ora');
+const queue = require('async-promise-queue');
 const tmp = require('tmp');
+const workerpool = require('workerpool');
 
 tmp.setGracefulCleanup();
 
@@ -15,6 +17,9 @@ const silentLogger = {
   info() {},
   warning() {},
   error() {},
+  spin() {},
+  updateSpinner() {},
+  stopSpinner() {},
 };
 
 /* eslint-disable no-console */
@@ -28,6 +33,19 @@ const verboseLogger = {
   error(message) {
     console.log(`${colors.white.bgRed(' ERR ')} ${message}`);
   },
+  spin(message) {
+    this.spinner = ora(message).start();
+  },
+  updateSpinner(message) {
+    this.spinner.text = message;
+  },
+  stopSpinner(persistentMessage) {
+    if (persistentMessage) {
+      this.spinner.stopAndPersist(persistentMessage);
+    } else {
+      this.spinner.stop();
+    }
+  },
 };
 /* eslint-enable no-console */
 
@@ -38,7 +56,6 @@ class StatsCollector {
     this.unchanged = 0;
     this.skipped = 0;
     this.errors = [];
-    this.loadError = null;
   }
 
   update(message) {
@@ -57,10 +74,6 @@ class StatsCollector {
         }
         break;
 
-      case 'loadError':
-        this.loadError = message.error;
-        break;
-
       case 'error':
         this.errors.push(message);
         break;
@@ -68,11 +81,6 @@ class StatsCollector {
   }
 
   print() {
-    if (this.loadError) {
-      this.logger.error(this.loadError);
-      return;
-    }
-
     this.logger.info(`Ok:        ${this.changed}`);
     this.logger.info(`Unchanged: ${this.unchanged}`);
 
@@ -81,11 +89,11 @@ class StatsCollector {
     }
 
     if (this.errors.length) {
-      this.logger.info(`Errored:   ${this.errored}`);
+      this.logger.info(`Errored:   ${this.errors.length}`);
 
       this.errors.slice(0, 5).forEach(({ file, error }) => {
         this.logger.error(`${file}`);
-        this.logger.error(error);
+        handleError(error, this.logger);
       });
 
       if (this.errors.length > 5) {
@@ -102,8 +110,17 @@ module.exports = function run(transformFile, filePaths, options) {
 
   return Promise.all([loadTransform(transformFile), getAllFiles(filePaths)])
     .then(([transformPath, files]) => spawnWorkers(transformPath, files, options, stats, logger))
-    .then(() => stats.print())
-    .catch(err => handleError(err, logger));
+    .then(() => {
+      logger.stopSpinner({
+        symbol: '🎉',
+        text: 'Complete!',
+      });
+      stats.print();
+    })
+    .catch(err => {
+      logger.stopSpinner();
+      handleError(err, logger);
+    });
 };
 
 /**
@@ -171,9 +188,7 @@ function getAllFiles(paths) {
 }
 
 /**
- * Divides files into chunks and distributes them across worker processes. When
- * workers send back messages, we either collect stats for display at the end
- * or send the worker more files.
+ * Divides files into chunks and distributes them across worker processes.
  * @param {string} transformPath
  * @param {string[]} files
  * @param {number} options.cpus
@@ -183,57 +198,35 @@ function getAllFiles(paths) {
  * @returns {Promise<void>}
  */
 function spawnWorkers(transformPath, files, { cpus, dry }, stats, logger) {
+  const processCount = Math.min(files.length, cpus);
+
   logger.info(`Processing ${files.length} file${files.length !== 1 ? 's' : ''}…`);
+  logger.info(`Spawning ${processCount} worker${processCount !== 1 ? 's' : ''}…`);
 
-  const chunkSize = Math.min(50, Math.ceil(files.length / cpus) + 1);
-  const chunkCount = Math.max(Math.ceil(files.length / chunkSize), 1);
-  const processCount = Math.min(chunkCount, cpus);
+  logger.spin('Processed 0 files');
 
-  let index = 0;
-  function next() {
-    return files.slice(index, (index += chunkSize));
-  }
+  const pool = workerpool.pool(require.resolve('./worker.js'), { maxWorkers: cpus });
 
-  function send(worker) {
-    const nextChunk = next();
-
-    if (nextChunk.length) {
-      logger.info(
-        `Sending ${nextChunk.length} file${nextChunk.length !== 1 ? 's' : ''} to worker…`
-      );
-    }
-
-    // always send a message to the worker. an empty `files` array tells the
-    // worker that it can disconnect.
-    worker.send({ files: nextChunk, options: { dry } });
-  }
-
-  logger.info(`Spawning ${processCount} worker${processCount !== 1 ? 's' : ''}`);
-  const workers = Array(processCount)
-    .fill(1)
-    .map(() => fork(require.resolve('./worker'), [transformPath]));
-
-  const workerPromises = workers.map(worker => {
-    send(worker);
-
-    worker.on('message', message => {
-      switch (message.type) {
-        case 'waiting':
-          send(worker);
-          break;
-        default:
-          stats.update(message);
-      }
+  let i = 0;
+  const worker = queue.async.asyncify(file => {
+    return pool.exec('run', [transformPath, file, { dry }]).then(message => {
+      stats.update(message);
+      logger.updateSpinner(`Processed ${i++} files`);
     });
-
-    return new Promise(resolve => worker.on('disconnect', resolve));
   });
 
-  return Promise.all(workerPromises);
+  return queue(worker, files, cpus)
+    .catch(err => {
+      pool.terminate();
+      return Promise.reject(err);
+    })
+    .then(() => pool.terminate());
 }
 
 function handleError(err, logger) {
-  if (err instanceof NoFilesError) {
+  if (err.code === 'MODULE_NOT_FOUND') {
+    logger.error('Transform plugin not found');
+  } else if (err instanceof NoFilesError) {
     logger.error('No files matched');
   } else {
     logger.error(err);

@@ -16,8 +16,8 @@ program
   .option(
     '-c, --cpus <count>',
     'determines the number of processes started.',
-    Math.max(os.cpus().length - 1, 1),
-    parseInt
+    parseInt,
+    Math.max(os.cpus().length - 1, 1)
   )
   .option('-d, --dry', 'dry run: no changes are made to files', false)
   .option('-s, --silent', 'no output', false)
