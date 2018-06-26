@@ -1,5 +1,17 @@
 # Change Log
 
+## v1.2.0 (2018-06-26)
+
+#### :rocket: Enhancement
+* [#8](https://github.com/ember-template-lint/ember-template-recast/pull/8) Add a binary for running transforms across multiple files. ([@lennyburdette](https://github.com/lennyburdette))
+
+#### :bug: Bug Fix
+* [#9](https://github.com/ember-template-lint/ember-template-recast/pull/9) Ensure `parseInt` is called with the correct radix.. ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 2
+- Lenny Burdette ([lennyburdette](https://github.com/lennyburdette))
+- Robert Jackson ([rwjblue](https://github.com/rwjblue))
+
 ## v1.1.3 (2018-05-19)
 
 #### :bug: Bug Fix
