@@ -85,7 +85,51 @@ Unchanged: 1
     });
 
     return run(['files', '-t', 'bad-transform.js'], this.fixture.path()).then(({ stdout }) => {
-      assert.ok(stdout.includes('Error: Unexpected identifier'));
+      assert.ok(stdout.includes('Error: Unexpected identifier'), 'Output includes error message');
+      assert.ok(
+        stdout.includes(join(this.fixture.path(), 'bad-transform.js')),
+        'Output includes full path to transform'
+      );
+    });
+  });
+
+  QUnit.test('with a bad template', function(assert) {
+    this.fixture.write({
+      files: {
+        'bad-template.hbs': `{{ not { valid (mustache) }`,
+      },
+    });
+
+    return run(['files', '-c', '1'], this.fixture.path()).then(({ stdout }) => {
+      const out = this.fixture.read();
+
+      assert.ok(
+        stdout.includes(
+          `Processing 4 files…
+Spawning 1 worker…
+Ok:        2
+Unchanged: 1
+Errored:   1
+`
+        ),
+        'Status message includes error count'
+      );
+
+      assert.ok(
+        stdout.includes(join(this.fixture.path(), 'files/bad-template.hbs')),
+        'Output includes full path to bad template'
+      );
+      assert.ok(
+        stdout.includes('Error: Parse error on line 1:'),
+        'Output includes error stacktrace'
+      );
+
+      assert.deepEqual(out.files, {
+        'a.hbs': '{{wat-wat}}',
+        'b.handlebars': '{{wat-wat}}',
+        'unchanged.hbs': `nothing to do`,
+        'bad-template.hbs': `{{ not { valid (mustache) }`,
+      });
     });
   });
 

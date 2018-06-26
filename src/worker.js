@@ -15,12 +15,12 @@ const { parse, transform } = require('./index');
  */
 
 /**
- * @param {string} pluginPath
+ * @param {string} transformPath
  * @param {string} filePath
  * @param {TransformOptions} options
  */
-function run(pluginPath, filePath, options) {
-  const module = require(pluginPath);
+function run(transformPath, filePath, options) {
+  const module = require(transformPath);
   const plugin = typeof module.default === 'function' ? module.default : module;
 
   return readFile(filePath)

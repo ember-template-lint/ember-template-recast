@@ -230,6 +230,9 @@ function handleError(err, logger) {
     logger.error('No files matched');
   } else {
     logger.error(err);
+    if (err.stack) {
+      logger.error(err.stack);
+    }
   }
   return 1;
 }
