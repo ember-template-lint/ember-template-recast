@@ -93,3 +93,31 @@ let { code } = transform(template, env => {
 
 console.log(code); // => {{wat-wat}}
 ```
+
+## Command Line Usage
+
+ember-template-recast comes with a binary for running a transform across multiple
+files, similar to jscodeshift.
+
+```
+npm install -g ember-template-recast
+ember-template-recast directory/of/templates -t transform.js
+```
+
+Example transform plugin:
+
+```js
+module.exports = function({ source, path }, { parse, visit }) {
+  const ast = parse(source);
+
+  return visit(ast, env => {
+    let { builders: b } = env.syntax;
+
+    return {
+      MustacheStatement() {
+        return b.mustache(b.path('wat-wat'));
+      },
+    };
+  });
+};
+```
