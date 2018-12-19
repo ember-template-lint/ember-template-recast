@@ -96,7 +96,7 @@ function wrapNode(node, parentNode, nearestNodeWithLoc, parseResult) {
       if (property === 'path' && node.type === 'BlockStatement') {
         let start = {
           line: node.loc.end.line,
-          column: node.loc.end.column - 1 - node.path.original.length,
+          column: node.loc.end.column - 2 - original.original.length,
         };
         parseResult.modifications.push({
           start,
