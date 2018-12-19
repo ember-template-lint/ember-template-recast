@@ -96,6 +96,30 @@ QUnit.module('ember-template-recast', function() {
     );
   });
 
+  QUnit.test('rename block component from longer to shorter name', function(assert) {
+    let template = stripIndent`
+      {{#this-is-a-long-name
+        hello="world"
+      }}
+        <div data-foo='single quoted'>
+          </div>
+      {{/this-is-a-long-name}}{{someInlineComponent hello="world"}}`;
+
+    let ast = parse(template);
+    ast.body[0].path = builders.path('baz-derp');
+
+    assert.equal(
+      print(ast),
+      stripIndent`
+        {{#baz-derp
+          hello="world"
+        }}
+          <div data-foo='single quoted'>
+            </div>
+        {{/baz-derp}}{{someInlineComponent hello="world"}}`
+    );
+  });
+
   QUnit.test('rename element tagname', function(assert) {
     let template = stripIndent`
       <div data-foo='single quoted'>
