@@ -72,7 +72,7 @@ QUnit.module('ember-template-recast', function() {
     );
   });
 
-  QUnit.test('rename block component', function(assert) {
+  QUnit.test('rename block component larger', function(assert) {
     let template = stripIndent`
       {{#foo-bar
         baz="stuff"
@@ -82,17 +82,42 @@ QUnit.module('ember-template-recast', function() {
       {{/foo-bar}}`;
 
     let ast = parse(template);
-    ast.body[0].path = builders.path('baz-derp');
+    ast.body[0].path = builders.path('baz-herp-derp');
 
     assert.equal(
       print(ast),
       stripIndent`
-        {{#baz-derp
+        {{#baz-herp-derp
           baz="stuff"
         }}
           <div data-foo='single quoted'>
             </div>
-        {{/baz-derp}}`
+        {{/baz-herp-derp}}`
+    );
+  });
+
+
+  QUnit.test('rename block component shorter', function(assert) {
+    let template = stripIndent`
+      {{#foo-bar
+        baz="stuff"
+      }}
+        <div data-foo='single quoted'>
+          </div>
+      {{/foo-bar}}`;
+
+    let ast = parse(template);
+    ast.body[0].path = builders.path('herp');
+
+    assert.equal(
+      print(ast),
+      stripIndent`
+        {{#herp
+          baz="stuff"
+        }}
+          <div data-foo='single quoted'>
+            </div>
+        {{/herp}}`
     );
   });
 
