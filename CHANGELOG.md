@@ -1,5 +1,13 @@
 # Change Log
 
+## v1.2.1 (2018-12-19)
+
+#### :bug: Bug Fix
+* [#12](https://github.com/ember-template-lint/ember-template-recast/pull/12) Fix: Closing tags on block statements. ([@zimmi88](https://github.com/zimmi88))
+
+#### Committers: 1
+- Tim Lindvall ([zimmi88](https://github.com/zimmi88))
+
 ## v1.2.0 (2018-06-26)
 
 #### :rocket: Enhancement
