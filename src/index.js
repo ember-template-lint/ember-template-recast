@@ -140,7 +140,11 @@ class ParseResult {
     this.source = linesFrom(template);
     this.modifications = [];
 
-    let ast = preprocess(template, { ignoreStandalone: true });
+    let ast = preprocess(template, {
+      parseOptions: {
+        ignoreStandalone: true,
+      },
+    });
     this.ast = wrapNode(ast, null, ast, this);
   }
 
@@ -167,12 +171,17 @@ class ParseResult {
         let isLastLine = index === replacementLines.length - 1;
         let updatedLine = line;
 
-        // We check for a couple of common error cases that can be introduced by line replacement...
+        // We check for a couple of common error cases that can be introduced by content removal...
         // 1) For one-line edits, if there is whitespace before and after the edited section
-        //   (usually due to a removed prop), trim the preceeding whitespace before the edit.
+        //    (usually due to a removed prop), trim the preceeding whitespace before the edit.
+        //    Also checks for if the only thing following the section is the end of a hbs tag ("}}"),
+        //    but only if the replacement content is empty (just removing stuff).
         if (isFirstLine && isLastLine && firstLineContents && lastLineContents) {
-          const hasPreceedingWhitespace = firstLineContents.slice(0, start.column).match(/\S+\s+$/);
-          const hasTrailingWhitespace = lastLineContents.slice(end.column).match(/^\s+\S+/);
+          const startSlice = firstLineContents.slice(0, start.column);
+          const endSlice = lastLineContents.slice(end.column);
+          const hasPreceedingWhitespace = startSlice.match(/\S+\s+$/);
+          const hasTrailingWhitespace =
+            endSlice.match(/^\s+\S+/) || (line === '' && endSlice.match(/^}}+/));
 
           if (hasPreceedingWhitespace && hasTrailingWhitespace) {
             // trimEnd() is as of Node 10, so we probably want to use replace() until Node < 10 is EOLd.
