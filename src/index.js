@@ -16,6 +16,13 @@ function linesFrom(string) {
   // split the strip up by \n or \r\n
   let lines = string.match(reLines);
 
+  // always insist on returning one line (since we always modify one line)
+  // otherwise, lines might disappear!
+  // (if it's whitespace-only after splicing in changes, we'll edit it out below)
+  if (lines.length === 1) {
+    return lines;
+  }
+
   // the split above always results in an extra empty line at the end remove it
   return lines.slice(0, -1);
 }
@@ -133,7 +140,11 @@ class ParseResult {
     this.source = linesFrom(template);
     this.modifications = [];
 
-    let ast = preprocess(template);
+    let ast = preprocess(template, {
+      parseOptions: {
+        ignoreStandalone: true,
+      },
+    });
     this.ast = wrapNode(ast, null, ast, this);
   }
 
@@ -160,12 +171,37 @@ class ParseResult {
         let isLastLine = index === replacementLines.length - 1;
         let updatedLine = line;
 
-        if (isFirstLine && firstLineContents) {
-          updatedLine = firstLineContents.slice(0, start.column) + line;
+        // We check for a couple of common error cases that can be introduced by content removal...
+        // 1) For one-line edits, if there is whitespace before and after the edited section
+        //    (usually due to a removed prop), trim the preceeding whitespace before the edit.
+        //    Also checks for if the only thing following the section is the end of a hbs tag ("}}"),
+        //    but only if the replacement content is empty (just removing stuff).
+        if (isFirstLine && isLastLine && firstLineContents && lastLineContents) {
+          const startSlice = firstLineContents.slice(0, start.column);
+          const endSlice = lastLineContents.slice(end.column);
+          const hasPreceedingWhitespace = startSlice.match(/\S+\s+$/);
+          const hasTrailingWhitespace =
+            endSlice.match(/^\s+\S+/) || (line === '' && endSlice.match(/^}}+/));
+
+          if (hasPreceedingWhitespace && hasTrailingWhitespace) {
+            // trimEnd() is as of Node 10, so we probably want to use replace() until Node < 10 is EOLd.
+            updatedLine = firstLineContents.slice(0, start.column).replace(/\s+$/, '') + line;
+          } else {
+            updatedLine = firstLineContents.slice(0, start.column) + line;
+          }
+          updatedLine += lastLineContents.slice(end.column);
+        } else {
+          if (isFirstLine && firstLineContents) {
+            updatedLine = firstLineContents.slice(0, start.column) + line;
+          }
+          if (isLastLine && lastLineContents) {
+            updatedLine += lastLineContents.slice(end.column);
+          }
         }
 
-        if (isLastLine && lastLineContents) {
-          updatedLine += lastLineContents.slice(end.column);
+        // 2) If the only thing that's left on this line is whitespace, and we made a change, remove it.
+        if (updatedLine.match(/\S/) === null && line !== updatedLine) {
+          return null;
         }
 
         return updatedLine;
