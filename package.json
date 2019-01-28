@@ -30,7 +30,7 @@
     "qunit": "^2.6.0"
   },
   "dependencies": {
-    "@glimmer/syntax": "^0.34.3",
+    "@glimmer/syntax": "^0.38.1",
     "async-promise-queue": "^1.0.4",
     "colors": "^1.3.0",
     "commander": "^2.15.1",
