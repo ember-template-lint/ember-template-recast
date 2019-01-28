@@ -1,5 +1,23 @@
 # Change Log
 
+## v1.2.3 (2019-01-28)
+
+#### :rocket: Enhancement
+* [#15](https://github.com/ember-template-lint/ember-template-recast/pull/15) Bump @glimmer/syntax to 0.38.1. ([@zimmi88](https://github.com/zimmi88))
+
+#### Committers: 1
+- Tim Lindvall ([zimmi88](https://github.com/zimmi88))
+
+
+## v1.2.2 (2019-01-11)
+
+#### :bug: Bug Fix
+* [#14](https://github.com/ember-template-lint/ember-template-recast/pull/14) Fix: Improve handling of removed hash pairs. ([@zimmi88](https://github.com/zimmi88))
+
+#### Committers: 1
+- Tim Lindvall ([zimmi88](https://github.com/zimmi88))
+
+
 ## v1.2.1 (2018-12-19)
 
 #### :bug: Bug Fix
