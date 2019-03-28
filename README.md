@@ -75,7 +75,7 @@ here](https://github.com/glimmerjs/glimmer-vm/blob/master/packages/@glimmer/synt
 
 Example:
 ```js
-const templateRecast = require('ember-template-recast');
+const { transform } = require('ember-template-recast');
 const template = `
 {{foo-bar
   baz="stuff"
