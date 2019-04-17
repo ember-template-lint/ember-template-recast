@@ -172,18 +172,17 @@ class ParseResult {
         let updatedLine = line;
 
         // We check for a couple of common error cases that can be introduced by content removal...
-        // 1) For one-line edits, if there is whitespace before and after the edited section
-        //    (usually due to a removed prop), trim the preceeding whitespace before the edit.
+        // 1) For one-line edits, if there is whitespace before and after the edited section,
+        //    and if the new content is empty, trim the preceeding whitespace before the edit.
         //    Also checks for if the only thing following the section is the end of a hbs tag ("}}"),
         //    but only if the replacement content is empty (just removing stuff).
         if (isFirstLine && isLastLine && firstLineContents && lastLineContents) {
           const startSlice = firstLineContents.slice(0, start.column);
           const endSlice = lastLineContents.slice(end.column);
           const hasPreceedingWhitespace = startSlice.match(/\S+\s+$/);
-          const hasTrailingWhitespace =
-            endSlice.match(/^\s+\S+/) || (line === '' && endSlice.match(/^}}+/));
+          const hasTrailingWhitespace = endSlice.match(/^\s+\S+/) || endSlice.match(/^}}/);
 
-          if (hasPreceedingWhitespace && hasTrailingWhitespace) {
+          if (line === '' && hasPreceedingWhitespace && hasTrailingWhitespace) {
             // trimEnd() is as of Node 10, so we probably want to use replace() until Node < 10 is EOLd.
             updatedLine = firstLineContents.slice(0, start.column).replace(/\s+$/, '') + line;
           } else {
