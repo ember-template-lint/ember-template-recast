@@ -1,5 +1,22 @@
 # Change Log
 
+## v1.2.4 (2019-04-18)
+
+#### :bug: Bug Fix
+* [#19](https://github.com/ember-template-lint/ember-template-recast/pull/19) Fix to whitespace trimming logic. ([@zimmi88](https://github.com/zimmi88))
+
+#### :memo: Documentation
+* [#18](https://github.com/ember-template-lint/ember-template-recast/pull/18) Fixes README example for template transform. ([@scalvert](https://github.com/scalvert))
+
+#### :house: Internal
+* [#17](https://github.com/ember-template-lint/ember-template-recast/pull/17) [PACKAGE UPDATE] Bump @glimmer/syntax to 0.39.3. ([@rajasegar](https://github.com/rajasegar))
+
+#### Committers: 3
+- Rajasegar Chandran ([rajasegar](https://github.com/rajasegar))
+- Steve Calvert ([scalvert](https://github.com/scalvert))
+- Tim Lindvall ([zimmi88](https://github.com/zimmi88))
+
+
 ## v1.2.3 (2019-01-28)
 
 #### :rocket: Enhancement
