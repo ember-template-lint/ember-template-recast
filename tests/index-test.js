@@ -425,6 +425,33 @@ QUnit.module('whitespace and removed hash pairs', function() {
       );
     }
   );
+
+  QUnit.test('Whitespace is left alone for replacements with whitespace on both sides', function(
+    assert
+  ) {
+    let template = stripIndent`
+      {{#hello-world foo="foo" bar="bar" as |yieldedProp|}}
+        {{yieldedProp.something-something}}
+      {{/hello-world}}`;
+    let { code } = transform(template, function(env) {
+      let { builders: b } = env.syntax;
+      return {
+        BlockStatement(ast) {
+          const hashPairs = ast.hash.pairs;
+          hashPairs.push(b.pair('somethingNew', b.string('Hello world!')));
+          return ast;
+        },
+      };
+    });
+    assert.equal(
+      code,
+      stripIndent`
+        {{#hello-world foo="foo" bar="bar" somethingNew="Hello world!" as |yieldedProp|}}
+          {{yieldedProp.something-something}}
+        {{/hello-world}}`,
+      'Code is updated with new hash, and whitespace on both sides is preserved'
+    );
+  });
 });
 
 QUnit.module('multi-line', function(hooks) {
