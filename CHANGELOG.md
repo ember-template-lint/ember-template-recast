@@ -1,5 +1,13 @@
 # Change Log
 
+## v1.2.5 (2019-04-30)
+
+#### :bug: Bug Fix
+* [#22](https://github.com/ember-template-lint/ember-template-recast/pull/22) Adding named arguments when none existed previously. ([@zimmi88](https://github.com/zimmi88))
+
+#### Committers: 1
+- Tim Lindvall ([zimmi88](https://github.com/zimmi88))
+
 ## v1.2.4 (2019-04-18)
 
 #### :bug: Bug Fix
