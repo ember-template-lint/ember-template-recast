@@ -12,6 +12,13 @@ const PARSE_RESULT = Symbol('PARSE_RESULT');
 const NEAREST_NODE_WITH_LOC = Symbol('NEAREST_NODE_WITH_LOC');
 const CLONED_NEAREST_NODE_WITH_LOC = Symbol('CLONED_NEAREST_NODE_WITH_LOC');
 
+function _isSynthetic(node) {
+  if (node && node.loc) {
+    return node.loc.source === '(synthetic)';
+  }
+  return true;
+}
+
 function linesFrom(string) {
   // split the strip up by \n or \r\n
   let lines = string.match(reLines);
@@ -27,7 +34,7 @@ function linesFrom(string) {
   return lines.slice(0, -1);
 }
 
-function wrapNode(node, parentNode, nearestNodeWithLoc, parseResult) {
+function wrapNode(node, parentNode, nearestNodeWithLoc, nearestNodeWithStableLoc, parseResult) {
   let propertyProxyMap = new Map();
   let clonedNearestNodeWithLoc = JSON.parse(JSON.stringify(nearestNodeWithLoc));
 
@@ -92,6 +99,26 @@ function wrapNode(node, parentNode, nearestNodeWithLoc, parseResult) {
           },
           value: updatedValue,
         });
+      } else if (property === 'hash' && node.type === 'BlockStatement' && _isSynthetic(original)) {
+        // Catches case where we try to replace an empty hash with a hash
+        // that contains entries.
+        const endOfPath = node.path.loc.end;
+        const hasBlockParams = node.program.blockParams.length > 0;
+        parseResult.modifications.push({
+          start: endOfPath,
+          end: endOfPath,
+          value: ` ${_print(updatedValue)}${hasBlockParams ? ' ' : ''}`,
+        });
+      } else if (property === '0' && parentNode.type === 'Hash' && _isSynthetic(parentNode)) {
+        // Catches case where we try to push a new hash pair on to a hash
+        // that doesn't contain any entries.
+        const endOfPath = nearestNodeWithStableLoc.path.loc.end;
+        const hasBlockParams = nearestNodeWithStableLoc.program.blockParams.length > 0;
+        parseResult.modifications.push({
+          start: endOfPath,
+          end: endOfPath,
+          value: ` ${_print(updatedValue)}${hasBlockParams ? ' ' : ''}`,
+        });
       } else {
         parseResult.modifications.push({
           start: original.loc.start,
@@ -126,6 +153,7 @@ function wrapNode(node, parentNode, nearestNodeWithLoc, parseResult) {
         value,
         node,
         value.loc ? value : node.loc ? node : nearestNodeWithLoc,
+        !_isSynthetic(value) ? value : !_isSynthetic(node) ? node : nearestNodeWithStableLoc,
         parseResult
       );
       propertyProxyMap.set(key, propertyProxy);
@@ -145,7 +173,7 @@ class ParseResult {
         ignoreStandalone: true,
       },
     });
-    this.ast = wrapNode(ast, null, ast, this);
+    this.ast = wrapNode(ast, null, ast, ast, this);
   }
 
   applyModifications() {

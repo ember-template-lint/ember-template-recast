@@ -303,6 +303,52 @@ QUnit.module('transform', () => {
 
     assert.equal(code, '{{wat-wat}}');
   });
+
+  QUnit.test('replacing empty hash pair works', function(assert) {
+    let template = '{{#foo-bar}}Hi there!{{/foo-bar}}';
+    let { code } = transform(template, env => {
+      let { builders: b } = env.syntax;
+      return {
+        BlockStatement(ast) {
+          ast.hash = b.hash([b.pair('hello', b.string('world'))]);
+        },
+      };
+    });
+
+    assert.equal(code, '{{#foo-bar hello="world"}}Hi there!{{/foo-bar}}');
+  });
+
+  QUnit.test('pushing new item on to empty hash pair works', function(assert) {
+    let template = '{{#foo-bar}}Hi there!{{/foo-bar}}';
+    let { code } = transform(template, env => {
+      let { builders: b } = env.syntax;
+      return {
+        BlockStatement(ast) {
+          ast.hash.pairs.push(b.pair('hello', b.string('world')));
+        },
+      };
+    });
+
+    assert.equal(code, '{{#foo-bar hello="world"}}Hi there!{{/foo-bar}}');
+  });
+
+  // Recast seems to be really unhappy about trying to make multiple sequential changes
+  // to a particular hash set. For now, if you need to add multiple items on to an
+  // empty hash pair, better to build a hash and set the hash property on the
+  // parent BlockStatement.
+  QUnit.todo('pushing multiple new items on to empty hash pair works', function(assert) {
+    let template = '{{#foo-bar}}Hi there!{{/foo-bar}}';
+    let { code } = transform(template, env => {
+      let { builders: b } = env.syntax;
+      return {
+        BlockStatement(ast) {
+          ast.hash.pairs.push(b.pair('hello', b.string('world')), b.pair('foo', b.string('bar')));
+        },
+      };
+    });
+
+    assert.equal(code, '{{#foo-bar hello="world" foo="bar"}}Hi there!{{/foo-bar}}');
+  });
 });
 
 QUnit.module('whitespace and removed hash pairs', function() {
