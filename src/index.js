@@ -99,25 +99,27 @@ function wrapNode(node, parentNode, nearestNodeWithLoc, nearestNodeWithStableLoc
           },
           value: updatedValue,
         });
-      } else if (property === 'hash' && node.type === 'BlockStatement' && _isSynthetic(original)) {
+      } else if (
+        property === 'hash' &&
+        (node.type === 'BlockStatement' || node.type === 'MustacheStatement') &&
+        _isSynthetic(original)
+      ) {
         // Catches case where we try to replace an empty hash with a hash
         // that contains entries.
         const endOfPath = node.path.loc.end;
-        const hasBlockParams = node.program.blockParams.length > 0;
         parseResult.modifications.push({
           start: endOfPath,
           end: endOfPath,
-          value: ` ${_print(updatedValue)}${hasBlockParams ? ' ' : ''}`,
+          value: ` ${_print(updatedValue)}`,
         });
-      } else if (property === '0' && parentNode.type === 'Hash' && _isSynthetic(parentNode)) {
+      } else if (Array.isArray(node) && parentNode.type === 'Hash' && _isSynthetic(parentNode)) {
         // Catches case where we try to push a new hash pair on to a hash
         // that doesn't contain any entries.
         const endOfPath = nearestNodeWithStableLoc.path.loc.end;
-        const hasBlockParams = nearestNodeWithStableLoc.program.blockParams.length > 0;
         parseResult.modifications.push({
           start: endOfPath,
           end: endOfPath,
-          value: ` ${_print(updatedValue)}${hasBlockParams ? ' ' : ''}`,
+          value: ` ${_print(updatedValue)}`,
         });
       } else {
         parseResult.modifications.push({
