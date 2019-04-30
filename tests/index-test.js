@@ -303,6 +303,113 @@ QUnit.module('transform', () => {
 
     assert.equal(code, '{{wat-wat}}');
   });
+
+  QUnit.test('replacing empty hash pair on BlockStatement works', function(assert) {
+    let template = '{{#foo-bar}}Hi there!{{/foo-bar}}{{baz}}';
+    let { code } = transform(template, env => {
+      let { builders: b } = env.syntax;
+      return {
+        BlockStatement(ast) {
+          ast.hash = b.hash([b.pair('hello', b.string('world'))]);
+        },
+      };
+    });
+
+    assert.equal(code, '{{#foo-bar hello="world"}}Hi there!{{/foo-bar}}{{baz}}');
+  });
+
+  QUnit.test('pushing new item on to empty hash pair on BlockStatement works', function(assert) {
+    let template = '{{#foo-bar}}Hi there!{{/foo-bar}}{{baz}}';
+    let { code } = transform(template, env => {
+      let { builders: b } = env.syntax;
+      return {
+        BlockStatement(ast) {
+          ast.hash.pairs.push(b.pair('hello', b.string('world')));
+        },
+      };
+    });
+
+    assert.equal(code, '{{#foo-bar hello="world"}}Hi there!{{/foo-bar}}{{baz}}');
+  });
+
+  // There's currently an issue trying to make multiple sequential changes
+  // to an empty hash set. For now, if you need to add multiple items on to an
+  // empty hash pair, better to build a hash and set the hash property on the
+  // parent BlockStatement.
+  QUnit.todo('pushing multiple new items on to empty hash pair works', function(assert) {
+    let template = '{{#foo-bar}}Hi there!{{/foo-bar}}{{baz}}';
+    let { code } = transform(template, env => {
+      let { builders: b } = env.syntax;
+      return {
+        BlockStatement(ast) {
+          ast.hash.pairs.push(b.pair('hello', b.string('world')), b.pair('foo', b.string('bar')));
+        },
+      };
+    });
+
+    assert.equal(code, '{{#foo-bar hello="world" foo="bar"}}Hi there!{{/foo-bar}}{{baz}}');
+  });
+
+  QUnit.test('replacing empty hash pair on a BlockStatement w/ block params works', function(
+    assert
+  ) {
+    let template = '{{#foo-bar as |a b c|}}Hi there!{{/foo-bar}}{{baz}}';
+    let { code } = transform(template, env => {
+      let { builders: b } = env.syntax;
+      return {
+        BlockStatement(ast) {
+          ast.hash = b.hash([b.pair('hello', b.string('world'))]);
+        },
+      };
+    });
+
+    assert.equal(code, '{{#foo-bar hello="world" as |a b c|}}Hi there!{{/foo-bar}}{{baz}}');
+  });
+
+  QUnit.test(
+    'pushing new item on an empty hash on a BlockStatement w/ block params works',
+    function(assert) {
+      let template = '{{#foo-bar as |a b c|}}Hi there!{{/foo-bar}}{{baz}}';
+      let { code } = transform(template, env => {
+        let { builders: b } = env.syntax;
+        return {
+          BlockStatement(ast) {
+            ast.hash.pairs.push(b.pair('hello', b.string('world')));
+          },
+        };
+      });
+
+      assert.equal(code, '{{#foo-bar hello="world" as |a b c|}}Hi there!{{/foo-bar}}{{baz}}');
+    }
+  );
+
+  QUnit.test('replacing empty hash pair on MustacheStatement works', function(assert) {
+    let template = '{{foo-bar}}{{#baz}}Hello!{{/baz}}';
+    let { code } = transform(template, env => {
+      let { builders: b } = env.syntax;
+      return {
+        MustacheStatement(ast) {
+          ast.hash = b.hash([b.pair('hello', b.string('world'))]);
+        },
+      };
+    });
+
+    assert.equal(code, '{{foo-bar hello="world"}}{{#baz}}Hello!{{/baz}}');
+  });
+
+  QUnit.test('pushing new item on to empty hash pair on MustacheStatement works', function(assert) {
+    let template = '{{foo-bar}}{{#baz}}Hello!{{/baz}}';
+    let { code } = transform(template, env => {
+      let { builders: b } = env.syntax;
+      return {
+        MustacheStatement(ast) {
+          ast.hash.pairs.push(b.pair('hello', b.string('world')));
+        },
+      };
+    });
+
+    assert.equal(code, '{{foo-bar hello="world"}}{{#baz}}Hello!{{/baz}}');
+  });
 });
 
 QUnit.module('whitespace and removed hash pairs', function() {
