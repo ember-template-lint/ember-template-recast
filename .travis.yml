@@ -20,8 +20,6 @@ stages:
   - additional tests
 
 jobs:
-  fail_fast: true
-
   include:
     # runs tests with current locked deps and linting
     - stage: test
