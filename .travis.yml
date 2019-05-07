@@ -29,9 +29,6 @@ jobs:
       install: yarn install --no-lockfile --non-interactive
       script: yarn test
 
-    - name: Node 6
-      node_js: "6"
-
     - name: Node 8
       node_js: "8"
 
