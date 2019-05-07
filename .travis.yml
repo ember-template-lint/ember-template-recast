@@ -32,9 +32,6 @@ jobs:
     - name: Node 8
       node_js: "8"
 
-    - name: Node 9
-      node_js: "9"
-
     - name: Node 10
       node_js: "10"
 
