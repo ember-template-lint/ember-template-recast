@@ -7,7 +7,7 @@
   "license": "MIT",
   "bin": "bin/ember-template-recast.js",
   "engines": {
-    "node": "6.* || 8.* || 9.* || >= 10"
+    "node": "8.* || >= 10"
   },
   "scripts": {
     "lint:js": "eslint .",
