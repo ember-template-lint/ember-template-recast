@@ -36,7 +36,7 @@
     "commander": "^2.15.1",
     "globby": "^9.2.0",
     "ora": "^3.4.0",
-    "tmp": "^0.0.33",
+    "tmp": "^0.1.0",
     "workerpool": "^3.1.2"
   },
   "changelog": {
