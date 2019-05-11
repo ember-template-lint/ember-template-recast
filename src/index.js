@@ -183,9 +183,7 @@ class ParseResult {
     this.modifications = Object.freeze([]);
 
     let sortedModifications = modifications
-      .sort(function(a, b) {
-        return a.start.line - b.start.line || a.start.column - b.start.column;
-      })
+      .sort((a, b) => a.start.line - b.start.line || a.start.column - b.start.column)
       .reverse();
 
     sortedModifications.forEach(({ start, end, value }) => {
