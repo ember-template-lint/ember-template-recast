@@ -74,7 +74,6 @@ function wrapNode(node, parentNode, nearestNodeWithLoc, nearestNodeWithStableLoc
       if (Array.isArray(target) && property === 'length') return true;
 
       if (node.type === 'ElementNode' && property === 'tag') {
-        updatedValue = value;
         parseResult.modifications.push({
           start: {
             line: original.loc.start.line,
@@ -84,7 +83,7 @@ function wrapNode(node, parentNode, nearestNodeWithLoc, nearestNodeWithStableLoc
             line: original.loc.start.line,
             column: original.loc.start.column + 1 + original.tag.length,
           },
-          value: updatedValue,
+          value,
         });
 
         parseResult.modifications.push({
@@ -96,7 +95,7 @@ function wrapNode(node, parentNode, nearestNodeWithLoc, nearestNodeWithStableLoc
             line: node.loc.end.line,
             column: node.loc.end.column - 1,
           },
-          value: updatedValue,
+          value,
         });
       } else if (
         property === 'hash' &&
