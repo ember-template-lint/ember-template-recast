@@ -74,6 +74,7 @@ function wrapNode(node, parentNode, nearestNodeWithLoc, nearestNodeWithStableLoc
       if (Array.isArray(target) && property === 'length') return true;
 
       if (node.type === 'ElementNode' && property === 'tag') {
+        // change the opening tag name
         parseResult.modifications.push({
           start: {
             line: original.loc.start.line,
@@ -86,6 +87,7 @@ function wrapNode(node, parentNode, nearestNodeWithLoc, nearestNodeWithStableLoc
           value,
         });
 
+        // change the closing tag name
         parseResult.modifications.push({
           start: {
             line: node.loc.end.line,
