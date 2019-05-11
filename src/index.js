@@ -87,12 +87,11 @@ function wrapNode(node, parentNode, nearestNodeWithLoc, nearestNodeWithStableLoc
           value: updatedValue,
         });
 
-        let start = {
-          line: node.loc.end.line,
-          column: node.loc.end.column - 1 - original.tag.length,
-        };
         parseResult.modifications.push({
-          start,
+          start: {
+            line: node.loc.end.line,
+            column: node.loc.end.column - 1 - original.tag.length,
+          },
           end: {
             line: node.loc.end.line,
             column: node.loc.end.column - 1,
@@ -130,12 +129,11 @@ function wrapNode(node, parentNode, nearestNodeWithLoc, nearestNodeWithStableLoc
       }
 
       if (property === 'path' && node.type === 'BlockStatement') {
-        let start = {
-          line: node.loc.end.line,
-          column: node.loc.end.column - 2 - original.original.length,
-        };
         parseResult.modifications.push({
-          start,
+          start: {
+            line: node.loc.end.line,
+            column: node.loc.end.column - 2 - original.original.length,
+          },
           end: {
             line: node.loc.end.line,
             column: node.loc.end.column - 2,
