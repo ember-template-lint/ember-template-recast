@@ -87,18 +87,20 @@ function wrapNode(node, parentNode, nearestNodeWithLoc, nearestNodeWithStableLoc
           value,
         });
 
-        // change the closing tag name
-        parseResult.modifications.push({
-          start: {
-            line: node.loc.end.line,
-            column: node.loc.end.column - 1 - original.tag.length,
-          },
-          end: {
-            line: node.loc.end.line,
-            column: node.loc.end.column - 1,
-          },
-          value,
-        });
+        if (!node.selfClosing) {
+          // change the closing tag name
+          parseResult.modifications.push({
+            start: {
+              line: node.loc.end.line,
+              column: node.loc.end.column - 1 - original.tag.length,
+            },
+            end: {
+              line: node.loc.end.line,
+              column: node.loc.end.column - 1,
+            },
+            value,
+          });
+        }
       } else if (
         property === 'hash' &&
         (node.type === 'BlockStatement' || node.type === 'MustacheStatement') &&
