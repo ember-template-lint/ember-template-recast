@@ -136,6 +136,14 @@ QUnit.module('ember-template-recast', function() {
     );
   });
 
+  QUnit.test('rename self-closing element tagname', function(assert) {
+    let ast = parse('<Foo bar="baz"/>');
+
+    ast.body[0].tag = 'Qux';
+
+    assert.equal(print(ast), '<Qux bar="baz"/>');
+  });
+
   QUnit.test('rename inline helper', function(assert) {
     let template = stripIndent`
       {{foo-bar

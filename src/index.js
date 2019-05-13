@@ -74,7 +74,7 @@ function wrapNode(node, parentNode, nearestNodeWithLoc, nearestNodeWithStableLoc
       if (Array.isArray(target) && property === 'length') return true;
 
       if (node.type === 'ElementNode' && property === 'tag') {
-        updatedValue = value;
+        // change the opening tag name
         parseResult.modifications.push({
           start: {
             line: original.loc.start.line,
@@ -84,21 +84,23 @@ function wrapNode(node, parentNode, nearestNodeWithLoc, nearestNodeWithStableLoc
             line: original.loc.start.line,
             column: original.loc.start.column + 1 + original.tag.length,
           },
-          value: updatedValue,
+          value,
         });
 
-        let start = {
-          line: node.loc.end.line,
-          column: node.loc.end.column - 1 - original.tag.length,
-        };
-        parseResult.modifications.push({
-          start,
-          end: {
-            line: node.loc.end.line,
-            column: node.loc.end.column - 1,
-          },
-          value: updatedValue,
-        });
+        if (!node.selfClosing) {
+          // change the closing tag name
+          parseResult.modifications.push({
+            start: {
+              line: node.loc.end.line,
+              column: node.loc.end.column - 1 - original.tag.length,
+            },
+            end: {
+              line: node.loc.end.line,
+              column: node.loc.end.column - 1,
+            },
+            value,
+          });
+        }
       } else if (
         property === 'hash' &&
         (node.type === 'BlockStatement' || node.type === 'MustacheStatement') &&
@@ -130,12 +132,11 @@ function wrapNode(node, parentNode, nearestNodeWithLoc, nearestNodeWithStableLoc
       }
 
       if (property === 'path' && node.type === 'BlockStatement') {
-        let start = {
-          line: node.loc.end.line,
-          column: node.loc.end.column - 2 - original.original.length,
-        };
         parseResult.modifications.push({
-          start,
+          start: {
+            line: node.loc.end.line,
+            column: node.loc.end.column - 2 - original.original.length,
+          },
           end: {
             line: node.loc.end.line,
             column: node.loc.end.column - 2,
@@ -183,9 +184,7 @@ class ParseResult {
     this.modifications = Object.freeze([]);
 
     let sortedModifications = modifications
-      .sort(function(a, b) {
-        return a.start.line - b.start.line || a.start.column - b.start.column;
-      })
+      .sort((a, b) => a.start.line - b.start.line || a.start.column - b.start.column)
       .reverse();
 
     sortedModifications.forEach(({ start, end, value }) => {
