@@ -278,9 +278,9 @@ astral-regex@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/astral-regex/-/astral-regex-1.0.0.tgz#6c8c3fb827dd43ee3918f27b82782ab7658a6fd9"
 
-async-promise-queue@^1.0.4:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/async-promise-queue/-/async-promise-queue-1.0.4.tgz#308baafbc74aff66a0bb6e7f4a18d4fe8434440c"
+async-promise-queue@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/async-promise-queue/-/async-promise-queue-1.0.5.tgz#cb23bce9fce903a133946a700cc85f27f09ea49d"
   dependencies:
     async "^2.4.1"
     debug "^2.6.8"
