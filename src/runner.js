@@ -37,7 +37,9 @@ const verboseLogger = {
     this.spinner = ora(message).start();
   },
   updateSpinner(message) {
-    this.spinner && this.spinner.text = message;
+    if (this.spinner) {
+      this.spinner.text = message;
+    }
   },
   stopSpinner(persistentMessage) {
     if (persistentMessage) {
