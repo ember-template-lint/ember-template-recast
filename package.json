@@ -2,32 +2,19 @@
   "name": "ember-template-recast",
   "version": "1.2.5",
   "description": "Non-destructive template transformer.",
-  "main": "src/index.js",
-  "author": "Robert Jackson <me@rwjblue.com>",
   "license": "MIT",
-  "bin": "bin/ember-template-recast.js",
-  "engines": {
-    "node": "8.* || 10.* || >= 12.*"
-  },
-  "scripts": {
-    "lint:js": "eslint .",
-    "test": "qunit tests/**/*-test.js",
-    "changelog": "lerna-changelog"
-  },
+  "author": "Robert Jackson <me@rwjblue.com>",
   "files": [
     "bin/",
     "src/"
   ],
-  "devDependencies": {
-    "broccoli-test-helper": "^2.0.0",
-    "common-tags": "^1.8.0",
-    "eslint": "^5.16.0",
-    "eslint-config-prettier": "^5.0.0",
-    "eslint-plugin-node": "^9.0.1",
-    "eslint-plugin-prettier": "^3.1.0",
-    "lerna-changelog": "^0.8.2",
-    "prettier": "^1.18.2",
-    "qunit": "^2.9.2"
+  "main": "src/index.js",
+  "bin": "bin/ember-template-recast.js",
+  "scripts": {
+    "changelog": "lerna-changelog",
+    "lint:js": "eslint .",
+    "release": "release-it",
+    "test": "qunit tests/**/*-test.js"
   },
   "dependencies": {
     "@glimmer/syntax": "^0.41.0",
@@ -39,6 +26,25 @@
     "tmp": "^0.1.0",
     "workerpool": "^3.1.2"
   },
+  "devDependencies": {
+    "broccoli-test-helper": "^2.0.0",
+    "common-tags": "^1.8.0",
+    "eslint": "^5.16.0",
+    "eslint-config-prettier": "^5.0.0",
+    "eslint-plugin-node": "^9.0.1",
+    "eslint-plugin-prettier": "^3.1.0",
+    "lerna-changelog": "^0.8.2",
+    "prettier": "^1.18.2",
+    "qunit": "^2.9.2",
+    "release-it": "^12.2.1",
+    "release-it-lerna-changelog": "^1.0.3"
+  },
+  "engines": {
+    "node": "8.* || 10.* || >= 12.*"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
   "changelog": {
     "repo": "ember-template-lint/ember-template-recast",
     "labels": {
@@ -47,6 +53,19 @@
       "bug": ":bug: Bug Fix",
       "documentation": ":memo: Documentation",
       "internal": ":house: Internal"
+    }
+  },
+  "release-it": {
+    "plugins": {
+      "release-it-lerna-changelog": {
+        "infile": "CHANGELOG.md"
+      }
+    },
+    "git": {
+      "tagName": "v${version}"
+    },
+    "github": {
+      "release": true
     }
   }
 }
