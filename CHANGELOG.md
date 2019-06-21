@@ -1,3 +1,25 @@
+## v2.0.0 (2019-06-21)
+
+#### :boom: Breaking Change
+* [#57](https://github.com/ember-template-lint/ember-template-recast/pull/57) Drop support for Node 11. ([@rwjblue](https://github.com/rwjblue))
+* [#37](https://github.com/ember-template-lint/ember-template-recast/pull/37) Drop support for Node.js 6 and 9 ([@Turbo87](https://github.com/Turbo87))
+
+#### :rocket: Enhancement
+* [#30](https://github.com/ember-template-lint/ember-template-recast/pull/30) Bump @glimmer/syntax from 0.39.3 to 0.40.1 ([@dependabot-preview[bot]](https://github.com/apps/dependabot-preview))
+
+#### :bug: Bug Fix
+* [#56](https://github.com/ember-template-lint/ember-template-recast/pull/56) Ensure logging doesn't obscure actual errors ([@lennyburdette](https://github.com/lennyburdette))
+* [#45](https://github.com/ember-template-lint/ember-template-recast/pull/45) Fix broken tag name mutation for self-closing elements ([@Turbo87](https://github.com/Turbo87))
+
+#### :house: Internal
+* [#31](https://github.com/ember-template-lint/ember-template-recast/pull/31) Cleanup CI config ([@Turbo87](https://github.com/Turbo87))
+
+#### Committers: 4
+- Lenny Burdette ([@lennyburdette](https://github.com/lennyburdette))
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+- Tobias Bieniek ([@Turbo87](https://github.com/Turbo87))
+- [@dependabot-preview[bot]](https://github.com/apps/dependabot-preview)
+
 # Change Log
 
 ## v1.2.5 (2019-04-30)
