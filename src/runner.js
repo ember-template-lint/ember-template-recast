@@ -180,7 +180,7 @@ function getAllFiles(paths) {
     return path;
   });
 
-  return globby(patterns, { absolute: true }).then(files => {
+  return globby(patterns, { absolute: true, gitignore: true }).then(files => {
     if (files.length < 1) {
       throw new NoFilesError();
     }
