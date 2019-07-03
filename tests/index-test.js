@@ -470,8 +470,6 @@ QUnit.module('whitespace and removed hash pairs', function() {
           if (token === 'positional') {
             return b.path(`this.${token}`);
           }
-
-          return ast;
         },
       };
     });
