@@ -1,7 +1,7 @@
 // module.exports = function() {
 //   return {
 //     PathExpression(node) {
-//       let token = root.original;
+//       let token = node.original;
 
 //       if (token === 'property') {
 //         root.original = `this.${token}`;
@@ -18,11 +18,13 @@ module.exports = function({ source }, { parse, visit }) {
 
     return {
       PathExpression(node) {
-        let token = root.original;
+        let token = node.original;
 
         if (token === 'property') {
-          root.original = `this.${token}`;
+          return b.path(`this.${token}`);
         }
+
+        return node;
       },
     };
   });
