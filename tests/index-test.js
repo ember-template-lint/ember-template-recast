@@ -461,14 +461,17 @@ QUnit.module('whitespace and removed hash pairs', function() {
       {{/block}}
     `;
 
-    let { code } = transform(template, function() {
+    let { code } = transform(template, function(env) {
+      let { builders: b } = env.syntax;
       return {
         PathExpression(ast) {
           let token = ast.original;
 
           if (token === 'positional') {
-            ast.original = `this.${token}`;
+            return b.path(`this.${token}`);
           }
+
+          return ast;
         },
       };
     });
