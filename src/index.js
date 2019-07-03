@@ -112,7 +112,7 @@ function wrapNode(node, parentNode, nearestNodeWithLoc, nearestNodeWithStableLoc
         parseResult.modifications.push({
           start: endOfPath,
           end: endOfPath,
-          value: ` ${_print(updatedValue)}`,
+          value: ` ${_print(updatedValue, { entityEncoding: 'raw' })}`,
         });
       } else if (Array.isArray(node) && parentNode.type === 'Hash' && _isSynthetic(parentNode)) {
         // Catches case where we try to push a new hash pair on to a hash
@@ -121,7 +121,7 @@ function wrapNode(node, parentNode, nearestNodeWithLoc, nearestNodeWithStableLoc
         parseResult.modifications.push({
           start: endOfPath,
           end: endOfPath,
-          value: ` ${_print(updatedValue)}`,
+          value: ` ${_print(updatedValue, { entityEncoding: 'raw' })}`,
         });
       } else {
         parseResult.modifications.push({
@@ -172,6 +172,7 @@ class ParseResult {
     this.modifications = [];
 
     let ast = preprocess(template, {
+      mode: 'codemod',
       parseOptions: {
         ignoreStandalone: true,
       },
@@ -188,7 +189,7 @@ class ParseResult {
       .reverse();
 
     sortedModifications.forEach(({ start, end, value }) => {
-      let printed = typeof value === 'string' ? value : _print(value);
+      let printed = typeof value === 'string' ? value : _print(value, { entityEncoding: 'raw' });
       let firstIndexToUpdate = start.line - 1;
       let lastIndexToUpdate = end.line - 1;
       let firstLineContents = this.source[firstIndexToUpdate];

@@ -52,6 +52,14 @@ QUnit.module('ember-template-recast', function() {
     );
   });
 
+  QUnit.test('basic parse -> mutation -> print: preserves HTML entities', function(assert) {
+    let template = stripIndent`<div>&nbsp;</div>`;
+    let ast = parse(template);
+    ast.body[0].children.push(builders.text('derp&nbsp;'));
+
+    assert.equal(print(ast), stripIndent`<div>&nbsp;derp&nbsp;</div>`);
+  });
+
   QUnit.test('rename non-block component', function(assert) {
     let template = stripIndent`
       {{foo-bar
