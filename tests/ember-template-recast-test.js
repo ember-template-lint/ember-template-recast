@@ -15,8 +15,10 @@ function run(args, cwd) {
   });
 }
 
-QUnit.module('ember-template-recast adding "this" to properties in PathExpression', function(hooks) {
-  hooks.beforeEach(function( ){
+QUnit.module('ember-template-recast adding "this" to properties in PathExpression', function(
+  hooks
+) {
+  hooks.beforeEach(function() {
     return createTempDir().then(fixture => {
       this.fixture = fixture;
 
