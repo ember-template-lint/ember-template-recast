@@ -454,7 +454,12 @@ QUnit.module('whitespace and removed hash pairs', function() {
   });
 
   QUnit.test('whitespace is preserved when mutating a positional param', function(assert) {
-    let template = `{{some-helper positional}}`;
+    let template = stripIndent`
+      {{some-helper positional}}
+      {{#block positional}}
+        empty
+      {{/block}}
+    `;
 
     let { code } = transform(template, function(env) {
       let { builders: b } = env.syntax;
@@ -470,7 +475,12 @@ QUnit.module('whitespace and removed hash pairs', function() {
     });
     assert.equal(
       code,
-      `{{some-helper this.positional}}`
+      stripIndent`
+        {{some-helper this.positional}}
+        {{#block this.positional}}
+          empty
+        {{/block}}
+      `
     );
   });
 
