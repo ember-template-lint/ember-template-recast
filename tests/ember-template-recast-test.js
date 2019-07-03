@@ -15,6 +15,46 @@ function run(args, cwd) {
   });
 }
 
+QUnit.module('ember-template-recast adding "this" to properties in PathExpression', function(hooks) {
+  hooks.beforeEach(function( ){
+    return createTempDir().then(fixture => {
+      this.fixture = fixture;
+
+      this.fixture.write({
+        files: {
+          'a.hbs': '{{hello-world property}}',
+        },
+        'transform.js': readFileSync(join(__dirname, 'fixtures', 'add-this.js'), 'utf8'),
+      });
+    });
+  });
+
+  hooks.afterEach(function() {
+    if (this.input) {
+      return this.input.dispose();
+    }
+  });
+
+  QUnit.test('updates the file', function(assert) {
+    return run(['files', '-c', '1'], this.fixture.path()).then(({ stdout }) => {
+      const out = this.fixture.read();
+
+      assert.equal(
+        stdout,
+        `Processing 3 files…
+Spawning 1 worker…
+Ok:        1
+Unchanged: 0
+`
+      );
+
+      assert.deepEqual(out.files, {
+        'a.hbs': '{{hello-world this.property}}',
+      });
+    });
+  });
+});
+
 QUnit.module('ember-template-recast executable', function({ beforeEach, afterEach }) {
   beforeEach(function() {
     return createTempDir().then(fixture => {
