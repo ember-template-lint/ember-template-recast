@@ -461,8 +461,7 @@ QUnit.module('whitespace and removed hash pairs', function() {
       {{/block}}
     `;
 
-    let { code } = transform(template, function(env) {
-      let { builders: b } = env.syntax;
+    let { code } = transform(template, function() {
       return {
         PathExpression(ast) {
           let token = ast.original;
