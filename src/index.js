@@ -75,7 +75,7 @@ function wrapNode(node, parentNode, nearestNodeWithLoc, nearestNodeWithStableLoc
 
       if (node.type === 'ElementNode' && property === 'tag') {
         // change the opening tag name
-        parseResult.modifications.push({
+        parseResult.addModification({
           start: {
             line: original.loc.start.line,
             column: original.loc.start.column + 1,
@@ -89,7 +89,7 @@ function wrapNode(node, parentNode, nearestNodeWithLoc, nearestNodeWithStableLoc
 
         if (!node.selfClosing) {
           // change the closing tag name
-          parseResult.modifications.push({
+          parseResult.addModification({
             start: {
               line: node.loc.end.line,
               column: node.loc.end.column - 1 - original.tag.length,
@@ -109,7 +109,7 @@ function wrapNode(node, parentNode, nearestNodeWithLoc, nearestNodeWithStableLoc
         // Catches case where we try to replace an empty hash with a hash
         // that contains entries.
         const endOfPath = node.path.loc.end;
-        parseResult.modifications.push({
+        parseResult.addModification({
           start: endOfPath,
           end: endOfPath,
           value: ` ${_print(updatedValue, { entityEncoding: 'raw' })}`,
@@ -118,13 +118,13 @@ function wrapNode(node, parentNode, nearestNodeWithLoc, nearestNodeWithStableLoc
         // Catches case where we try to push a new hash pair on to a hash
         // that doesn't contain any entries.
         const endOfPath = nearestNodeWithStableLoc.path.loc.end;
-        parseResult.modifications.push({
+        parseResult.addModification({
           start: endOfPath,
           end: endOfPath,
           value: ` ${_print(updatedValue, { entityEncoding: 'raw' })}`,
         });
       } else {
-        parseResult.modifications.push({
+        parseResult.addModification({
           start: original.loc.start,
           end: original.loc.end,
           value: updatedValue,
@@ -132,7 +132,7 @@ function wrapNode(node, parentNode, nearestNodeWithLoc, nearestNodeWithStableLoc
       }
 
       if (property === 'path' && node.type === 'BlockStatement') {
-        parseResult.modifications.push({
+        parseResult.addModification({
           start: {
             line: node.loc.end.line,
             column: node.loc.end.column - 2 - original.original.length,
@@ -166,6 +166,15 @@ function wrapNode(node, parentNode, nearestNodeWithLoc, nearestNodeWithStableLoc
   return proxy;
 }
 
+function hasSameLocation(a, b) {
+  return (
+    a.start.line === b.start.line &&
+    a.start.column === b.start.column &&
+    a.end.line === b.end.line &&
+    a.end.column === b.end.column
+  );
+}
+
 class ParseResult {
   constructor(template) {
     this.source = linesFrom(template);
@@ -178,6 +187,18 @@ class ParseResult {
       },
     });
     this.ast = wrapNode(ast, null, ast, ast, this);
+  }
+
+  addModification(modification) {
+    let existingModificationIndex = this.modifications.findIndex(m =>
+      hasSameLocation(m, modification)
+    );
+
+    if (existingModificationIndex === -1) {
+      this.modifications.push(modification);
+    } else {
+      this.modifications.splice(existingModificationIndex, 1, modification);
+    }
   }
 
   applyModifications() {

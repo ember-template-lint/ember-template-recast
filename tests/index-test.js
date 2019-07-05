@@ -244,6 +244,62 @@ QUnit.module('transform', () => {
     assert.deepEqual(paths, ['foo-bar', 'foo']);
   });
 
+  QUnit.test('can handle comment append before html node case', function(assert) {
+    let template = '<table></table>';
+    let seen = new Set();
+
+    const result = transform(template, function({ syntax }) {
+      const b = syntax.builders;
+
+      return {
+        ElementNode(node) {
+          if (node.tag === 'table' && !seen.has(node)) {
+            seen.add(node);
+
+            return [b.mustacheComment(' template-lint-disable no-table-tag '), b.text('\n'), node];
+          }
+          return node;
+        },
+      };
+    });
+
+    assert.deepEqual(
+      result.code,
+      ['{{!-- template-lint-disable no-table-tag --}}', '<table></table>'].join('\n')
+    );
+  });
+
+  QUnit.test('can handle comment append between html + newline', function(assert) {
+    let template = ['\n', '<table>', '<tbody></tbody>', '</table>'].join('\n');
+    let seen = new Set();
+
+    const result = transform(template, function({ syntax }) {
+      const b = syntax.builders;
+
+      return {
+        ElementNode(node) {
+          if (node.tag === 'table' && !seen.has(node)) {
+            seen.add(node);
+
+            return [b.mustacheComment(' template-lint-disable no-table-tag '), b.text('\n'), node];
+          }
+          return node;
+        },
+      };
+    });
+
+    assert.deepEqual(
+      result.code,
+      [
+        '\n',
+        '{{!-- template-lint-disable no-table-tag --}}',
+        '<table>',
+        '<tbody></tbody>',
+        '</table>',
+      ].join('\n')
+    );
+  });
+
   QUnit.test('can accept an AST', function(assert) {
     let template = '{{foo-bar bar=foo}}';
     let paths = [];
@@ -348,12 +404,9 @@ QUnit.module('transform', () => {
     assert.equal(code, '{{#foo-bar hello="world"}}Hi there!{{/foo-bar}}{{baz}}');
   });
 
-  // There's currently an issue trying to make multiple sequential changes
-  // to an empty hash set. For now, if you need to add multiple items on to an
-  // empty hash pair, better to build a hash and set the hash property on the
-  // parent BlockStatement.
-  QUnit.todo('pushing multiple new items on to empty hash pair works', function(assert) {
+  QUnit.test('pushing multiple new items on to empty hash pair works', function(assert) {
     let template = '{{#foo-bar}}Hi there!{{/foo-bar}}{{baz}}';
+
     let { code } = transform(template, env => {
       let { builders: b } = env.syntax;
       return {
