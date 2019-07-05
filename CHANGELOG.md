@@ -1,4 +1,19 @@
-Must provide GITHUB_AUTH
+## v2.0.1 (2019-07-05)
+
+#### :bug: Bug Fix
+* [#67](https://github.com/ember-template-lint/ember-template-recast/pull/67) Fix rewriting of whitespace controlled mustaches (bump @glimmer/syntax to 0.41.3) ([@dependabot-preview[bot]](https://github.com/apps/dependabot-preview))
+* * [#66](https://github.com/ember-template-lint/ember-template-recast/pull/66) Ensure HTML Entities are not transformed during printing ([@rwjblue](https://github.com/rwjblue))
+* * [#61](https://github.com/ember-template-lint/ember-template-recast/pull/61) Ensure `{{{` can be printed properly (bump @glimmer/syntax to 0.41.1) ([@dependabot-preview[bot]](https://github.com/apps/dependabot-preview))
+* * [#63](https://github.com/ember-template-lint/ember-template-recast/pull/63) Ignore gitignored files when using globs ([@lennyburdette](https://github.com/lennyburdette))
+*
+* #### :house: Internal
+* * [#65](https://github.com/ember-template-lint/ember-template-recast/pull/65) Add test case demonstrating how to update a path expression of a positional param ([@NullVoxPopuli](https://github.com/NullVoxPopuli))
+*
+* #### Committers: 4
+* - L. Preston Sego III ([@NullVoxPopuli](https://github.com/NullVoxPopuli))
+* - Lenny Burdette ([@lennyburdette](https://github.com/lennyburdette))
+* - Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+* - [@dependabot-preview[bot]](https://github.com/apps/dependabot-preview)
 
 ## v2.0.0 (2019-06-21)
 
