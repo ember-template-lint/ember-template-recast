@@ -244,6 +244,28 @@ QUnit.module('transform', () => {
     assert.deepEqual(paths, ['foo-bar', 'foo']);
   });
 
+  QUnit.test('can handle comment append before html node case', function(assert) {
+    let template = '<table></table>';
+    let alreadyCommented = [];
+    const result = transform(template, function({ syntax }) {
+      const b = syntax.builders;
+      return {
+        ElementNode(node) {
+          if (node.tag === 'table' && !alreadyCommented.find(c => c === node)) {
+            alreadyCommented.push(node);
+            return [b.mustacheComment(' template-lint-disable no-table-tag '), b.text('\n'), node];
+          }
+          return node;
+        },
+      };
+    });
+
+    assert.deepEqual(
+      result.code,
+      ['{{!-- template-lint-disable no-table-tag --}}', '<table></table'].join('\n')
+    );
+  });
+
   QUnit.test('can accept an AST', function(assert) {
     let template = '{{foo-bar bar=foo}}';
     let paths = [];
