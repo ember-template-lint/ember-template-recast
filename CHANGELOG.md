@@ -1,3 +1,11 @@
+## v2.0.2 (2019-07-05)
+
+#### :bug: Bug Fix
+* [#69](https://github.com/ember-template-lint/ember-template-recast/pull/69) Ensure returning an array from a visitor is handled properly ([@lifeart](https://github.com/lifeart))
+
+#### Committers: 1
+- Alex Kanunnikov ([@lifeart](https://github.com/lifeart))
+
 ## v2.0.1 (2019-07-05)
 
 #### :bug: Bug Fix
