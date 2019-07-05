@@ -262,7 +262,35 @@ QUnit.module('transform', () => {
 
     assert.deepEqual(
       result.code,
-      ['{{!-- template-lint-disable no-table-tag --}}', '<table></table'].join('\n')
+      ['{{!-- template-lint-disable no-table-tag --}}', '<table></table>'].join('\n')
+    );
+  });
+
+  QUnit.test('can handle comment append between html + newline', function(assert) {
+    let template = ['\n', '<table>', '<tbody></tbody>', '</table>'].join('\n');
+    let alreadyCommented = [];
+    const result = transform(template, function({ syntax }) {
+      const b = syntax.builders;
+      return {
+        ElementNode(node) {
+          if (node.tag === 'table' && !alreadyCommented.find(c => c === node)) {
+            alreadyCommented.push(node);
+            return [b.mustacheComment(' template-lint-disable no-table-tag '), b.text('\n'), node];
+          }
+          return node;
+        },
+      };
+    });
+
+    assert.deepEqual(
+      result.code,
+      [
+        '\n',
+        '{{!-- template-lint-disable no-table-tag --}}',
+        '<table>',
+        '<tbody></tbody>',
+        '</table>',
+      ].join('\n')
     );
   });
 
