@@ -398,12 +398,9 @@ QUnit.module('transform', () => {
     assert.equal(code, '{{#foo-bar hello="world"}}Hi there!{{/foo-bar}}{{baz}}');
   });
 
-  // There's currently an issue trying to make multiple sequential changes
-  // to an empty hash set. For now, if you need to add multiple items on to an
-  // empty hash pair, better to build a hash and set the hash property on the
-  // parent BlockStatement.
-  QUnit.todo('pushing multiple new items on to empty hash pair works', function(assert) {
+  QUnit.test('pushing multiple new items on to empty hash pair works', function(assert) {
     let template = '{{#foo-bar}}Hi there!{{/foo-bar}}{{baz}}';
+
     let { code } = transform(template, env => {
       let { builders: b } = env.syntax;
       return {
