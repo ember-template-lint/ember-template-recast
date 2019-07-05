@@ -246,13 +246,16 @@ QUnit.module('transform', () => {
 
   QUnit.test('can handle comment append before html node case', function(assert) {
     let template = '<table></table>';
-    let alreadyCommented = [];
+    let seen = new Set();
+
     const result = transform(template, function({ syntax }) {
       const b = syntax.builders;
+
       return {
         ElementNode(node) {
-          if (node.tag === 'table' && !alreadyCommented.find(c => c === node)) {
-            alreadyCommented.push(node);
+          if (node.tag === 'table' && !seen.has(node)) {
+            seen.add(node);
+
             return [b.mustacheComment(' template-lint-disable no-table-tag '), b.text('\n'), node];
           }
           return node;
@@ -268,13 +271,16 @@ QUnit.module('transform', () => {
 
   QUnit.test('can handle comment append between html + newline', function(assert) {
     let template = ['\n', '<table>', '<tbody></tbody>', '</table>'].join('\n');
-    let alreadyCommented = [];
+    let seen = new Set();
+
     const result = transform(template, function({ syntax }) {
       const b = syntax.builders;
+
       return {
         ElementNode(node) {
-          if (node.tag === 'table' && !alreadyCommented.find(c => c === node)) {
-            alreadyCommented.push(node);
+          if (node.tag === 'table' && !seen.has(node)) {
+            seen.add(node);
+
             return [b.mustacheComment(' template-lint-disable no-table-tag '), b.text('\n'), node];
           }
           return node;
