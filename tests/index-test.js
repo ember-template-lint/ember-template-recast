@@ -461,6 +461,37 @@ QUnit.module('whitespace and removed hash pairs', function() {
     );
   });
 
+  QUnit.test('whitespace is preserved when mutating a positional param', function(assert) {
+    let template = stripIndent`
+      {{some-helper positional}}
+      {{#block positional}}
+        empty
+      {{/block}}
+    `;
+
+    let { code } = transform(template, function(env) {
+      let { builders: b } = env.syntax;
+      return {
+        PathExpression(ast) {
+          let token = ast.original;
+
+          if (token === 'positional') {
+            return b.path(`this.${token}`);
+          }
+        },
+      };
+    });
+    assert.equal(
+      code,
+      stripIndent`
+        {{some-helper this.positional}}
+        {{#block this.positional}}
+          empty
+        {{/block}}
+      `
+    );
+  });
+
   QUnit.test('Same-line removed hash pair from middle collapses excess whitespace', function(
     assert
   ) {
