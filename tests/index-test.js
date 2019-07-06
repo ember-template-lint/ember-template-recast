@@ -848,4 +848,9 @@ QUnit.module('multi-line', function(hooks) {
     `
     );
   });
+
+  QUnit.skip('supports removing an {{else if foo}} condition');
+  QUnit.skip('supports adding a block param');
+  QUnit.skip('supports removing a block param');
+  QUnit.skip('supports updating the various literal types');
 });
