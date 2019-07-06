@@ -33,7 +33,7 @@ QUnit.module('ember-template-recast', function() {
     assert.equal(print(ast), template);
   });
 
-  QUnit.todo('basic parse -> mutation -> print', function(assert) {
+  QUnit.test('basic parse -> mutation -> print', function(assert) {
     let template = stripIndent`
       {{foo-bar
         baz="stuff"
@@ -52,7 +52,7 @@ QUnit.module('ember-template-recast', function() {
     );
   });
 
-  QUnit.todo('infers indentation of hash when multiple HashPairs existed', function(assert) {
+  QUnit.test('infers indentation of hash when multiple HashPairs existed', function(assert) {
     let template = stripIndent`
       {{foo-bar
         baz="stuff"
@@ -100,7 +100,7 @@ QUnit.module('ember-template-recast', function() {
     assert.equal(print(ast), stripIndent`<div>&nbsp;derp&nbsp;</div>`);
   });
 
-  QUnit.todo('rename non-block component', function(assert) {
+  QUnit.test('rename non-block component', function(assert) {
     let template = stripIndent`
       {{foo-bar
         baz="stuff"

@@ -253,13 +253,14 @@ module.exports = class ParseResult {
               })
             : '';
 
-          let postParamsWhitespace =
-            hadHash && hadParams
-              ? this.sourceForLoc({
-                  start: original.params[original.params.length - 1].loc.end,
-                  end: original.hash.loc.start,
-                })
-              : '';
+          let postParamsWhitespace = hadHash
+            ? this.sourceForLoc({
+                start: hadParams
+                  ? original.params[original.params.length - 1].loc.end
+                  : original.path.loc.end,
+                end: original.hash.loc.start,
+              })
+            : '';
 
           let hashSource = hadHash ? this.sourceForLoc(original.hash.loc) : '';
 
@@ -288,6 +289,7 @@ module.exports = class ParseResult {
 
               if (ast.params.length === 0) {
                 postPathWhitespace = '';
+                postParamsWhitespace = '';
               }
             } else {
               let joinWith;
