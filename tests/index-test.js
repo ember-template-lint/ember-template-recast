@@ -382,7 +382,7 @@ QUnit.module('ember-template-recast', function() {
   });
 
   QUnit.module('BlockStatement', function() {
-    QUnit.todo('rename block component', function(assert) {
+    QUnit.test('rename block component', function(assert) {
       let template = stripIndent`
       {{#foo-bar
         baz="stuff"
@@ -406,7 +406,7 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
-    QUnit.todo('rename block component from longer to shorter name', function(assert) {
+    QUnit.test('rename block component from longer to shorter name', function(assert) {
       let template = stripIndent`
       {{#this-is-a-long-name
         hello="world"
@@ -429,6 +429,7 @@ QUnit.module('ember-template-recast', function() {
         {{/baz-derp}}{{someInlineComponent hello="world"}}`
       );
     });
+
     QUnit.test('replacing a previously empty hash', function(assert) {
       let template = `{{#foo-bar}}Hi there!{{/foo-bar}}`;
 
@@ -472,7 +473,9 @@ QUnit.module('ember-template-recast', function() {
     QUnit.skip('add inverse');
     QUnit.skip('remove inverse');
     QUnit.skip('add child to end of program');
+    QUnit.skip('add child to beginning of program');
     QUnit.skip('add child to end of inverse');
+    QUnit.skip('add child to beginning of inverse');
     QUnit.skip('{{else if foo}} chaining');
   });
 

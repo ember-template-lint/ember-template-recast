@@ -476,17 +476,30 @@ module.exports = class ParseResult {
         {
           this._updateNodeInfoForParamsHash(ast, nodeInfo);
 
+          let hadInverse = !!ast.inverse;
+
           let openSource = this.sourceForLoc({
             start: original.loc.start,
             end: original.path.loc.end,
           });
 
-          let endSource = this.sourceForLoc({
+          // TODO: account for block params here (openEndSource should _just_
+          // be for `}}`, `}}}`, or `~}}`)
+          let openEndSource = this.sourceForLoc({
             start: nodeInfo.hadHash
               ? original.hash.loc.end
               : nodeInfo.hadParams
               ? original.params[original.params.length - 1].loc.end
               : original.path.loc.end,
+            end: original.program.loc.start,
+          });
+
+          let programSource = this.sourceForLoc(original.program.loc);
+
+          let inverseSource = hadInverse ? this.sourceForLoc(original.inverse.loc) : '';
+
+          let endSource = this.sourceForLoc({
+            start: hadInverse ? original.inverse.loc.end : original.program.loc.end,
             end: original.loc.end,
           });
 
@@ -496,6 +509,12 @@ module.exports = class ParseResult {
                 start: original.loc.start,
                 end: original.path.loc.start,
               }) + _print(ast.path);
+
+            let pathIndex = endSource.indexOf(original.path.original);
+            endSource =
+              endSource.slice(0, pathIndex) +
+              ast.path.original +
+              endSource.slice(pathIndex + original.path.original.length);
 
             dirtyFields.delete('path');
           }
@@ -508,6 +527,9 @@ module.exports = class ParseResult {
             nodeInfo.paramsSource,
             nodeInfo.postParamsWhitespace,
             nodeInfo.hashSource,
+            openEndSource,
+            programSource,
+            inverseSource,
             endSource
           );
 
