@@ -353,7 +353,7 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
-    QUnit.todo('MustacheStatements retain whitespace when multiline replacements occur', function(
+    QUnit.test('MustacheStatements retain whitespace when multiline replacements occur', function(
       assert
     ) {
       let template = stripIndent`

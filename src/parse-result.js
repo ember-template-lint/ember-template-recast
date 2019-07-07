@@ -67,10 +67,11 @@ module.exports = class ParseResult {
 
   wrapNode(ancestor, node) {
     this.ancestor.set(node, ancestor);
-    this.nodeInfo.set(node, {
+    let nodeInfo = {
       original: JSON.parse(JSON.stringify(node)),
       source: this.sourceForLoc(node.loc),
-    });
+    };
+    this.nodeInfo.set(node, nodeInfo);
 
     let hasLocInfo = !!node.loc;
     let propertyProxyMap = new Map();
@@ -108,6 +109,10 @@ module.exports = class ParseResult {
         return result;
       },
     });
+
+    // this is needed in order to handle splicing of Template.body (which
+    // happens when during replacement)
+    this.nodeInfo.set(proxy, nodeInfo);
 
     for (let key in node) {
       let value = node[key];
@@ -208,7 +213,6 @@ module.exports = class ParseResult {
         break;
       case 'ElementNode':
         {
-          debugger;
           let { selfClosing, children } = original;
           let hadChildren = children.length > 0;
 
