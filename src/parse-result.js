@@ -179,6 +179,116 @@ module.exports = class ParseResult {
     }
   }
 
+  _updateNodeInfoForParamsHash(ast, nodeInfo) {
+    let { original } = nodeInfo;
+
+    let hadParams = (nodeInfo.hadParams = original.params.length > 0);
+    let hadHash = (nodeInfo.hadHash = original.hash.pairs.length > 0);
+
+    nodeInfo.postPathWhitespace = hadParams
+      ? this.sourceForLoc({
+          start: original.path.loc.end,
+          end: original.params[0].loc.start,
+        })
+      : '';
+
+    nodeInfo.paramsSource = hadParams
+      ? this.sourceForLoc({
+          start: original.params[0].loc.start,
+          end: original.params[original.params.length - 1].loc.end,
+        })
+      : '';
+
+    nodeInfo.postParamsWhitespace = hadHash
+      ? this.sourceForLoc({
+          start: hadParams
+            ? original.params[original.params.length - 1].loc.end
+            : original.path.loc.end,
+          end: original.hash.loc.start,
+        })
+      : '';
+
+    nodeInfo.hashSource = hadHash ? this.sourceForLoc(original.hash.loc) : '';
+
+    //let postHashSource = this.sourceForLoc({
+    //  start: hadHash
+    //    ? original.hash.loc.end
+    //    : hadParams
+    //    ? original.params[original.params.length - 1].loc.end
+    //    : original.path.loc.end,
+    //  end: original.loc.end,
+    //});
+
+    //nodeInfo.postHashWhitespace = '';
+    //let postHashWhitespaceMatch = postHashSource.match(leadingWhitespace);
+    //if (postHashWhitespaceMatch) {
+    //  nodeInfo.postHashWhitespace = postHashWhitespaceMatch[0];
+    //}
+  }
+
+  _rebuildParamsHash(ast, nodeInfo, dirtyFields) {
+    let { original } = nodeInfo;
+    if (dirtyFields.has('hash')) {
+      if (ast.hash.pairs.length === 0) {
+        nodeInfo.hashSource = '';
+
+        if (ast.params.length === 0) {
+          nodeInfo.postPathWhitespace = '';
+          nodeInfo.postParamsWhitespace = '';
+        }
+      } else {
+        let joinWith;
+        if (original.hash.pairs.length > 1) {
+          joinWith = this.sourceForLoc({
+            start: original.hash.pairs[0].loc.end,
+            end: original.hash.pairs[1].loc.start,
+          });
+        } else if (nodeInfo.hadParams) {
+          joinWith = nodeInfo.postPathWhitespace;
+        } else {
+          joinWith = ' ';
+        }
+
+        nodeInfo.hashSource = ast.hash.pairs
+          .map(pair => {
+            return this.print(pair);
+          })
+          .join(joinWith);
+
+        if (!nodeInfo.hadHash) {
+          nodeInfo.postParamsWhitespace = joinWith;
+        }
+      }
+
+      dirtyFields.delete('hash');
+    }
+
+    if (dirtyFields.has('params')) {
+      let joinWith;
+      if (original.params.length > 1) {
+        joinWith = this.sourceForLoc({
+          start: original.params[0].loc.end,
+          end: original.params[1].loc.start,
+        });
+      } else if (nodeInfo.hadParams) {
+        joinWith = nodeInfo.postPathWhitespace;
+      } else if (nodeInfo.hadHash) {
+        joinWith = nodeInfo.postParamsWhitespace;
+      } else {
+        joinWith = ' ';
+      }
+      nodeInfo.paramsSource = ast.params.map(param => this.print(param)).join(joinWith);
+
+      if (nodeInfo.hadParams && ast.params.length === 0) {
+        nodeInfo.postPathWhitespace = '';
+      } else if (!nodeInfo.hadParams && ast.params.length > 0) {
+        nodeInfo.postPathWhitespace = joinWith;
+      }
+
+      dirtyFields.delete('params');
+    }
+  }
+
   print(ast = this._originalAst) {
     if (!ast) {
       return '';
@@ -320,43 +430,17 @@ module.exports = class ParseResult {
 
       case 'MustacheStatement':
         {
-          let hadParams = original.params.length > 0;
-          let hadHash = original.hash.pairs.length > 0;
+          this._updateNodeInfoForParamsHash(ast, nodeInfo);
 
           let openSource = this.sourceForLoc({
             start: original.loc.start,
             end: original.path.loc.end,
           });
 
-          let postPathWhitespace = hadParams
-            ? this.sourceForLoc({
-                start: original.path.loc.end,
-                end: original.params[0].loc.start,
-              })
-            : '';
-
-          let paramsSource = hadParams
-            ? this.sourceForLoc({
-                start: original.params[0].loc.start,
-                end: original.params[original.params.length - 1].loc.end,
-              })
-            : '';
-
-          let postParamsWhitespace = hadHash
-            ? this.sourceForLoc({
-                start: hadParams
-                  ? original.params[original.params.length - 1].loc.end
-                  : original.path.loc.end,
-                end: original.hash.loc.start,
-              })
-            : '';
-
-          let hashSource = hadHash ? this.sourceForLoc(original.hash.loc) : '';
-
           let endSource = this.sourceForLoc({
-            start: hadHash
+            start: nodeInfo.hadHash
               ? original.hash.loc.end
-              : hadParams
+              : nodeInfo.hadParams
               ? original.params[original.params.length - 1].loc.end
               : original.path.loc.end,
             end: original.loc.end,
@@ -372,72 +456,14 @@ module.exports = class ParseResult {
             dirtyFields.delete('path');
           }
 
-          if (dirtyFields.has('hash')) {
-            if (ast.hash.pairs.length === 0) {
-              hashSource = '';
-
-              if (ast.params.length === 0) {
-                postPathWhitespace = '';
-                postParamsWhitespace = '';
-              }
-            } else {
-              let joinWith;
-              if (original.hash.pairs.length > 1) {
-                joinWith = this.sourceForLoc({
-                  start: original.hash.pairs[0].loc.end,
-                  end: original.hash.pairs[1].loc.start,
-                });
-              } else if (hadParams) {
-                joinWith = postPathWhitespace;
-              } else {
-                joinWith = ' ';
-              }
-
-              hashSource = ast.hash.pairs
-                .map(pair => {
-                  return this.print(pair);
-                })
-                .join(joinWith);
-
-              if (!hadHash) {
-                postParamsWhitespace = joinWith;
-              }
-            }
-
-            dirtyFields.delete('hash');
-          }
-
-          if (dirtyFields.has('params')) {
-            let joinWith;
-            if (original.params.length > 1) {
-              joinWith = this.sourceForLoc({
-                start: original.params[0].loc.end,
-                end: original.params[1].loc.start,
-              });
-            } else if (hadParams) {
-              joinWith = postPathWhitespace;
-            } else if (hadHash) {
-              joinWith = postParamsWhitespace;
-            } else {
-              joinWith = ' ';
-            }
-            paramsSource = ast.params.map(param => this.print(param)).join(joinWith);
-
-            if (hadParams && ast.params.length === 0) {
-              postPathWhitespace = '';
-            } else if (!hadParams && ast.params.length > 0) {
-              postPathWhitespace = joinWith;
-            }
-
-            dirtyFields.delete('params');
-          }
+          this._rebuildParamsHash(ast, nodeInfo, dirtyFields);
 
           output.push(
             openSource,
-            postPathWhitespace,
-            paramsSource,
-            postParamsWhitespace,
-            hashSource,
+            nodeInfo.postPathWhitespace,
+            nodeInfo.paramsSource,
+            nodeInfo.postParamsWhitespace,
+            nodeInfo.hashSource,
             endSource
           );
 
