@@ -189,30 +189,30 @@ module.exports = class ParseResult {
 
           let openSource = `<${original.tag}`;
 
-          let openParts = []
+          let originalOpenParts = []
             .concat(original.attributes, original.modifiers, original.comments)
             // sort by order within the element node
             .sort((a, b) => a.start.line - b.start.line || a.start.column - b.start.column);
 
           let postTagWhitespace =
-            openParts.length > 0
+            originalOpenParts.length > 0
               ? this.sourceForLoc({
                   start: {
                     line: original.loc.start.line,
                     column: original.loc.start.column + 1 /* < */ + original.tag.length,
                   },
-                  end: openParts[0].loc.start,
+                  end: originalOpenParts[0].loc.start,
                 })
               : '';
 
           let joinOpenPartsWith = ' ';
-          if (openParts.length > 1) {
+          if (originalOpenParts.length > 1) {
             joinOpenPartsWith = this.sourceForLoc({
-              start: openParts[0].loc.end,
-              end: openParts[1].loc.start,
+              start: originalOpenParts[0].loc.end,
+              end: originalOpenParts[1].loc.start,
             });
           }
-          let openPartsSource = openParts
+          let openPartsSource = originalOpenParts
             .map(part => this.sourceForLoc(part.loc))
             .join(joinOpenPartsWith);
 
@@ -237,6 +237,27 @@ module.exports = class ParseResult {
             closeSource = selfClosing ? '' : `</${ast.tag}>`;
 
             dirtyFields.delete('tag');
+          }
+
+          if (
+            dirtyFields.has('attributes') ||
+            dirtyFields.has('comments') ||
+            dirtyFields.has('modifiers')
+          ) {
+            openPartsSource = []
+              .concat(ast.attributes, ast.modifiers, ast.comments)
+              // sort by order within the element node
+              .sort((a, b) => a.start.line - b.start.line || a.start.column - b.start.column)
+              .map(part => this.print(part))
+              .join(joinOpenPartsWith);
+
+            if (originalOpenParts.length === 0) {
+              postTagWhitespace = ' ';
+            }
+
+            dirtyFields.delete('attributes');
+            dirtyFields.delete('comments');
+            dirtyFields.delete('modifiers');
           }
 
           output.push(

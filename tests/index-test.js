@@ -203,7 +203,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '<Qux bar="baz"/>');
     });
 
-    QUnit.todo('adding attribute when none originally existed', function(assert) {
+    QUnit.test('adding attribute when none originally existed', function(assert) {
       let template = stripIndent`
       <div></div>`;
 
@@ -213,7 +213,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(
         print(ast),
         stripIndent`
-        <div data-foo="wheee"></div>`
+        <div data-test="wheee"></div>`
       );
     });
 
@@ -880,7 +880,7 @@ QUnit.module('multi-line', function(hooks) {
     assert.equal(code, '{{ foo }}here is a single line string{{ bar }}');
   });
 
-  QUnit.todo('Can handle multi-line column expansion', function(assert) {
+  QUnit.test('Can handle multi-line column expansion', function(assert) {
     let template = `
     <div data-foo="bar"></div>here
     is
