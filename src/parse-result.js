@@ -1,6 +1,7 @@
 const { preprocess, print: _print } = require('@glimmer/syntax');
 
 const reLines = /(.*?(?:\r\n?|\n|$))/gm;
+const leadingWhitespace = /(^\s+)/;
 
 const NODE_TYPES_WITH_BEGIN_END = ['BlockStatement', 'ElementNode'];
 
@@ -19,6 +20,18 @@ function childrenFor(node) {
     case 'ElementNode':
       return node.children;
   }
+}
+
+function sortByLoc(a, b) {
+  if (a.loc.start.line < b.loc.start.line) {
+    return -1;
+  }
+
+  if (a.loc.start.line === b.loc.start.line && a.loc.start.column < b.loc.start.column) {
+    return 1;
+  }
+
+  return 0;
 }
 
 module.exports = class ParseResult {
@@ -153,7 +166,6 @@ module.exports = class ParseResult {
     if (!ast) {
       return '';
     }
-    debugger;
 
     let nodeInfo = this.nodeInfo.get(ast);
     // make a copy of the dirtyFields, so we can easily track
@@ -184,6 +196,7 @@ module.exports = class ParseResult {
         break;
       case 'ElementNode':
         {
+          debugger;
           let { selfClosing, children } = original;
           let hadChildren = children.length > 0;
 
@@ -191,8 +204,7 @@ module.exports = class ParseResult {
 
           let originalOpenParts = []
             .concat(original.attributes, original.modifiers, original.comments)
-            // sort by order within the element node
-            .sort((a, b) => a.start.line - b.start.line || a.start.column - b.start.column);
+            .sort(sortByLoc);
 
           let postTagWhitespace =
             originalOpenParts.length > 0
@@ -215,6 +227,19 @@ module.exports = class ParseResult {
           let openPartsSource = originalOpenParts
             .map(part => this.sourceForLoc(part.loc))
             .join(joinOpenPartsWith);
+
+          let postPartsWhitespace = '';
+          if (originalOpenParts.length > 0) {
+            let postPartsSource = this.sourceForLoc({
+              start: originalOpenParts[originalOpenParts.length - 1].loc.end,
+              end: hadChildren ? original.children[0].loc.start : original.loc.end,
+            });
+
+            let matchedWhitespace = postPartsSource.match(leadingWhitespace);
+            if (matchedWhitespace) {
+              postPartsWhitespace = matchedWhitespace[0];
+            }
+          }
 
           let closeOpen = selfClosing ? `/>` : `>`;
 
@@ -246,8 +271,7 @@ module.exports = class ParseResult {
           ) {
             openPartsSource = []
               .concat(ast.attributes, ast.modifiers, ast.comments)
-              // sort by order within the element node
-              .sort((a, b) => a.start.line - b.start.line || a.start.column - b.start.column)
+              .sort(sortByLoc)
               .map(part => this.print(part))
               .join(joinOpenPartsWith);
 
@@ -264,6 +288,7 @@ module.exports = class ParseResult {
             openSource,
             postTagWhitespace,
             openPartsSource,
+            postPartsWhitespace,
             closeOpen,
             childrenSource,
             closeSource

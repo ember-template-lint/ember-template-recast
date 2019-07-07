@@ -217,6 +217,27 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
+    QUnit.test('adding an attribute to existing list', function(assert) {
+      let template = stripIndent`
+      <div
+        data-foo='lol'
+        data-bar=hahaha
+      ></div>`;
+
+      let ast = parse(template);
+      ast.body[0].attributes.push(builders.attr('data-test', builders.string('wheee')));
+
+      assert.equal(
+        print(ast),
+        stripIndent`
+        <div
+          data-foo='lol'
+          data-bar=hahaha
+          data-test="wheee"
+        ></div>`
+      );
+    });
+
     QUnit.skip('adding MustacheCommentStatement');
     QUnit.skip('removing MustacheCommentStatement');
     QUnit.skip('adding ElementModifierStatement');
