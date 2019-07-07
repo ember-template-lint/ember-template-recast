@@ -173,6 +173,8 @@ module.exports = class ParseResult {
     // based on dirtyFields
     const output = [];
 
+    let { original } = nodeInfo;
+
     switch (ast.type) {
       case 'Template':
         {
@@ -182,18 +184,39 @@ module.exports = class ParseResult {
         break;
       case 'ElementNode':
         {
-          let { original } = nodeInfo;
           let { selfClosing, children } = original;
           let hadChildren = children.length > 0;
 
-          let openSource = this.sourceForLoc(
-            hadChildren
-              ? {
-                  start: original.loc.start,
-                  end: children[0].loc.start,
-                }
-              : ast.loc
-          );
+          let openSource = `<${original.tag}`;
+
+          let openParts = []
+            .concat(original.attributes, original.modifiers, original.comments)
+            // sort by order within the element node
+            .sort((a, b) => a.start.line - b.start.line || a.start.column - b.start.column);
+
+          let postTagWhitespace =
+            openParts.length > 0
+              ? this.sourceForLoc({
+                  start: {
+                    line: original.loc.start.line,
+                    column: original.loc.start.column + 1 /* < */ + original.tag.length,
+                  },
+                  end: openParts[0].loc.start,
+                })
+              : '';
+
+          let joinOpenPartsWith = ' ';
+          if (openParts.length > 1) {
+            joinOpenPartsWith = this.sourceForLoc({
+              start: openParts[0].loc.end,
+              end: openParts[1].loc.start,
+            });
+          }
+          let openPartsSource = openParts
+            .map(part => this.sourceForLoc(part.loc))
+            .join(joinOpenPartsWith);
+
+          let closeOpen = selfClosing ? `/>` : `>`;
 
           let childrenSource = hadChildren
             ? this.sourceForLoc({
@@ -202,12 +225,7 @@ module.exports = class ParseResult {
               })
             : '';
 
-          let closeSource = selfClosing
-            ? ''
-            : this.sourceForLoc({
-                start: children[children.length - 1].loc.end,
-                end: original.loc.end,
-              });
+          let closeSource = selfClosing ? '' : `</${original.tag}>`;
 
           if (dirtyFields.has('children')) {
             childrenSource = ast.children.map(child => this.print(child)).join('');
@@ -215,12 +233,20 @@ module.exports = class ParseResult {
           }
 
           if (dirtyFields.has('tag')) {
-            dirtyFields.delete('tag');
-            openSource = `<${ast.tag} ${openSource.slice(original.tag.length + 2)}`;
+            openSource = `<${ast.tag}`;
             closeSource = selfClosing ? '' : `</${ast.tag}>`;
+
+            dirtyFields.delete('tag');
           }
 
-          output.push(openSource, childrenSource, closeSource);
+          output.push(
+            openSource,
+            postTagWhitespace,
+            openPartsSource,
+            closeOpen,
+            childrenSource,
+            closeSource
+          );
 
           if (dirtyFields.size > 0) {
             throw new Error(`Unhandled mutations for ${ast.type}: ${Array.from(dirtyFields)}`);
@@ -230,7 +256,6 @@ module.exports = class ParseResult {
 
       case 'MustacheStatement':
         {
-          let { original } = nodeInfo;
           let hadParams = original.params.length > 0;
           let hadHash = original.hash.pairs.length > 0;
 
@@ -337,9 +362,11 @@ module.exports = class ParseResult {
       case 'HashPair':
         output.push(`${ast.key}=${this.print(ast.value)}`);
         break;
+      case 'AttrNode':
+        output.push(`${ast.name}=${this.print(ast.value)}`);
+        break;
       case 'Program':
       case 'Block':
-      case 'AttrNode':
       case 'ConcatStatement':
       case 'TextNode':
       case 'MustacheCommentStatement':

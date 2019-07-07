@@ -185,7 +185,7 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
-    QUnit.only('rename element tagname without children', function(assert) {
+    QUnit.test('rename element tagname without children', function(assert) {
       let template = stripIndent`
       <div></div>`;
 
@@ -203,7 +203,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '<Qux bar="baz"/>');
     });
 
-    QUnit.only('adding attribute when none originally existed', function(assert) {
+    QUnit.todo('adding attribute when none originally existed', function(assert) {
       let template = stripIndent`
       <div></div>`;
 
@@ -224,6 +224,7 @@ QUnit.module('ember-template-recast', function() {
     QUnit.skip('adding block param');
     QUnit.skip('removing block param');
     QUnit.skip('interleaved attributes and modifiers are not modified when unchanged');
+    QUnit.skip('adding children to self-closing element');
   });
 
   QUnit.todo('rename inline helper', function(assert) {
