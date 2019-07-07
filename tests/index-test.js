@@ -168,28 +168,62 @@ QUnit.module('ember-template-recast', function() {
     );
   });
 
-  QUnit.test('rename element tagname', function(assert) {
-    let template = stripIndent`
+  QUnit.module('ElementNode', function() {
+    QUnit.test('rename element tagname', function(assert) {
+      let template = stripIndent`
       <div data-foo='single quoted'>
         </div>`;
 
-    let ast = parse(template);
-    ast.body[0].tag = 'a';
+      let ast = parse(template);
+      ast.body[0].tag = 'a';
 
-    assert.equal(
-      print(ast),
-      stripIndent`
+      assert.equal(
+        print(ast),
+        stripIndent`
         <a data-foo='single quoted'>
           </a>`
-    );
-  });
+      );
+    });
 
-  QUnit.test('rename self-closing element tagname', function(assert) {
-    let ast = parse('<Foo bar="baz"/>');
+    QUnit.only('rename element tagname without children', function(assert) {
+      let template = stripIndent`
+      <div></div>`;
 
-    ast.body[0].tag = 'Qux';
+      let ast = parse(template);
+      ast.body[0].tag = 'a';
 
-    assert.equal(print(ast), '<Qux bar="baz"/>');
+      assert.equal(print(ast), `<a></a>`);
+    });
+
+    QUnit.test('rename self-closing element tagname', function(assert) {
+      let ast = parse('<Foo bar="baz"/>');
+
+      ast.body[0].tag = 'Qux';
+
+      assert.equal(print(ast), '<Qux bar="baz"/>');
+    });
+
+    QUnit.only('adding attribute when none originally existed', function(assert) {
+      let template = stripIndent`
+      <div></div>`;
+
+      let ast = parse(template);
+      ast.body[0].attributes.push(builders.attr('data-test', builders.string('wheee')));
+
+      assert.equal(
+        print(ast),
+        stripIndent`
+        <div data-foo="wheee"></div>`
+      );
+    });
+
+    QUnit.skip('adding MustacheCommentStatement');
+    QUnit.skip('removing MustacheCommentStatement');
+    QUnit.skip('adding ElementModifierStatement');
+    QUnit.skip('removing ElementModifierStatement');
+    QUnit.skip('adding block param');
+    QUnit.skip('removing block param');
+    QUnit.skip('interleaved attributes and modifiers are not modified when unchanged');
   });
 
   QUnit.todo('rename inline helper', function(assert) {
