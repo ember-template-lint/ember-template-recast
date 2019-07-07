@@ -325,6 +325,16 @@ QUnit.module('ember-template-recast', function() {
 
     assert.equal(code, 'hello world\n{{other-stuff}}');
   });
+
+  QUnit.skip('supports removing an {{else if foo}} condition');
+  QUnit.skip('supports adding a block param');
+  QUnit.skip('supports removing a block param');
+  QUnit.skip('supports updating the various literal types');
+  QUnit.skip('supports changing element node tagname and adding attributes');
+  QUnit.skip('preserves whitespace on mustache statement end -> hash mutation');
+  QUnit.skip('preserves whitespace on mustache statement end -> params mutation');
+  QUnit.skip('preserves whitespace on mustache statement end -> path mutation');
+  QUnit.skip('update path on ambiguous mustache statement');
 });
 
 QUnit.module('transform', () => {
@@ -959,14 +969,4 @@ QUnit.module('multi-line', function(hooks) {
     `
     );
   });
-
-  QUnit.skip('supports removing an {{else if foo}} condition');
-  QUnit.skip('supports adding a block param');
-  QUnit.skip('supports removing a block param');
-  QUnit.skip('supports updating the various literal types');
-  QUnit.skip('supports changing element node tagname and adding attributes');
-  QUnit.skip('preserves whitespace on mustache statement end -> hash mutation');
-  QUnit.skip('preserves whitespace on mustache statement end -> params mutation');
-  QUnit.skip('preserves whitespace on mustache statement end -> path mutation');
-  QUnit.skip('update path on ambiguous mustache statement');
 });
