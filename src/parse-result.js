@@ -399,7 +399,7 @@ module.exports = class ParseResult {
                 })
                 .join(joinWith);
 
-              if (hadParams && !hadHash) {
+              if (!hadHash) {
                 postParamsWhitespace = joinWith;
               }
             }
@@ -423,7 +423,9 @@ module.exports = class ParseResult {
             }
             paramsSource = ast.params.map(param => this.print(param)).join(joinWith);
 
-            if (!hadParams && ast.params.length > 0) {
+            if (hadParams && ast.params.length === 0) {
+              postPathWhitespace = '';
+            } else if (!hadParams && ast.params.length > 0) {
               postPathWhitespace = joinWith;
             }
 

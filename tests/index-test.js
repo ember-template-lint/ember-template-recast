@@ -393,6 +393,40 @@ QUnit.module('ember-template-recast', function() {
         }}`
       );
     });
+
+    QUnit.test('can remove param', function(assert) {
+      let template = stripIndent`
+      {{foo-bar
+        hhaahahaha
+        baz=(stuff
+          goes='here')
+      }}`;
+
+      let ast = parse(template);
+      ast.body[0].params.pop();
+
+      assert.equal(
+        print(ast),
+        stripIndent`
+        {{foo-bar
+          baz=(stuff
+            goes='here')
+        }}`
+      );
+    });
+
+    QUnit.test('replacing empty hash pair on MustacheStatement works', function(assert) {
+      let template = '{{foo-bar}}';
+
+      let ast = parse(template);
+      ast.body[0].hash = builders.hash([builders.pair('hello', builders.string('world'))]);
+
+      assert.equal(
+        print(ast),
+        stripIndent`
+        {{foo-bar hello="world"}}`
+      );
+    });
   });
 
   QUnit.todo('can remove during traversal by returning `null`', function(assert) {
@@ -678,21 +712,7 @@ QUnit.module('transform', () => {
     }
   );
 
-  QUnit.todo('replacing empty hash pair on MustacheStatement works', function(assert) {
-    let template = '{{foo-bar}}{{#baz}}Hello!{{/baz}}';
-    let { code } = transform(template, env => {
-      let { builders: b } = env.syntax;
-      return {
-        MustacheStatement(ast) {
-          ast.hash = b.hash([b.pair('hello', b.string('world'))]);
-        },
-      };
-    });
-
-    assert.equal(code, '{{foo-bar hello="world"}}{{#baz}}Hello!{{/baz}}');
-  });
-
-  QUnit.todo('pushing new item on to empty hash pair on MustacheStatement works', function(assert) {
+  QUnit.test('pushing new item on to empty hash pair on MustacheStatement works', function(assert) {
     let template = '{{foo-bar}}{{#baz}}Hello!{{/baz}}';
     let { code } = transform(template, env => {
       let { builders: b } = env.syntax;
