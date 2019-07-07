@@ -427,7 +427,6 @@ module.exports = class ParseResult {
           }
         }
         break;
-
       case 'MustacheStatement':
       case 'SubExpression':
         {
@@ -504,6 +503,8 @@ module.exports = class ParseResult {
             end: original.loc.end,
           });
 
+          this._rebuildParamsHash(ast, nodeInfo, dirtyFields);
+
           if (dirtyFields.has('path')) {
             openSource =
               this.sourceForLoc({
@@ -520,7 +521,11 @@ module.exports = class ParseResult {
             dirtyFields.delete('path');
           }
 
-          this._rebuildParamsHash(ast, nodeInfo, dirtyFields);
+          if (dirtyFields.has('program')) {
+            programSource = ast.program.body.map(child => this.print(child)).join('');
+
+            dirtyFields.delete('program');
+          }
 
           output.push(
             openSource,

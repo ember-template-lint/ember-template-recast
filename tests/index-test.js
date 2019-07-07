@@ -817,7 +817,7 @@ QUnit.module('whitespace and removed hash pairs', function() {
     );
   });
 
-  QUnit.todo('Same-line removed hash pair from middle collapses excess whitespace', function(
+  QUnit.test('Same-line removed hash pair from middle collapses excess whitespace', function(
     assert
   ) {
     let template = stripIndent`
@@ -845,7 +845,7 @@ QUnit.module('whitespace and removed hash pairs', function() {
     );
   });
 
-  QUnit.todo('Whitespace properly collapsed when the removed prop is last', function(assert) {
+  QUnit.test('Whitespace properly collapsed when the removed prop is last', function(assert) {
     let template = stripIndent`
     {{#hello-world}}
       {{#foo-bar prop="abc" yetAnotherProp="xyz" anotherProp=123}}
