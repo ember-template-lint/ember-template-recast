@@ -22,16 +22,28 @@ function childrenFor(node) {
   }
 }
 
+function isSynthetic(node) {
+  if (node && node.loc) {
+    return node.loc.source === '(synthetic)';
+  }
+
+  return false;
+}
+
 function sortByLoc(a, b) {
+  if (isSynthetic(b)) {
+    return -1;
+  }
+
   if (a.loc.start.line < b.loc.start.line) {
     return -1;
   }
 
   if (a.loc.start.line === b.loc.start.line && a.loc.start.column < b.loc.start.column) {
-    return 1;
+    return -1;
   }
 
-  return 0;
+  return 1;
 }
 
 module.exports = class ParseResult {
@@ -269,14 +281,16 @@ module.exports = class ParseResult {
             dirtyFields.has('comments') ||
             dirtyFields.has('modifiers')
           ) {
-            openPartsSource = []
-              .concat(ast.attributes, ast.modifiers, ast.comments)
-              .sort(sortByLoc)
-              .map(part => this.print(part))
-              .join(joinOpenPartsWith);
+            let openParts = [].concat(ast.attributes, ast.modifiers, ast.comments).sort(sortByLoc);
+
+            openPartsSource = openParts.map(part => this.print(part)).join(joinOpenPartsWith);
 
             if (originalOpenParts.length === 0) {
               postTagWhitespace = ' ';
+            }
+
+            if (openParts.length === 0 && originalOpenParts.length > 0) {
+              postTagWhitespace = '';
             }
 
             dirtyFields.delete('attributes');

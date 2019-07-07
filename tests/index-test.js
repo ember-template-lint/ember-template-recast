@@ -238,10 +238,94 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
-    QUnit.skip('adding MustacheCommentStatement');
-    QUnit.skip('removing MustacheCommentStatement');
-    QUnit.skip('adding ElementModifierStatement');
-    QUnit.skip('removing ElementModifierStatement');
+    QUnit.test('adding modifier when no open parts originally existed', function(assert) {
+      let template = stripIndent`
+      <div></div>`;
+
+      let ast = parse(template);
+      ast.body[0].modifiers.push(
+        builders.elementModifier('on', [builders.string('click'), builders.path('this.foo')])
+      );
+
+      assert.equal(
+        print(ast),
+        stripIndent`
+        <div {{on "click" this.foo}}></div>`
+      );
+    });
+
+    QUnit.test('adding modifier with existing attributes', function(assert) {
+      let template = stripIndent`
+      <div class="foo"></div>`;
+
+      let ast = parse(template);
+      ast.body[0].modifiers.push(
+        builders.elementModifier('on', [builders.string('click'), builders.path('this.foo')])
+      );
+
+      assert.equal(
+        print(ast),
+        stripIndent`
+        <div class="foo" {{on "click" this.foo}}></div>`
+      );
+    });
+
+    QUnit.test('removing a modifier with other attributes', function(assert) {
+      let template = stripIndent`
+      <div class="foo" {{on "click" this.blah}}></div>`;
+
+      let ast = parse(template);
+      ast.body[0].modifiers.shift();
+
+      assert.equal(
+        print(ast),
+        stripIndent`
+        <div class="foo"></div>`
+      );
+    });
+
+    QUnit.test('removing a modifier with no other attributes/comments/modifiers', function(assert) {
+      let template = stripIndent`
+      <div {{on "click" this.blah}}></div>`;
+
+      let ast = parse(template);
+      ast.body[0].modifiers.shift();
+
+      assert.equal(
+        print(ast),
+        stripIndent`
+        <div></div>`
+      );
+    });
+
+    QUnit.test('adding comment when no open parts originally existed', function(assert) {
+      let template = stripIndent`
+      <div></div>`;
+
+      let ast = parse(template);
+      ast.body[0].comments.push(builders.mustacheComment(' template-lint-disable '));
+
+      assert.equal(
+        print(ast),
+        stripIndent`
+        <div {{!-- template-lint-disable --}}></div>`
+      );
+    });
+
+    QUnit.test('adding comment with existing attributes', function(assert) {
+      let template = stripIndent`
+      <div class="foo"></div>`;
+
+      let ast = parse(template);
+      ast.body[0].comments.push(builders.mustacheComment(' template-lint-disable '));
+
+      assert.equal(
+        print(ast),
+        stripIndent`
+        <div class="foo" {{!-- template-lint-disable --}}></div>`
+      );
+    });
+
     QUnit.skip('adding block param');
     QUnit.skip('removing block param');
     QUnit.skip('interleaved attributes and modifiers are not modified when unchanged');
