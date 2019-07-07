@@ -407,7 +407,28 @@ module.exports = class ParseResult {
             dirtyFields.delete('hash');
           }
 
-          // TODO: handle params mutation
+          if (dirtyFields.has('params')) {
+            let joinWith;
+            if (original.params.length > 1) {
+              joinWith = this.sourceForLoc({
+                start: original.params[0].loc.end,
+                end: original.params[1].loc.start,
+              });
+            } else if (hadParams) {
+              joinWith = postPathWhitespace;
+            } else if (hadHash) {
+              joinWith = postParamsWhitespace;
+            } else {
+              joinWith = ' ';
+            }
+            paramsSource = ast.params.map(param => this.print(param)).join(joinWith);
+
+            if (!hadParams && ast.params.length > 0) {
+              postPathWhitespace = joinWith;
+            }
+
+            dirtyFields.delete('params');
+          }
 
           output.push(
             openSource,

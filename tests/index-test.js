@@ -372,6 +372,27 @@ QUnit.module('ember-template-recast', function() {
 
       assert.equal(code, 'xy\n{{ other-stuff }}');
     });
+
+    QUnit.test('can add param', function(assert) {
+      let template = stripIndent`
+      {{foo-bar
+        baz=(stuff
+          goes='here')
+      }}`;
+
+      let ast = parse(template);
+      ast.body[0].params.push(builders.path('zomg'));
+
+      assert.equal(
+        print(ast),
+        stripIndent`
+        {{foo-bar
+          zomg
+          baz=(stuff
+            goes='here')
+        }}`
+      );
+    });
   });
 
   QUnit.todo('can remove during traversal by returning `null`', function(assert) {
