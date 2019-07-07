@@ -636,7 +636,7 @@ QUnit.module('transform', () => {
     assert.equal(code, '{{foo-bar}}');
   });
 
-  QUnit.todo('replacing empty hash pair on BlockStatement works', function(assert) {
+  QUnit.test('replacing empty hash pair on BlockStatement works', function(assert) {
     let template = '{{#foo-bar}}Hi there!{{/foo-bar}}{{baz}}';
     let { code } = transform(template, env => {
       let { builders: b } = env.syntax;
@@ -650,7 +650,7 @@ QUnit.module('transform', () => {
     assert.equal(code, '{{#foo-bar hello="world"}}Hi there!{{/foo-bar}}{{baz}}');
   });
 
-  QUnit.todo('pushing new item on to empty hash pair on BlockStatement works', function(assert) {
+  QUnit.test('pushing new item on to empty hash pair on BlockStatement works', function(assert) {
     let template = '{{#foo-bar}}Hi there!{{/foo-bar}}{{baz}}';
     let { code } = transform(template, env => {
       let { builders: b } = env.syntax;
@@ -664,7 +664,7 @@ QUnit.module('transform', () => {
     assert.equal(code, '{{#foo-bar hello="world"}}Hi there!{{/foo-bar}}{{baz}}');
   });
 
-  QUnit.todo('pushing multiple new items on to empty hash pair works', function(assert) {
+  QUnit.test('pushing multiple new items on to empty hash pair works', function(assert) {
     let template = '{{#foo-bar}}Hi there!{{/foo-bar}}{{baz}}';
 
     let { code } = transform(template, env => {
@@ -679,7 +679,7 @@ QUnit.module('transform', () => {
     assert.equal(code, '{{#foo-bar hello="world" foo="bar"}}Hi there!{{/foo-bar}}{{baz}}');
   });
 
-  QUnit.todo('replacing empty hash pair on a BlockStatement w/ block params works', function(
+  QUnit.test('replacing empty hash pair on a BlockStatement w/ block params works', function(
     assert
   ) {
     let template = '{{#foo-bar as |a b c|}}Hi there!{{/foo-bar}}{{baz}}';
@@ -695,7 +695,7 @@ QUnit.module('transform', () => {
     assert.equal(code, '{{#foo-bar hello="world" as |a b c|}}Hi there!{{/foo-bar}}{{baz}}');
   });
 
-  QUnit.todo(
+  QUnit.test(
     'pushing new item on an empty hash on a BlockStatement w/ block params works',
     function(assert) {
       let template = '{{#foo-bar as |a b c|}}Hi there!{{/foo-bar}}{{baz}}';
@@ -760,7 +760,7 @@ QUnit.module('whitespace and removed hash pairs', function() {
     );
   });
 
-  QUnit.todo('whitespace is preserved when mutating a positional param', function(assert) {
+  QUnit.test('whitespace is preserved when mutating a positional param', function(assert) {
     let template = stripIndent`
       {{some-helper positional}}
       {{#block positional}}
@@ -879,7 +879,7 @@ QUnit.module('whitespace and removed hash pairs', function() {
     }
   );
 
-  QUnit.todo('Whitespace is left alone for replacements with whitespace on both sides', function(
+  QUnit.test('Whitespace is left alone for replacements with whitespace on both sides', function(
     assert
   ) {
     let template = stripIndent`

@@ -472,6 +472,50 @@ module.exports = class ParseResult {
           }
         }
         break;
+      case 'BlockStatement':
+        {
+          this._updateNodeInfoForParamsHash(ast, nodeInfo);
+
+          let openSource = this.sourceForLoc({
+            start: original.loc.start,
+            end: original.path.loc.end,
+          });
+
+          let endSource = this.sourceForLoc({
+            start: nodeInfo.hadHash
+              ? original.hash.loc.end
+              : nodeInfo.hadParams
+              ? original.params[original.params.length - 1].loc.end
+              : original.path.loc.end,
+            end: original.loc.end,
+          });
+
+          if (dirtyFields.has('path')) {
+            openSource =
+              this.sourceForLoc({
+                start: original.loc.start,
+                end: original.path.loc.start,
+              }) + _print(ast.path);
+
+            dirtyFields.delete('path');
+          }
+
+          this._rebuildParamsHash(ast, nodeInfo, dirtyFields);
+
+          output.push(
+            openSource,
+            nodeInfo.postPathWhitespace,
+            nodeInfo.paramsSource,
+            nodeInfo.postParamsWhitespace,
+            nodeInfo.hashSource,
+            endSource
+          );
+
+          if (dirtyFields.size > 0) {
+            throw new Error(`Unhandled mutations for ${ast.type}: ${Array.from(dirtyFields)}`);
+          }
+        }
+        break;
       case 'HashPair':
         output.push(`${ast.key}=${this.print(ast.value)}`);
         break;
@@ -488,7 +532,6 @@ module.exports = class ParseResult {
       case 'MustacheCommentStatement':
       case 'ElementModifierStatement':
       case 'SubExpression':
-      case 'BlockStatement':
       case 'PartialStatement':
       case 'CommentStatement':
       case 'Hash':
