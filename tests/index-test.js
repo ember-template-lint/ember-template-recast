@@ -100,74 +100,6 @@ QUnit.module('ember-template-recast', function() {
     assert.equal(print(ast), stripIndent`<div>&nbsp;derp&nbsp;</div>`);
   });
 
-  QUnit.test('rename non-block component', function(assert) {
-    let template = stripIndent`
-      {{foo-bar
-        baz="stuff"
-        other='single quote'
-      }}`;
-
-    let ast = parse(template);
-    ast.body[0].path = builders.path('baz-derp');
-
-    assert.equal(
-      print(ast),
-      stripIndent`
-        {{baz-derp
-          baz="stuff"
-          other='single quote'
-        }}`
-    );
-  });
-
-  QUnit.todo('rename block component', function(assert) {
-    let template = stripIndent`
-      {{#foo-bar
-        baz="stuff"
-      }}
-        <div data-foo='single quoted'>
-          </div>
-      {{/foo-bar}}`;
-
-    let ast = parse(template);
-    ast.body[0].path = builders.path('baz-derp');
-
-    assert.equal(
-      print(ast),
-      stripIndent`
-        {{#baz-derp
-          baz="stuff"
-        }}
-          <div data-foo='single quoted'>
-            </div>
-        {{/baz-derp}}`
-    );
-  });
-
-  QUnit.todo('rename block component from longer to shorter name', function(assert) {
-    let template = stripIndent`
-      {{#this-is-a-long-name
-        hello="world"
-      }}
-        <div data-foo='single quoted'>
-          </div>
-      {{/this-is-a-long-name}}{{someInlineComponent hello="world"}}`;
-
-    let ast = parse(template);
-    ast.body[0].path = builders.path('baz-derp');
-
-    assert.equal(
-      print(ast),
-      stripIndent`
-        {{#baz-derp
-          hello="world"
-        }}
-          <div data-foo='single quoted'>
-            </div>
-        {{/baz-derp}}{{someInlineComponent hello="world"}}`
-    );
-  });
-
   QUnit.module('ElementNode', function() {
     QUnit.test('rename element tagname', function(assert) {
       let template = stripIndent`
@@ -333,6 +265,26 @@ QUnit.module('ember-template-recast', function() {
   });
 
   QUnit.module('MustacheStatement', function() {
+    QUnit.test('rename non-block component', function(assert) {
+      let template = stripIndent`
+      {{foo-bar
+        baz="stuff"
+        other='single quote'
+      }}`;
+
+      let ast = parse(template);
+      ast.body[0].path = builders.path('baz-derp');
+
+      assert.equal(
+        print(ast),
+        stripIndent`
+        {{baz-derp
+          baz="stuff"
+          other='single quote'
+        }}`
+      );
+    });
+
     QUnit.todo('rename inline helper', function(assert) {
       let template = stripIndent`
       {{foo-bar
@@ -427,6 +379,101 @@ QUnit.module('ember-template-recast', function() {
         {{foo-bar hello="world"}}`
       );
     });
+  });
+
+  QUnit.module('BlockStatement', function() {
+    QUnit.todo('rename block component', function(assert) {
+      let template = stripIndent`
+      {{#foo-bar
+        baz="stuff"
+      }}
+        <div data-foo='single quoted'>
+          </div>
+      {{/foo-bar}}`;
+
+      let ast = parse(template);
+      ast.body[0].path = builders.path('baz-derp');
+
+      assert.equal(
+        print(ast),
+        stripIndent`
+        {{#baz-derp
+          baz="stuff"
+        }}
+          <div data-foo='single quoted'>
+            </div>
+        {{/baz-derp}}`
+      );
+    });
+
+    QUnit.todo('rename block component from longer to shorter name', function(assert) {
+      let template = stripIndent`
+      {{#this-is-a-long-name
+        hello="world"
+      }}
+        <div data-foo='single quoted'>
+          </div>
+      {{/this-is-a-long-name}}{{someInlineComponent hello="world"}}`;
+
+      let ast = parse(template);
+      ast.body[0].path = builders.path('baz-derp');
+
+      assert.equal(
+        print(ast),
+        stripIndent`
+        {{#baz-derp
+          hello="world"
+        }}
+          <div data-foo='single quoted'>
+            </div>
+        {{/baz-derp}}{{someInlineComponent hello="world"}}`
+      );
+    });
+    QUnit.test('replacing a previously empty hash', function(assert) {
+      let template = `{{#foo-bar}}Hi there!{{/foo-bar}}`;
+
+      let ast = parse(template);
+      ast.body[0].hash = builders.hash([builders.pair('hello', builders.string('world'))]);
+
+      assert.equal(print(ast), '{{#foo-bar hello="world"}}Hi there!{{/foo-bar}}');
+    });
+
+    QUnit.test('adding multiple HashPair to previously empty hash', function(assert) {
+      let template = '{{#foo-bar}}Hi there!{{/foo-bar}}{{baz}}';
+
+      let ast = parse(template);
+      ast.body[0].hash.pairs.push(builders.pair('hello', builders.string('world')));
+      ast.body[0].hash.pairs.push(builders.pair('foo', builders.string('bar')));
+
+      assert.equal(print(ast), '{{#foo-bar hello="world" foo="bar"}}Hi there!{{/foo-bar}}{{baz}}');
+    });
+
+    QUnit.test('replacing empty hash w/ block params works', function(assert) {
+      let template = `{{#foo-bar as |a b c|}}Hi there!{{/foo-bar}}`;
+
+      let ast = parse(template);
+      ast.body[0].hash = builders.hash([builders.pair('hello', builders.string('world'))]);
+
+      assert.equal(print(ast), '{{#foo-bar hello="world" as |a b c|}}Hi there!{{/foo-bar}}');
+    });
+
+    QUnit.test('adding new HashPair to an empty hash w/ block params works', function(assert) {
+      let template = `{{#foo-bar as |a b c|}}Hi there!{{/foo-bar}}`;
+
+      let ast = parse(template);
+      ast.body[0].hash.pairs.push(builders.pair('hello', builders.string('world')));
+
+      assert.equal(print(ast), '{{#foo-bar hello="world" as |a b c|}}Hi there!{{/foo-bar}}');
+    });
+
+    QUnit.skip('add param');
+    QUnit.skip('add block param');
+    QUnit.skip('remove block param');
+    QUnit.skip('add inverse');
+    QUnit.skip('remove inverse');
+    QUnit.skip('add child to end of program');
+    QUnit.skip('add child to end of inverse');
+    QUnit.skip('{{else if foo}} chaining');
   });
 
   QUnit.todo('can remove during traversal by returning `null`', function(assert) {
@@ -635,82 +682,6 @@ QUnit.module('transform', () => {
 
     assert.equal(code, '{{foo-bar}}');
   });
-
-  QUnit.test('replacing empty hash pair on BlockStatement works', function(assert) {
-    let template = '{{#foo-bar}}Hi there!{{/foo-bar}}{{baz}}';
-    let { code } = transform(template, env => {
-      let { builders: b } = env.syntax;
-      return {
-        BlockStatement(ast) {
-          ast.hash = b.hash([b.pair('hello', b.string('world'))]);
-        },
-      };
-    });
-
-    assert.equal(code, '{{#foo-bar hello="world"}}Hi there!{{/foo-bar}}{{baz}}');
-  });
-
-  QUnit.test('pushing new item on to empty hash pair on BlockStatement works', function(assert) {
-    let template = '{{#foo-bar}}Hi there!{{/foo-bar}}{{baz}}';
-    let { code } = transform(template, env => {
-      let { builders: b } = env.syntax;
-      return {
-        BlockStatement(ast) {
-          ast.hash.pairs.push(b.pair('hello', b.string('world')));
-        },
-      };
-    });
-
-    assert.equal(code, '{{#foo-bar hello="world"}}Hi there!{{/foo-bar}}{{baz}}');
-  });
-
-  QUnit.test('pushing multiple new items on to empty hash pair works', function(assert) {
-    let template = '{{#foo-bar}}Hi there!{{/foo-bar}}{{baz}}';
-
-    let { code } = transform(template, env => {
-      let { builders: b } = env.syntax;
-      return {
-        BlockStatement(ast) {
-          ast.hash.pairs.push(b.pair('hello', b.string('world')), b.pair('foo', b.string('bar')));
-        },
-      };
-    });
-
-    assert.equal(code, '{{#foo-bar hello="world" foo="bar"}}Hi there!{{/foo-bar}}{{baz}}');
-  });
-
-  QUnit.test('replacing empty hash pair on a BlockStatement w/ block params works', function(
-    assert
-  ) {
-    let template = '{{#foo-bar as |a b c|}}Hi there!{{/foo-bar}}{{baz}}';
-    let { code } = transform(template, env => {
-      let { builders: b } = env.syntax;
-      return {
-        BlockStatement(ast) {
-          ast.hash = b.hash([b.pair('hello', b.string('world'))]);
-        },
-      };
-    });
-
-    assert.equal(code, '{{#foo-bar hello="world" as |a b c|}}Hi there!{{/foo-bar}}{{baz}}');
-  });
-
-  QUnit.test(
-    'pushing new item on an empty hash on a BlockStatement w/ block params works',
-    function(assert) {
-      let template = '{{#foo-bar as |a b c|}}Hi there!{{/foo-bar}}{{baz}}';
-      let { code } = transform(template, env => {
-        let { builders: b } = env.syntax;
-        return {
-          BlockStatement(ast) {
-            ast.hash.pairs.push(b.pair('hello', b.string('world')));
-          },
-        };
-      });
-
-      assert.equal(code, '{{#foo-bar hello="world" as |a b c|}}Hi there!{{/foo-bar}}{{baz}}');
-    }
-  );
 
   QUnit.test('pushing new item on to empty hash pair on MustacheStatement works', function(assert) {
     let template = '{{foo-bar}}{{#baz}}Hello!{{/baz}}';
