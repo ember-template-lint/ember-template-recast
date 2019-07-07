@@ -227,24 +227,46 @@ QUnit.module('ember-template-recast', function() {
     QUnit.skip('adding children to self-closing element');
   });
 
-  QUnit.todo('rename inline helper', function(assert) {
-    let template = stripIndent`
+  QUnit.module('MustacheStatement', function() {
+    QUnit.todo('rename inline helper', function(assert) {
+      let template = stripIndent`
       {{foo-bar
         baz=(stuff
           goes='here')
       }}`;
 
-    let ast = parse(template);
-    ast.body[0].hash.pairs[0].value.path = builders.path('zomg');
+      let ast = parse(template);
+      ast.body[0].hash.pairs[0].value.path = builders.path('zomg');
 
-    assert.equal(
-      print(ast),
-      stripIndent`
+      assert.equal(
+        print(ast),
+        stripIndent`
         {{foo-bar
           baz=(zomg
             goes='here')
         }}`
-    );
+      );
+    });
+
+    QUnit.todo('MustacheStatements retain whitespace when multiline replacements occur', function(
+      assert
+    ) {
+      let template = stripIndent`
+    <p></p>
+    {{ other-stuff }}
+    `;
+      let { code } = transform(template, env => {
+        let { builders: b } = env.syntax;
+
+        return {
+          ElementNode() {
+            return [b.text('x'), b.text('y')];
+          },
+        };
+      });
+
+      assert.equal(code, 'xy\n{{ other-stuff }}');
+    });
   });
 
   QUnit.todo('can remove during traversal by returning `null`', function(assert) {
@@ -281,26 +303,6 @@ QUnit.module('ember-template-recast', function() {
     });
 
     assert.equal(code, 'hello world\n{{other-stuff}}');
-  });
-
-  QUnit.todo('MustacheStatements retain whitespace when multiline replacements occur', function(
-    assert
-  ) {
-    let template = stripIndent`
-    <p></p>
-    {{ other-stuff }}
-    `;
-    let { code } = transform(template, env => {
-      let { builders: b } = env.syntax;
-
-      return {
-        ElementNode() {
-          return [b.text('x'), b.text('y')];
-        },
-      };
-    });
-
-    assert.equal(code, 'xy\n{{ other-stuff }}');
   });
 });
 
