@@ -702,7 +702,7 @@ QUnit.module('transform', () => {
 });
 
 QUnit.module('whitespace and removed hash pairs', function() {
-  QUnit.todo('Multi-line removed hash pair causes line removal', function(assert) {
+  QUnit.test('Multi-line removed hash pair causes line removal', function(assert) {
     let template = stripIndent`
       {{#foo-bar
         prop="abc"
@@ -711,17 +711,15 @@ QUnit.module('whitespace and removed hash pairs', function() {
       }}
         Hello!
       {{/foo-bar}}`;
-    let { code } = transform(template, function(env) {
-      let { builders: b } = env.syntax;
+
+    let { code } = transform(template, function() {
       return {
-        HashPair(ast) {
-          if (ast.key === 'anotherProp') {
-            return b.text('');
-          }
-          return ast;
+        Hash(ast) {
+          ast.pairs = ast.pairs.filter(pair => pair.key !== 'anotherProp');
         },
       };
     });
+
     assert.equal(
       code,
       stripIndent`
@@ -774,17 +772,14 @@ QUnit.module('whitespace and removed hash pairs', function() {
         Hello!
       {{/foo-bar}}
     {{/hello-world}}`;
-    let { code } = transform(template, function(env) {
-      let { builders: b } = env.syntax;
+    let { code } = transform(template, function() {
       return {
-        HashPair(ast) {
-          if (ast.key === 'anotherProp') {
-            return b.text('');
-          }
-          return ast;
+        Hash(ast) {
+          ast.pairs = ast.pairs.filter(pair => pair.key !== 'anotherProp');
         },
       };
     });
+
     assert.equal(
       code,
       stripIndent`
@@ -803,14 +798,10 @@ QUnit.module('whitespace and removed hash pairs', function() {
         Hello!
       {{/foo-bar}}
     {{/hello-world}}`;
-    let { code } = transform(template, function(env) {
-      let { builders: b } = env.syntax;
+    let { code } = transform(template, function() {
       return {
-        HashPair(ast) {
-          if (ast.key === 'anotherProp') {
-            return b.text('');
-          }
-          return ast;
+        Hash(ast) {
+          ast.pairs = ast.pairs.filter(pair => pair.key !== 'anotherProp');
         },
       };
     });
@@ -825,24 +816,22 @@ QUnit.module('whitespace and removed hash pairs', function() {
     );
   });
 
-  QUnit.todo(
+  QUnit.test(
     'Whitespace properly collapsed when the removed prop is last and the contents of the tag are spaced',
     function(assert) {
       let template = stripIndent`
       {{#hello-world}}
         {{ foo-bar prop="abc" yetAnotherProp="xyz" anotherProp=123 }}
       {{/hello-world}}`;
-      let { code } = transform(template, function(env) {
-        let { builders: b } = env.syntax;
+
+      let { code } = transform(template, function() {
         return {
-          HashPair(ast) {
-            if (ast.key === 'anotherProp') {
-              return b.text('');
-            }
-            return ast;
+          Hash(ast) {
+            ast.pairs = ast.pairs.filter(pair => pair.key !== 'anotherProp');
           },
         };
       });
+
       assert.equal(
         code,
         stripIndent`
