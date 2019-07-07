@@ -429,6 +429,7 @@ module.exports = class ParseResult {
         break;
 
       case 'MustacheStatement':
+      case 'SubExpression':
         {
           this._updateNodeInfoForParamsHash(ast, nodeInfo);
 
@@ -530,50 +531,6 @@ module.exports = class ParseResult {
             openEndSource,
             programSource,
             inverseSource,
-            endSource
-          );
-
-          if (dirtyFields.size > 0) {
-            throw new Error(`Unhandled mutations for ${ast.type}: ${Array.from(dirtyFields)}`);
-          }
-        }
-        break;
-      case 'SubExpression':
-        {
-          this._updateNodeInfoForParamsHash(ast, nodeInfo);
-
-          let openSource = this.sourceForLoc({
-            start: original.loc.start,
-            end: original.path.loc.end,
-          });
-
-          let endSource = this.sourceForLoc({
-            start: nodeInfo.hadHash
-              ? original.hash.loc.end
-              : nodeInfo.hadParams
-              ? original.params[original.params.length - 1].loc.end
-              : original.path.loc.end,
-            end: original.loc.end,
-          });
-
-          if (dirtyFields.has('path')) {
-            openSource =
-              this.sourceForLoc({
-                start: original.loc.start,
-                end: original.path.loc.start,
-              }) + _print(ast.path);
-
-            dirtyFields.delete('path');
-          }
-
-          this._rebuildParamsHash(ast, nodeInfo, dirtyFields);
-
-          output.push(
-            openSource,
-            nodeInfo.postPathWhitespace,
-            nodeInfo.paramsSource,
-            nodeInfo.postParamsWhitespace,
-            nodeInfo.hashSource,
             endSource
           );
 
