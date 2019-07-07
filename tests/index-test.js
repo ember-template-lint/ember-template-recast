@@ -285,33 +285,13 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
-    QUnit.todo('rename inline helper', function(assert) {
-      let template = stripIndent`
-      {{foo-bar
-        baz=(stuff
-          goes='here')
-      }}`;
-
-      let ast = parse(template);
-      ast.body[0].hash.pairs[0].value.path = builders.path('zomg');
-
-      assert.equal(
-        print(ast),
-        stripIndent`
-        {{foo-bar
-          baz=(zomg
-            goes='here')
-        }}`
-      );
-    });
-
     QUnit.test('MustacheStatements retain whitespace when multiline replacements occur', function(
       assert
     ) {
       let template = stripIndent`
-    <p></p>
-    {{ other-stuff }}
-    `;
+        <p></p>
+        {{ other-stuff }}
+      `;
       let { code } = transform(template, env => {
         let { builders: b } = env.syntax;
 
@@ -327,10 +307,10 @@ QUnit.module('ember-template-recast', function() {
 
     QUnit.test('can add param', function(assert) {
       let template = stripIndent`
-      {{foo-bar
-        baz=(stuff
-          goes='here')
-      }}`;
+        {{foo-bar
+          baz=(stuff
+            goes='here')
+        }}`;
 
       let ast = parse(template);
       ast.body[0].params.push(builders.path('zomg'));
@@ -338,21 +318,21 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(
         print(ast),
         stripIndent`
-        {{foo-bar
-          zomg
-          baz=(stuff
-            goes='here')
-        }}`
+          {{foo-bar
+            zomg
+            baz=(stuff
+              goes='here')
+          }}`
       );
     });
 
     QUnit.test('can remove param', function(assert) {
       let template = stripIndent`
-      {{foo-bar
-        hhaahahaha
-        baz=(stuff
-          goes='here')
-      }}`;
+        {{foo-bar
+          hhaahahaha
+          baz=(stuff
+            goes='here')
+        }}`;
 
       let ast = parse(template);
       ast.body[0].params.pop();
@@ -360,10 +340,10 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(
         print(ast),
         stripIndent`
-        {{foo-bar
-          baz=(stuff
-            goes='here')
-        }}`
+          {{foo-bar
+            baz=(stuff
+              goes='here')
+          }}`
       );
     });
 
@@ -373,11 +353,85 @@ QUnit.module('ember-template-recast', function() {
       let ast = parse(template);
       ast.body[0].hash = builders.hash([builders.pair('hello', builders.string('world'))]);
 
+      assert.equal(print(ast), stripIndent`{{foo-bar hello="world"}}`);
+    });
+  });
+
+  QUnit.module('SubExpression', function() {
+    QUnit.test('rename path', function(assert) {
+      let template = stripIndent`
+        {{foo-bar
+          baz=(stuff
+            goes='here')
+        }}`;
+
+      let ast = parse(template);
+      ast.body[0].hash.pairs[0].value.path = builders.path('zomg');
+
       assert.equal(
         print(ast),
         stripIndent`
-        {{foo-bar hello="world"}}`
+          {{foo-bar
+            baz=(zomg
+              goes='here')
+          }}`
       );
+    });
+
+    QUnit.test('can add param', function(assert) {
+      let template = stripIndent`
+        {{foo-bar
+          baz=(stuff
+            goes='here')
+        }}`;
+
+      let ast = parse(template);
+      ast.body[0].hash.pairs[0].value.params.push(builders.path('zomg'));
+
+      assert.equal(
+        print(ast),
+        stripIndent`
+          {{foo-bar
+            baz=(stuff
+              zomg
+              goes='here')
+          }}`
+      );
+    });
+
+    QUnit.test('can remove param', function(assert) {
+      let template = stripIndent`
+        {{foo-bar
+          baz=(stuff
+            hhaahahaha
+            goes='here')
+        }}`;
+
+      let ast = parse(template);
+      ast.body[0].hash.pairs[0].value.params.pop();
+
+      assert.equal(
+        print(ast),
+        stripIndent`
+          {{foo-bar
+            baz=(stuff
+              goes='here')
+          }}`
+      );
+    });
+
+    QUnit.test('replacing empty hash pair', function(assert) {
+      let template = stripIndent`
+        {{foo-bar
+          baz=(stuff)
+        }}`;
+
+      let ast = parse(template);
+      ast.body[0].hash.pairs[0].value.hash = builders.hash([
+        builders.pair('hello', builders.string('world')),
+      ]);
+
+      assert.equal(print(ast), stripIndent`{{foo-bar\n  baz=(stuff hello="world")\n}}`);
     });
   });
 
