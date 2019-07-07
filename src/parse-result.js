@@ -2,6 +2,7 @@ const { preprocess, print: _print } = require('@glimmer/syntax');
 
 const reLines = /(.*?(?:\r\n?|\n|$))/gm;
 const leadingWhitespace = /(^\s+)/;
+const charsBeforeEquals = /(^[^=]+)(\s+)?=(\s+)?(\S+)/;
 
 const NODE_TYPES_WITH_BEGIN_END = ['BlockStatement', 'ElementNode'];
 
@@ -545,7 +546,30 @@ module.exports = class ParseResult {
         }
         break;
       case 'HashPair':
-        output.push(`${ast.key}=${this.print(ast.value)}`);
+        {
+          let { source } = nodeInfo;
+          let [, keySource, postKeyWhitespace, postEqualsWhitespace, valueSource] = source.match(
+            charsBeforeEquals
+          );
+
+          if (dirtyFields.has('key')) {
+            keySource = ast.key;
+
+            dirtyFields.delete('key');
+          }
+
+          if (dirtyFields.has('value')) {
+            valueSource = this.print(ast.value);
+
+            dirtyFields.delete('value');
+          }
+
+          output.push(keySource, postKeyWhitespace, '=', postEqualsWhitespace, valueSource);
+
+          if (dirtyFields.size > 0) {
+            throw new Error(`Unhandled mutations for ${ast.type}: ${Array.from(dirtyFields)}`);
+          }
+        }
         break;
       case 'AttrNode':
         output.push(`${ast.name}=${this.print(ast.value)}`);

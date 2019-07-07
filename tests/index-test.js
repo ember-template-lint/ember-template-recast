@@ -533,6 +533,26 @@ QUnit.module('ember-template-recast', function() {
     QUnit.skip('{{else if foo}} chaining');
   });
 
+  QUnit.module('HashPair', function() {
+    QUnit.test('mutations', function(assert) {
+      let template = '{{foo-bar bar=foo}}';
+
+      let ast = parse(template);
+      ast.body[0].hash.pairs[0].value.original = 'bar';
+
+      assert.equal(print(ast), '{{foo-bar bar=bar}}');
+    });
+
+    QUnit.test('mutations retain formatting', function(assert) {
+      let template = '{{foo-bar   bar= foo}}';
+
+      let ast = parse(template);
+      ast.body[0].hash.pairs[0].value.original = 'bar';
+
+      assert.equal(print(ast), '{{foo-bar   bar= bar}}');
+    });
+  });
+
   QUnit.todo('can remove during traversal by returning `null`', function(assert) {
     let template = stripIndent`
     <p>here is some multiline string</p>
@@ -679,38 +699,6 @@ QUnit.module('transform', () => {
 
     assert.ok(ast);
     assert.ok(code);
-  });
-
-  QUnit.test('mutations', function(assert) {
-    let template = '{{foo-bar bar=foo}}';
-    let { code } = transform(template, () => {
-      return {
-        PathExpression(node) {
-          if (node.original === 'foo') {
-            node.original = 'bar';
-          }
-          return node;
-        },
-      };
-    });
-
-    assert.equal(code, '{{foo-bar bar=bar}}');
-  });
-
-  QUnit.todo('mutations retain formatting', function(assert) {
-    let template = '{{foo-bar   bar= foo}}';
-    let { code } = transform(template, () => {
-      return {
-        PathExpression(node) {
-          if (node.original === 'foo') {
-            node.original = 'bar';
-          }
-          return node;
-        },
-      };
-    });
-
-    assert.equal(code, '{{foo-bar   bar= bar}}');
   });
 
   QUnit.test('replacement', function(assert) {
