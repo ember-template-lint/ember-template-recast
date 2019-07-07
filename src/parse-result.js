@@ -429,13 +429,15 @@ module.exports = class ParseResult {
       case 'AttrNode':
         output.push(`${ast.name}=${this.print(ast.value)}`);
         break;
+      case 'PathExpression':
+        output.push(ast.original);
+        break;
       case 'Program':
       case 'Block':
       case 'ConcatStatement':
       case 'TextNode':
       case 'MustacheCommentStatement':
       case 'ElementModifierStatement':
-      case 'PathExpression':
       case 'SubExpression':
       case 'BlockStatement':
       case 'PartialStatement':

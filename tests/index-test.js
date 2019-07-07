@@ -522,7 +522,7 @@ QUnit.module('transform', () => {
     assert.ok(code);
   });
 
-  QUnit.todo('mutations', function(assert) {
+  QUnit.test('mutations', function(assert) {
     let template = '{{foo-bar bar=foo}}';
     let { code } = transform(template, () => {
       return {
