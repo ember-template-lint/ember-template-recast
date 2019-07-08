@@ -373,6 +373,15 @@ QUnit.module('ember-template-recast', function() {
   });
 
   QUnit.module('MustacheStatement', function() {
+    QUnit.test('path mutations retain custom whitespace formatting', function(assert) {
+      let template = `{{ foo }}`;
+
+      let ast = parse(template);
+      ast.body[0].path.original = 'bar';
+
+      assert.equal(print(ast), '{{ bar }}');
+    });
+
     QUnit.test('rename non-block component', function(assert) {
       let template = stripIndent`
       {{foo-bar
@@ -730,6 +739,29 @@ QUnit.module('ember-template-recast', function() {
     QUnit.skip('add child to inverse with whitespace control');
     QUnit.skip('add {{else if foo}} chaining');
     QUnit.skip('removing an {{else if foo}} condition');
+  });
+
+  QUnit.module('AttrNode', function() {
+    QUnit.test('mutations', function(assert) {
+      let template = '<Foo bar={{foo}} />';
+
+      let ast = parse(template);
+      ast.body[0].attributes[0].value.path.original = 'bar';
+
+      assert.equal(print(ast), '<Foo bar={{bar}} />');
+    });
+
+    QUnit.test('mutations retain custom whitespace formatting', function(assert) {
+      let template = stripIndent`
+        <Foo 
+          bar = {{ foo }} />
+      `;
+
+      let ast = parse(template);
+      ast.body[0].attributes[0].value.path.original = 'bar';
+
+      assert.equal(print(ast), '<Foo \n  bar = {{ bar }} />');
+    });
   });
 
   QUnit.module('HashPair', function() {

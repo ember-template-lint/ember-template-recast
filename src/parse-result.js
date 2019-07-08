@@ -3,7 +3,7 @@ const { sortByLoc } = require('./utils');
 
 const reLines = /(.*?(?:\r\n?|\n|$))/gm;
 const leadingWhitespace = /(^\s+)/;
-const charsBeforeEquals = /(^[^=]+)(\s+)?=(\s+)?(\S+)/;
+const hashPairParts = /(^[^=]+)(\s+)?=(\s+)?(\S+)/;
 
 module.exports = class ParseResult {
   constructor(template) {
@@ -601,7 +601,7 @@ module.exports = class ParseResult {
         {
           let { source } = nodeInfo;
           let [, keySource, postKeyWhitespace, postEqualsWhitespace, valueSource] = source.match(
-            charsBeforeEquals
+            hashPairParts
           );
 
           if (dirtyFields.has('key')) {
@@ -624,7 +624,30 @@ module.exports = class ParseResult {
         }
         break;
       case 'AttrNode':
-        output.push(`${ast.name}=${this.print(ast.value)}`);
+        {
+          let { source } = nodeInfo;
+          let [, nameSource, postNameWhitespace, postEqualsWhitespace, valueSource] = source.match(
+            hashPairParts
+          );
+
+          if (dirtyFields.has('name')) {
+            nameSource = ast.name;
+
+            dirtyFields.delete('name');
+          }
+
+          if (dirtyFields.has('value')) {
+            valueSource = this.print(ast.value);
+
+            dirtyFields.delete('value');
+          }
+
+          output.push(nameSource, postNameWhitespace, '=', postEqualsWhitespace, valueSource);
+
+          if (dirtyFields.size > 0) {
+            throw new Error(`Unhandled mutations for ${ast.type}: ${Array.from(dirtyFields)}`);
+          }
+        }
         break;
       case 'PathExpression':
         output.push(ast.original);
