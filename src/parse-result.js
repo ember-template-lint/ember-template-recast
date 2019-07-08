@@ -189,20 +189,20 @@ module.exports = class ParseResult {
 
     nodeInfo.hashSource = hadHash ? this.sourceForLoc(original.hash.loc) : '';
 
-    //let postHashSource = this.sourceForLoc({
-    //  start: hadHash
-    //    ? original.hash.loc.end
-    //    : hadParams
-    //    ? original.params[original.params.length - 1].loc.end
-    //    : original.path.loc.end,
-    //  end: original.loc.end,
-    //});
+    let postHashSource = this.sourceForLoc({
+      start: hadHash
+        ? original.hash.loc.end
+        : hadParams
+        ? original.params[original.params.length - 1].loc.end
+        : original.path.loc.end,
+      end: original.loc.end,
+    });
 
-    //nodeInfo.postHashWhitespace = '';
-    //let postHashWhitespaceMatch = postHashSource.match(leadingWhitespace);
-    //if (postHashWhitespaceMatch) {
-    //  nodeInfo.postHashWhitespace = postHashWhitespaceMatch[0];
-    //}
+    nodeInfo.postHashWhitespace = '';
+    let postHashWhitespaceMatch = postHashSource.match(leadingWhitespace);
+    if (postHashWhitespaceMatch) {
+      nodeInfo.postHashWhitespace = postHashWhitespaceMatch[0];
+    }
   }
 
   _rebuildParamsHash(ast, nodeInfo, dirtyFields) {
@@ -483,7 +483,7 @@ module.exports = class ParseResult {
               ? original.params[original.params.length - 1].loc.end
               : original.path.loc.end,
             end: original.loc.end,
-          });
+          }).trimLeft();
 
           if (dirtyFields.has('path')) {
             openSource =
@@ -503,6 +503,7 @@ module.exports = class ParseResult {
             nodeInfo.paramsSource,
             nodeInfo.postParamsWhitespace,
             nodeInfo.hashSource,
+            nodeInfo.postHashWhitespace,
             endSource
           );
 
@@ -515,16 +516,44 @@ module.exports = class ParseResult {
         {
           this._updateNodeInfoForParamsHash(ast, nodeInfo);
 
+          debugger;
           let hadProgram = original.program.body.length > 0;
           let hadInverse = !!original.inverse;
+          let hadProgramBlockParams = original.program.blockParams.length > 0;
 
           let openSource = this.sourceForLoc({
             start: original.loc.start,
             end: original.path.loc.end,
           });
 
-          // TODO: account for block params here (openEndSource should _just_
-          // be for `}}`, `}}}`, or `~}}`)
+          let blockParamsSource = '';
+          let postBlockParamsWhitespace = '';
+          if (hadProgramBlockParams) {
+            let blockParamsSourceScratch = this.sourceForLoc({
+              start: nodeInfo.hadHash
+                ? original.hash.loc.end
+                : nodeInfo.hadParams
+                ? original.params[original.params.length - 1].loc.end
+                : original.path.loc.end,
+              end: original.loc.end,
+            });
+
+            let indexOfAsPipe = blockParamsSourceScratch.indexOf('as |');
+            let indexOfEndPipe = blockParamsSourceScratch.indexOf('|', indexOfAsPipe + 4);
+
+            blockParamsSource = blockParamsSourceScratch.substring(
+              indexOfAsPipe,
+              indexOfEndPipe + 1
+            );
+
+            let postBlockParamsWhitespaceMatch = blockParamsSourceScratch
+              .substring(indexOfEndPipe + 1)
+              .match(leadingWhitespace);
+            if (postBlockParamsWhitespaceMatch) {
+              postBlockParamsWhitespace = postBlockParamsWhitespaceMatch[0];
+            }
+          }
+
           let openEndSource;
           {
             let openEndSourceScratch = this.sourceForLoc({
@@ -536,10 +565,20 @@ module.exports = class ParseResult {
               end: original.loc.end,
             });
 
+            let startingOffset = 0;
+            if (hadProgramBlockParams) {
+              let indexOfAsPipe = openEndSourceScratch.indexOf('as |');
+              let indexOfEndPipe = openEndSourceScratch.indexOf('|', indexOfAsPipe + 4);
+
+              startingOffset = indexOfEndPipe + 1;
+            }
+
             let indexOfFirstCurly = openEndSourceScratch.indexOf('}');
             let indexOfSecondCurly = openEndSourceScratch.indexOf('}', indexOfFirstCurly + 1);
 
-            openEndSource = openEndSourceScratch.substring(0, indexOfSecondCurly + 1);
+            openEndSource = openEndSourceScratch
+              .substring(startingOffset, indexOfSecondCurly + 1)
+              .trimLeft();
           }
 
           let programSource = hadProgram ? this.sourceForLoc(original.program.loc) : '';
@@ -585,7 +624,30 @@ module.exports = class ParseResult {
           }
 
           if (dirtyFields.has('program')) {
-            programSource = ast.program.body.map(child => this.print(child)).join('');
+            let programDirtyFields = new Set(this.dirtyFields.get(ast.program));
+
+            if (programDirtyFields.has('blockParams')) {
+              if (ast.program.blockParams.length === 0) {
+                nodeInfo.postHashWhitespace = '';
+                blockParamsSource = '';
+              } else {
+                nodeInfo.postHashWhitespace = nodeInfo.postHashWhitespace || ' ';
+                blockParamsSource = `as |${ast.program.blockParams.join(' ')}|`;
+              }
+              programDirtyFields.delete('blockParams');
+            }
+
+            if (programDirtyFields.has('body')) {
+              programSource = ast.program.body.map(child => this.print(child)).join('');
+
+              programDirtyFields.delete('body');
+            }
+
+            if (programDirtyFields.size > 0) {
+              throw new Error(
+                `Unhandled mutations for ${ast.program.type}: ${Array.from(programDirtyFields)}`
+              );
+            }
 
             dirtyFields.delete('program');
           }
@@ -612,6 +674,9 @@ module.exports = class ParseResult {
             nodeInfo.paramsSource,
             nodeInfo.postParamsWhitespace,
             nodeInfo.hashSource,
+            nodeInfo.postHashWhitespace,
+            blockParamsSource,
+            postBlockParamsWhitespace,
             openEndSource,
             programSource,
             inversePreamble,

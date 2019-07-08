@@ -864,8 +864,78 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '{{#foo-bar}}Goodbye{{/foo-bar}}');
     });
 
-    QUnit.skip('add block param');
-    QUnit.skip('remove block param');
+    QUnit.test('add block param (when none existed)', function(assert) {
+      let template = `{{#foo-bar}}{{/foo-bar}}`;
+
+      let ast = parse(template);
+      ast.body[0].program.blockParams.push('foo');
+
+      assert.equal(print(ast), '{{#foo-bar as |foo|}}{{/foo-bar}}');
+    });
+
+    QUnit.test('remove only block param', function(assert) {
+      let template = `{{#foo-bar as |a|}}{{/foo-bar}}`;
+
+      let ast = parse(template);
+      ast.body[0].program.blockParams.pop();
+
+      assert.equal(print(ast), '{{#foo-bar}}{{/foo-bar}}');
+    });
+
+    QUnit.test('remove one block param of many', function(assert) {
+      let template = `{{#foo-bar as |a b|}}{{/foo-bar}}`;
+
+      let ast = parse(template);
+      ast.body[0].program.blockParams.pop();
+
+      assert.equal(print(ast), '{{#foo-bar as |a|}}{{/foo-bar}}');
+    });
+
+    QUnit.test('remove one block param of many preserves custom whitespace', function(assert) {
+      let template = stripIndent`
+        {{#foo-bar
+          as |a b|
+        }}
+        {{/foo-bar}}
+      `;
+
+      let ast = parse(template);
+      ast.body[0].program.blockParams.pop();
+
+      assert.equal(
+        print(ast),
+        stripIndent`
+        {{#foo-bar
+          as |a|
+        }}
+        {{/foo-bar}}
+        `
+      );
+    });
+
+    QUnit.test('remove only block param preserves custom whitespace', function(assert) {
+      let template = stripIndent`
+        {{#foo-bar
+          some=thing
+          as |a|
+        }}
+        {{/foo-bar}}
+      `;
+
+      let ast = parse(template);
+      ast.body[0].program.blockParams.pop();
+
+      assert.equal(
+        print(ast),
+        stripIndent`
+        {{#foo-bar
+          some=thing
+        }}
+        {{/foo-bar}}
+        `
+      );
+    });
+
     QUnit.skip('add child to inverse with whitespace control');
     QUnit.skip('add {{else if foo}} chaining');
     QUnit.skip('removing an {{else if foo}} condition');
