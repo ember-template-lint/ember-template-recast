@@ -629,15 +629,79 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '{{#foo-bar hello="world" as |a b c|}}Hi there!{{/foo-bar}}');
     });
 
-    QUnit.skip('add param');
+    QUnit.test('adding param with no params or hash', function(assert) {
+      let template = `{{#foo-bar}}Hi there!{{/foo-bar}}`;
+
+      let ast = parse(template);
+      ast.body[0].params.push(builders.path('this.foo'));
+
+      assert.equal(print(ast), '{{#foo-bar this.foo}}Hi there!{{/foo-bar}}');
+    });
+
+    QUnit.test('adding param with existing params', function(assert) {
+      let template = `{{#foo-bar this.first}}Hi there!{{/foo-bar}}`;
+
+      let ast = parse(template);
+      ast.body[0].params.push(builders.path('this.foo'));
+
+      assert.equal(print(ast), '{{#foo-bar this.first this.foo}}Hi there!{{/foo-bar}}');
+    });
+
+    QUnit.test(
+      'adding param with existing params infers indentation from existing params',
+      function(assert) {
+        let template = `{{#foo-bar \n   \nthis.first}}Hi there!{{/foo-bar}}`;
+
+        let ast = parse(template);
+        ast.body[0].params.push(builders.path('this.foo'));
+
+        assert.equal(
+          print(ast),
+          '{{#foo-bar \n   \nthis.first \n   \nthis.foo}}Hi there!{{/foo-bar}}'
+        );
+      }
+    );
+
+    QUnit.test('adding child to end of program', function(assert) {
+      let template = `{{#foo-bar}}Hello{{/foo-bar}}`;
+
+      let ast = parse(template);
+      ast.body[0].program.body.push(builders.text(' world!'));
+
+      assert.equal(print(ast), '{{#foo-bar}}Hello world!{{/foo-bar}}');
+    });
+
+    QUnit.test('adding child to beginning of program', function(assert) {
+      let template = `{{#foo-bar}}Hello{{/foo-bar}}`;
+
+      let ast = parse(template);
+      ast.body[0].program.body.unshift(builders.text('ZOMG! '));
+
+      assert.equal(print(ast), '{{#foo-bar}}ZOMG! Hello{{/foo-bar}}');
+    });
+
+    QUnit.todo('adding child to end of inverse', function(assert) {
+      let template = `{{#foo-bar}}{{else}}Hello{{/foo-bar}}`;
+
+      let ast = parse(template);
+      ast.body[0].inverse.body.push(builders.text(' world!'));
+
+      assert.equal(print(ast), '{{#foo-bar}}{{else}}Hello world!{{/foo-bar}}');
+    });
+
+    QUnit.todo('adding child to beginning of inverse', function(assert) {
+      let template = `{{#foo-bar}}{{else}}Hello{{/foo-bar}}`;
+
+      let ast = parse(template);
+      ast.body[0].inverse.body.unshift(builders.text('ZOMG! '));
+
+      assert.equal(print(ast), '{{#foo-bar}}{{else}}ZOMG! Hello{{/foo-bar}}');
+    });
+
     QUnit.skip('add block param');
     QUnit.skip('remove block param');
     QUnit.skip('add inverse');
     QUnit.skip('remove inverse');
-    QUnit.skip('add child to end of program');
-    QUnit.skip('add child to beginning of program');
-    QUnit.skip('add child to end of inverse');
-    QUnit.skip('add child to beginning of inverse');
     QUnit.skip('{{else if foo}} chaining');
   });
 
