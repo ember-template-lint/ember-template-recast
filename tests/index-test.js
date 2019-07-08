@@ -229,6 +229,21 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
+    // This fails due to https://github.com/glimmerjs/glimmer-vm/pull/953
+    QUnit.todo('adding modifier when ...attributes is present', function(assert) {
+      let template = stripIndent`<div data-foo="asdf" data-foo data-other="asdf"></div>`;
+
+      let ast = parse(template);
+      ast.body[0].modifiers.push(
+        builders.elementModifier('on', [builders.string('click'), builders.path('this.foo')])
+      );
+
+      assert.equal(
+        print(ast),
+        `<div data-foo="asdf" data-foo data-other="asdf" {{on "click" this.foo}}></div>`
+      );
+    });
+
     QUnit.test('removing a modifier with other attributes', function(assert) {
       let template = stripIndent`
       <div class="foo" {{on "click" this.blah}}></div>`;
@@ -323,7 +338,21 @@ QUnit.module('ember-template-recast', function() {
         ></MyFoo>`
       );
     });
-    QUnit.skip('interleaved attributes and modifiers are not modified when unchanged');
+
+    QUnit.test('interleaved attributes and modifiers are not modified when unchanged', function(
+      assert
+    ) {
+      let template = `<div data-test="foo" {{on "click" this.bar}} data-blah="derp"></div>`;
+
+      let ast = parse(template);
+      ast.body[0].comments.push(builders.mustacheComment(' template-lint-disable '));
+
+      assert.equal(
+        print(ast),
+        `<div data-test="foo" {{on "click" this.bar}} data-blah="derp" {{!-- template-lint-disable --}}></div>`
+      );
+    });
+
     QUnit.skip('adding children to self-closing element');
   });
 
