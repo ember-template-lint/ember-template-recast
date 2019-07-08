@@ -12,7 +12,12 @@
   "bin": "bin/ember-template-recast.js",
   "scripts": {
     "changelog": "lerna-changelog",
+    "lint": "npm run lint:putout && npm run lint:js",
     "lint:js": "eslint .",
+    "lint:putout": "putout bin src",
+    "fix:lint:js": "npm run lint:js -- --fix",
+    "fix:lint:putout": "putout bin src --fix",
+    "fix:lint": "npm run fix:lint:putout && npm run fix:lint:js",
     "release": "release-it",
     "test": "qunit tests/**/*-test.js"
   },
@@ -35,6 +40,7 @@
     "eslint-plugin-prettier": "^3.1.0",
     "lerna-changelog": "^0.8.2",
     "prettier": "^1.18.2",
+    "putout": "^4.52.1",
     "qunit": "^2.9.2",
     "release-it": "^12.2.1",
     "release-it-lerna-changelog": "^1.0.3"

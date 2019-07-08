@@ -1,0 +1,10 @@
+{
+    "match": {
+        "src/runner.js": {
+            "remove-console": false
+        }
+    },
+    "rules": {
+        "strict-mode": false
+    }
+}

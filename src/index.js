@@ -209,7 +209,7 @@ class ParseResult {
       .sort((a, b) => a.start.line - b.start.line || a.start.column - b.start.column)
       .reverse();
 
-    sortedModifications.forEach(({ start, end, value }) => {
+    for (const { start, end, value } of sortedModifications) {
       let printed = typeof value === 'string' ? value : _print(value, { entityEncoding: 'raw' });
       let firstIndexToUpdate = start.line - 1;
       let lastIndexToUpdate = end.line - 1;
@@ -262,7 +262,7 @@ class ParseResult {
         1 /* always replace at least one line */ + lastIndexToUpdate - firstIndexToUpdate,
         ...mergedReplacementLines
       );
-    });
+    }
   }
 
   print() {

@@ -93,10 +93,10 @@ class StatsCollector {
     if (this.errors.length) {
       this.logger.info(`Errored:   ${this.errors.length}`);
 
-      this.errors.slice(0, 5).forEach(({ file, error }) => {
+      for (const { file, error } of this.errors.slice(0, 5)) {
         this.logger.error(`${file}`);
         handleError(error, this.logger);
-      });
+      }
 
       if (this.errors.length > 5) {
         const more = this.errors.length - 5;
