@@ -197,6 +197,15 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
+    QUnit.test('adding attribute after valueless attribute', function(assert) {
+      let template = '<Foo data-foo />';
+
+      let ast = parse(template);
+      ast.body[0].attributes.push(builders.attr('data-bar', builders.text('foo')));
+
+      assert.equal(print(ast), '<Foo data-foo data-bar="foo" />');
+    });
+
     QUnit.test('adding valueless attribute when no open parts existed', function(assert) {
       let template = '<Foo />';
 
@@ -238,8 +247,8 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
-    // This fails due to https://github.com/glimmerjs/glimmer-vm/pull/953
-    QUnit.todo('adding modifier when ...attributes is present', function(assert) {
+    // This is specifically testing the issue described in https://github.com/glimmerjs/glimmer-vm/pull/953
+    QUnit.test('adding modifier when ...attributes is present', function(assert) {
       let template = stripIndent`<div data-foo="asdf" data-foo data-other="asdf"></div>`;
 
       let ast = parse(template);

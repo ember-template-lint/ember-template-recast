@@ -3,6 +3,7 @@ const { sortByLoc } = require('./utils');
 
 const reLines = /(.*?(?:\r\n?|\n|$))/gm;
 const leadingWhitespace = /(^\s+)/;
+const trailingWhitespace = /(\s+)$/;
 const hashPairParts = /(^[^=]+)(\s+)?=(\s+)?(\S+)/;
 
 module.exports = class ParseResult {
@@ -30,6 +31,24 @@ module.exports = class ParseResult {
       original: JSON.parse(JSON.stringify(node)),
       source: this.sourceForLoc(node.loc),
     };
+
+    // TODO: this sucks, manually working around https://github.com/glimmerjs/glimmer-vm/pull/953
+    if (node.type === 'AttrNode' && node.value.type === 'TextNode' && node.value.chars === '') {
+      let extraneousWhitespaceMatch = nodeInfo.source.match(trailingWhitespace);
+      let lineOffset = 0;
+      let columnOffset = 0;
+      if (extraneousWhitespaceMatch) {
+        let [, whitespace] = extraneousWhitespaceMatch;
+        let whitespaceLines = whitespace.match(reLines);
+
+        lineOffset = whitespaceLines.length - 1;
+        columnOffset = whitespaceLines[whitespaceLines.length - 1].length;
+      }
+      nodeInfo.source = nodeInfo.source.trimRight();
+      node.loc.end.line = node.loc.end.line - lineOffset;
+      node.loc.end.column = node.loc.end.column - columnOffset;
+    }
+
     this.nodeInfo.set(node, nodeInfo);
 
     let hasLocInfo = !!node.loc;
