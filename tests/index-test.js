@@ -331,6 +331,32 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
+    QUnit.test('adding children to element with children', function(assert) {
+      let template = stripIndent`
+        <ul>
+          <li></li>
+        </ul>
+      `;
+
+      let ast = parse(template);
+      ast.body[0].children.splice(
+        2,
+        0,
+        builders.text('\n  '),
+        builders.element('li', { attrs: [builders.attr('data-foo', builders.text('bar'))] })
+      );
+
+      assert.equal(
+        print(ast),
+        stripIndent`
+          <ul>
+            <li></li>
+            <li data-foo="bar"></li>
+          </ul>
+        `
+      );
+    });
+
     QUnit.test('adding children to an empty element', function(assert) {
       let template = `<div></div>`;
 
