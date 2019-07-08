@@ -197,6 +197,15 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
+    QUnit.test('adding valueless attribute when no open parts existed', function(assert) {
+      let template = '<Foo />';
+
+      let ast = parse(template);
+      ast.body[0].attributes.push(builders.attr('data-bar', builders.text('')));
+
+      assert.equal(print(ast), '<Foo data-bar />');
+    });
+
     QUnit.test('adding modifier when no open parts originally existed', function(assert) {
       let template = stripIndent`
       <div></div>`;
@@ -742,7 +751,7 @@ QUnit.module('ember-template-recast', function() {
   });
 
   QUnit.module('AttrNode', function() {
-    QUnit.test('mutations', function(assert) {
+    QUnit.test('updating value', function(assert) {
       let template = '<Foo bar={{foo}} />';
 
       let ast = parse(template);
