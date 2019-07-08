@@ -870,6 +870,15 @@ QUnit.module('ember-template-recast', function() {
       }
     );
 
+    QUnit.test('add child in an {{else if foo}} chain', function(assert) {
+      let template = `{{#if foo}}{{else if baz}}Hello{{/if}}`;
+
+      let ast = parse(template);
+      ast.body[0].inverse.body[0].program.body.push(builders.text(' world!'));
+
+      assert.equal(print(ast), '{{#if foo}}{{else if baz}}Hello world!{{/if}}');
+    });
+
     QUnit.test('adding an inverse', function(assert) {
       let template = `{{#foo-bar}}{{/foo-bar}}`;
 
@@ -959,9 +968,6 @@ QUnit.module('ember-template-recast', function() {
         `
       );
     });
-
-    QUnit.skip('add {{else if foo}} chaining');
-    QUnit.skip('removing an {{else if foo}} condition');
   });
 
   QUnit.module('AttrNode', function() {
@@ -1051,8 +1057,6 @@ QUnit.module('ember-template-recast', function() {
 
     assert.equal(code, 'hello world\n{{other-stuff}}');
   });
-
-  QUnit.skip('supports updating the various literal types');
 });
 
 QUnit.module('transform', () => {

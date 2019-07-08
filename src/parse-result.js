@@ -676,7 +676,13 @@ module.exports = class ParseResult {
               inverseSource = '';
               inversePreamble = '';
             } else {
-              inverseSource = ast.inverse.body.map(child => this.print(child)).join('');
+              if (ast.inverse.chained) {
+                inverseSource = ast.inverse.body[0].program.body
+                  .map(child => this.print(child))
+                  .join('');
+              } else {
+                inverseSource = ast.inverse.body.map(child => this.print(child)).join('');
+              }
 
               if (!hadInverse) {
                 // TODO: detect {{else}} vs {{else if foo}}
