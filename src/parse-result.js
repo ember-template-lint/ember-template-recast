@@ -1,32 +1,9 @@
 const { preprocess, print: _print } = require('@glimmer/syntax');
+const { sortByLoc } = require('./utils');
 
 const reLines = /(.*?(?:\r\n?|\n|$))/gm;
 const leadingWhitespace = /(^\s+)/;
 const charsBeforeEquals = /(^[^=]+)(\s+)?=(\s+)?(\S+)/;
-
-function isSynthetic(node) {
-  if (node && node.loc) {
-    return node.loc.source === '(synthetic)';
-  }
-
-  return false;
-}
-
-function sortByLoc(a, b) {
-  if (isSynthetic(b)) {
-    return -1;
-  }
-
-  if (a.loc.start.line < b.loc.start.line) {
-    return -1;
-  }
-
-  if (a.loc.start.line === b.loc.start.line && a.loc.start.column < b.loc.start.column) {
-    return -1;
-  }
-
-  return 1;
-}
 
 module.exports = class ParseResult {
   constructor(template) {
