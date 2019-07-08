@@ -136,6 +136,17 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
+    QUnit.test('adding boolean attribute to ElementNode', function(assert) {
+      let template = stripIndent`<button></button>`;
+
+      let ast = parse(template);
+      ast.body[0].attributes.push(
+        builders.attr('disabled', builders.mustache(builders.boolean(true)))
+      );
+
+      assert.equal(print(ast), '<button disabled={{true}}></button>');
+    });
+
     QUnit.test('adding an attribute to existing list', function(assert) {
       let template = stripIndent`
       <div
