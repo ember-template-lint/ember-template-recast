@@ -149,6 +149,33 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
+    QUnit.test('adding attribute to ElementNode with block params', function(assert) {
+      let template = `<Foo as |bar|></Foo>`;
+
+      let ast = parse(template);
+      ast.body[0].attributes.push(builders.attr('data-test', builders.string('wheee')));
+
+      assert.equal(print(ast), `<Foo data-test="wheee" as |bar|></Foo>`);
+    });
+
+    QUnit.test('adding attribute to ElementNode with block params (extra whitespace)', function(
+      assert
+    ) {
+      let template = stripIndent`<Foo as |
+        bar
+          |></Foo>`;
+
+      let ast = parse(template);
+      ast.body[0].attributes.push(builders.attr('data-test', builders.string('wheee')));
+
+      assert.equal(
+        print(ast),
+        stripIndent`<Foo data-test="wheee" as |
+        bar
+          |></Foo>`
+      );
+    });
+
     QUnit.test('adding an attribute to existing list', function(assert) {
       let template = stripIndent`
       <div
@@ -258,8 +285,44 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
-    QUnit.skip('adding block param');
-    QUnit.skip('removing block param');
+    QUnit.test('adding block param', function(assert) {
+      let template = `<MyFoo class="foo"></MyFoo>`;
+
+      let ast = parse(template);
+      ast.body[0].blockParams.push('blah');
+
+      assert.equal(print(ast), `<MyFoo class="foo" as |blah|></MyFoo>`);
+    });
+
+    QUnit.test('removing a block param', function(assert) {
+      let template = `<MyFoo class="foo" as |bar|></MyFoo>`;
+
+      let ast = parse(template);
+      ast.body[0].blockParams.pop();
+
+      assert.equal(print(ast), `<MyFoo class="foo"></MyFoo>`);
+    });
+
+    QUnit.test('removing a block param preserves formatting of "open element closing"', function(
+      assert
+    ) {
+      let template = stripIndent`
+        <MyFoo
+          class="foo"
+          as |bar|
+        ></MyFoo>`;
+
+      let ast = parse(template);
+      ast.body[0].blockParams.pop();
+
+      assert.equal(
+        print(ast),
+        stripIndent`
+        <MyFoo
+          class="foo"
+        ></MyFoo>`
+      );
+    });
     QUnit.skip('interleaved attributes and modifiers are not modified when unchanged');
     QUnit.skip('adding children to self-closing element');
   });

@@ -284,6 +284,7 @@ module.exports = class ParseResult {
         {
           let { selfClosing, children } = original;
           let hadChildren = children.length > 0;
+          let hadBlockParams = original.blockParams.length > 0;
 
           let openSource = `<${original.tag}`;
 
@@ -324,6 +325,36 @@ module.exports = class ParseResult {
             if (matchedWhitespace) {
               postPartsWhitespace = matchedWhitespace[0];
             }
+          } else if (hadBlockParams) {
+            let postPartsSource = this.sourceForLoc({
+              start: {
+                line: original.loc.start.line,
+                column: original.loc.start.column + 1 + original.tag.length,
+              },
+              end: hadChildren ? original.children[0].loc.start : original.loc.end,
+            });
+
+            let matchedWhitespace = postPartsSource.match(leadingWhitespace);
+            if (matchedWhitespace) {
+              postPartsWhitespace = matchedWhitespace[0];
+            }
+          }
+
+          let blockParamsSource = '';
+          let postBlockParamsWhitespace = '';
+          if (original.blockParams.length > 0) {
+            let blockParamStartIndex = nodeInfo.source.indexOf('as |');
+            let blockParamsEndIndex = nodeInfo.source.indexOf('|', blockParamStartIndex + 4);
+            blockParamsSource = nodeInfo.source.substring(
+              blockParamStartIndex,
+              blockParamsEndIndex + 1
+            );
+
+            let closeOpenIndex = nodeInfo.source.indexOf(selfClosing ? '/>' : '>');
+            postBlockParamsWhitespace = nodeInfo.source.substring(
+              blockParamsEndIndex + 1,
+              closeOpenIndex
+            );
           }
 
           let closeOpen = selfClosing ? `/>` : `>`;
@@ -371,11 +402,27 @@ module.exports = class ParseResult {
             dirtyFields.delete('modifiers');
           }
 
+          if (dirtyFields.has('blockParams')) {
+            if (ast.blockParams.length === 0) {
+              blockParamsSource = '';
+              postPartsWhitespace = '';
+            } else {
+              blockParamsSource = `as |${ast.blockParams.join(' ')}|`;
+
+              // ensure we have at least a space
+              postPartsWhitespace = postPartsWhitespace || ' ';
+            }
+
+            dirtyFields.delete('blockParams');
+          }
+
           output.push(
             openSource,
             postTagWhitespace,
             openPartsSource,
             postPartsWhitespace,
+            blockParamsSource,
+            postBlockParamsWhitespace,
             closeOpen,
             childrenSource,
             closeSource
