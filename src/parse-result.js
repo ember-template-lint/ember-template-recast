@@ -516,7 +516,6 @@ module.exports = class ParseResult {
         {
           this._updateNodeInfoForParamsHash(ast, nodeInfo);
 
-          debugger;
           let hadProgram = original.program.body.length > 0;
           let hadInverse = !!original.inverse;
           let hadProgramBlockParams = original.program.blockParams.length > 0;
