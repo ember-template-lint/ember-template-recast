@@ -1057,6 +1057,22 @@ QUnit.module('ember-template-recast', function() {
 
     assert.equal(code, 'hello world\n{{other-stuff}}');
   });
+
+  QUnit.module('MustacheCommentStatement', function() {
+    QUnit.skip('can be updated');
+  });
+
+  QUnit.module('ElementModifierStatement', function() {
+    QUnit.skip('can be updated');
+  });
+
+  QUnit.module('CommentStatement', function() {
+    QUnit.skip('can be updated');
+  });
+
+  QUnit.module('ConcatStatement', function() {
+    QUnit.skip('can be updated');
+  });
 });
 
 QUnit.module('transform', () => {
