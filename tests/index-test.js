@@ -846,6 +846,30 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '{{#foo-bar}}{{else}}ZOMG! Hello{{/foo-bar}}');
     });
 
+    QUnit.test(
+      'adding child to end of inverse preserves whitespace and whitespace control when program is also present',
+      function(assert) {
+        let template = `{{#foo-bar}}Goodbye{{~ else ~}}Hello{{/foo-bar}}`;
+
+        let ast = parse(template);
+        ast.body[0].inverse.body.push(builders.text(' world!'));
+
+        assert.equal(print(ast), '{{#foo-bar}}Goodbye{{~ else ~}}Hello world!{{/foo-bar}}');
+      }
+    );
+
+    QUnit.test(
+      'adding child to end of inverse preserves whitespace and whitespace control',
+      function(assert) {
+        let template = `{{#foo-bar}}{{~ else ~}}Hello{{/foo-bar}}`;
+
+        let ast = parse(template);
+        ast.body[0].inverse.body.push(builders.text(' world!'));
+
+        assert.equal(print(ast), '{{#foo-bar}}{{~ else ~}}Hello world!{{/foo-bar}}');
+      }
+    );
+
     QUnit.test('adding an inverse', function(assert) {
       let template = `{{#foo-bar}}{{/foo-bar}}`;
 
@@ -936,7 +960,6 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
-    QUnit.skip('add child to inverse with whitespace control');
     QUnit.skip('add {{else if foo}} chaining');
     QUnit.skip('removing an {{else if foo}} condition');
   });

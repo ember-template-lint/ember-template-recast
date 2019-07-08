@@ -585,10 +585,30 @@ module.exports = class ParseResult {
 
           let inversePreamble = '';
           if (hadInverse) {
-            if (original.inverse.type === 'Block') {
-              inversePreamble = '{{else}}';
+            if (hadProgram) {
+              inversePreamble = this.sourceForLoc({
+                start: original.program.loc.end,
+                end: original.inverse.loc.start,
+              });
             } else {
-              // TODO: handle {{else if foo}}
+              let openEndSourceScratch = this.sourceForLoc({
+                start: nodeInfo.hadHash
+                  ? original.hash.loc.end
+                  : nodeInfo.hadParams
+                  ? original.params[original.params.length - 1].loc.end
+                  : original.path.loc.end,
+                end: original.loc.end,
+              });
+
+              let indexOfFirstCurly = openEndSourceScratch.indexOf('}');
+              let indexOfSecondCurly = openEndSourceScratch.indexOf('}', indexOfFirstCurly + 1);
+              let indexOfThirdCurly = openEndSourceScratch.indexOf('}', indexOfSecondCurly + 1);
+              let indexOfFourthCurly = openEndSourceScratch.indexOf('}', indexOfThirdCurly + 1);
+
+              inversePreamble = openEndSourceScratch.substring(
+                indexOfSecondCurly + 1,
+                indexOfFourthCurly + 1
+              );
             }
           }
 
