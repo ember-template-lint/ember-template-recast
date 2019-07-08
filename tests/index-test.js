@@ -400,6 +400,33 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '{{ bar }}');
     });
 
+    QUnit.test('updating from this.foo to @foo via path.original mutation', function(assert) {
+      let template = `{{this.foo}}`;
+
+      let ast = parse(template);
+      ast.body[0].path.original = '@foo';
+
+      assert.equal(print(ast), '{{@foo}}');
+    });
+
+    QUnit.test('updating from this.foo to @foo via path replacement', function(assert) {
+      let template = `{{this.foo}}`;
+
+      let ast = parse(template);
+      ast.body[0].path = builders.path('@foo');
+
+      assert.equal(print(ast), '{{@foo}}');
+    });
+
+    QUnit.test('updating path via path replacement retains custom whitespace', function(assert) {
+      let template = `{{\n@foo\n}}`;
+
+      let ast = parse(template);
+      ast.body[0].path = builders.path('this.foo');
+
+      assert.equal(print(ast), '{{\nthis.foo\n}}');
+    });
+
     QUnit.test('rename non-block component', function(assert) {
       let template = stripIndent`
       {{foo-bar
