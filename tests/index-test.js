@@ -844,6 +844,15 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '<Foo bar={{bar}} />');
     });
 
+    QUnit.test('renaming valueless attribute', function(assert) {
+      let template = '<Foo data-bar />';
+
+      let ast = parse(template);
+      ast.body[0].attributes[0].name = 'data-foo';
+
+      assert.equal(print(ast), '<Foo data-foo />');
+    });
+
     QUnit.test('mutations retain custom whitespace formatting', function(assert) {
       let template = stripIndent`
         <Foo 

@@ -4,6 +4,7 @@ const { sortByLoc } = require('./utils');
 const reLines = /(.*?(?:\r\n?|\n|$))/gm;
 const leadingWhitespace = /(^\s+)/;
 const trailingWhitespace = /(\s+)$/;
+const attrNodeParts = /(^[^=]+)(\s+)?(=)?(\s+)?(\S+)?/;
 const hashPairParts = /(^[^=]+)(\s+)?=(\s+)?(\S+)/;
 
 module.exports = class ParseResult {
@@ -652,9 +653,14 @@ module.exports = class ParseResult {
       case 'AttrNode':
         {
           let { source } = nodeInfo;
-          let [, nameSource, postNameWhitespace, postEqualsWhitespace, valueSource] = source.match(
-            hashPairParts
-          );
+          let [
+            ,
+            nameSource,
+            postNameWhitespace,
+            equals,
+            postEqualsWhitespace,
+            valueSource,
+          ] = source.match(attrNodeParts);
 
           if (dirtyFields.has('name')) {
             nameSource = ast.name;
@@ -668,7 +674,7 @@ module.exports = class ParseResult {
             dirtyFields.delete('value');
           }
 
-          output.push(nameSource, postNameWhitespace, '=', postEqualsWhitespace, valueSource);
+          output.push(nameSource, postNameWhitespace, equals, postEqualsWhitespace, valueSource);
 
           if (dirtyFields.size > 0) {
             throw new Error(`Unhandled mutations for ${ast.type}: ${Array.from(dirtyFields)}`);
