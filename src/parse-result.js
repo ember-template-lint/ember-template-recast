@@ -223,6 +223,8 @@ module.exports = class ParseResult {
           });
         } else if (nodeInfo.hadParams) {
           joinWith = nodeInfo.postPathWhitespace;
+        } else if (nodeInfo.hadHash) {
+          joinWith = nodeInfo.postParamsWhitespace;
         } else {
           joinWith = ' ';
         }

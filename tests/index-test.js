@@ -52,46 +52,6 @@ QUnit.module('ember-template-recast', function() {
     );
   });
 
-  QUnit.test('infers indentation of hash when multiple HashPairs existed', function(assert) {
-    let template = stripIndent`
-      {{foo-bar
-        baz="stuff"
-        other='single quote'
-      }}`;
-    let ast = parse(template);
-    ast.body[0].hash.pairs.push(builders.pair('some', builders.string('other-thing')));
-
-    assert.equal(
-      print(ast),
-      stripIndent`
-        {{foo-bar
-          baz="stuff"
-          other='single quote'
-          some="other-thing"
-        }}`
-    );
-  });
-
-  QUnit.test('infers indentation of hash when no existing hash existed but params do', function(
-    assert
-  ) {
-    let template = stripIndent`
-      {{foo-bar
-        someParam
-      }}`;
-    let ast = parse(template);
-    ast.body[0].hash.pairs.push(builders.pair('some', builders.string('other-thing')));
-
-    assert.equal(
-      print(ast),
-      stripIndent`
-        {{foo-bar
-          someParam
-          some="other-thing"
-        }}`
-    );
-  });
-
   QUnit.test('basic parse -> mutation -> print: preserves HTML entities', function(assert) {
     let template = stripIndent`<div>&nbsp;</div>`;
     let ast = parse(template);
@@ -516,6 +476,94 @@ QUnit.module('ember-template-recast', function() {
       ast.body[0].hash = builders.hash([builders.pair('hello', builders.string('world'))]);
 
       assert.equal(print(ast), stripIndent`{{foo-bar hello="world"}}`);
+    });
+
+    QUnit.test('infers indentation of hash when multiple HashPairs existed', function(assert) {
+      let template = stripIndent`
+        {{foo-bar
+          baz="stuff"
+          other='single quote'
+        }}`;
+      let ast = parse(template);
+      ast.body[0].hash.pairs.push(builders.pair('some', builders.string('other-thing')));
+
+      assert.equal(
+        print(ast),
+        stripIndent`
+          {{foo-bar
+            baz="stuff"
+            other='single quote'
+            some="other-thing"
+          }}`
+      );
+    });
+
+    QUnit.test('infers indentation of hash when no existing hash existed but params do', function(
+      assert
+    ) {
+      let template = stripIndent`
+        {{foo-bar
+          someParam
+        }}`;
+      let ast = parse(template);
+      ast.body[0].hash.pairs.push(builders.pair('some', builders.string('other-thing')));
+
+      assert.equal(
+        print(ast),
+        stripIndent`
+          {{foo-bar
+            someParam
+            some="other-thing"
+          }}`
+      );
+    });
+
+    QUnit.test(
+      'infers indentation of new HashPairs when existing hash with single entry (but no params)',
+      function(assert) {
+        let template = stripIndent`
+        {{foo-bar
+          stuff=here
+        }}`;
+        let ast = parse(template);
+        ast.body[0].hash.pairs.push(builders.pair('some', builders.string('other-thing')));
+
+        assert.equal(
+          print(ast),
+          stripIndent`
+          {{foo-bar
+            stuff=here
+            some="other-thing"
+          }}`
+        );
+      }
+    );
+
+    QUnit.test('can add literal hash pair values', function(assert) {
+      let template = stripIndent`
+        {{foo-bar
+          first=thing
+        }}`;
+
+      let ast = parse(template);
+      ast.body[0].hash.pairs.push(builders.pair('some', builders.null()));
+      ast.body[0].hash.pairs.push(builders.pair('other', builders.undefined()));
+      ast.body[0].hash.pairs.push(builders.pair('things', builders.boolean(true)));
+      ast.body[0].hash.pairs.push(builders.pair('go', builders.number(42)));
+      ast.body[0].hash.pairs.push(builders.pair('here', builders.boolean(false)));
+
+      assert.equal(
+        print(ast),
+        stripIndent`
+          {{foo-bar
+            first=thing
+            some=null
+            other=undefined
+            things=true
+            go=42
+            here=false
+          }}`
+      );
     });
   });
 
