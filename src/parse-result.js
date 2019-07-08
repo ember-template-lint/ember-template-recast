@@ -488,7 +488,8 @@ module.exports = class ParseResult {
         {
           this._updateNodeInfoForParamsHash(ast, nodeInfo);
 
-          let hadInverse = !!ast.inverse;
+          let hadProgram = original.program.body.length > 0;
+          let hadInverse = !!original.inverse;
 
           let openSource = this.sourceForLoc({
             start: original.loc.start,
@@ -497,23 +498,46 @@ module.exports = class ParseResult {
 
           // TODO: account for block params here (openEndSource should _just_
           // be for `}}`, `}}}`, or `~}}`)
-          let openEndSource = this.sourceForLoc({
-            start: nodeInfo.hadHash
-              ? original.hash.loc.end
-              : nodeInfo.hadParams
-              ? original.params[original.params.length - 1].loc.end
-              : original.path.loc.end,
-            end: original.program.loc.start,
-          });
+          let openEndSource;
+          {
+            let openEndSourceScratch = this.sourceForLoc({
+              start: nodeInfo.hadHash
+                ? original.hash.loc.end
+                : nodeInfo.hadParams
+                ? original.params[original.params.length - 1].loc.end
+                : original.path.loc.end,
+              end: original.loc.end,
+            });
 
-          let programSource = this.sourceForLoc(original.program.loc);
+            let indexOfFirstCurly = openEndSourceScratch.indexOf('}');
+            let indexOfSecondCurly = openEndSourceScratch.indexOf('}', indexOfFirstCurly + 1);
+
+            openEndSource = openEndSourceScratch.substring(0, indexOfSecondCurly + 1);
+          }
+
+          let programSource = hadProgram ? this.sourceForLoc(original.program.loc) : '';
+
+          let inversePreamble = '';
+          if (hadInverse) {
+            if (original.inverse.type === 'Block') {
+              inversePreamble = '{{else}}';
+            } else {
+              // TODO: handle {{else if foo}}
+            }
+          }
 
           let inverseSource = hadInverse ? this.sourceForLoc(original.inverse.loc) : '';
 
-          let endSource = this.sourceForLoc({
-            start: hadInverse ? original.inverse.loc.end : original.program.loc.end,
-            end: original.loc.end,
-          });
+          let endSource;
+          {
+            let firstOpenCurlyFromEndIndex = nodeInfo.source.lastIndexOf('{');
+            let secondOpenCurlyFromEndIndex = nodeInfo.source.lastIndexOf(
+              '{',
+              firstOpenCurlyFromEndIndex - 1
+            );
+
+            endSource = nodeInfo.source.substring(secondOpenCurlyFromEndIndex);
+          }
 
           this._rebuildParamsHash(ast, nodeInfo, dirtyFields);
 
@@ -539,6 +563,22 @@ module.exports = class ParseResult {
             dirtyFields.delete('program');
           }
 
+          if (dirtyFields.has('inverse')) {
+            if (ast.inverse === null) {
+              inverseSource = '';
+              inversePreamble = '';
+            } else {
+              inverseSource = ast.inverse.body.map(child => this.print(child)).join('');
+
+              if (!hadInverse) {
+                // TODO: detect {{else}} vs {{else if foo}}
+                inversePreamble = '{{else}}';
+              }
+            }
+
+            dirtyFields.delete('inverse');
+          }
+
           output.push(
             openSource,
             nodeInfo.postPathWhitespace,
@@ -547,6 +587,7 @@ module.exports = class ParseResult {
             nodeInfo.hashSource,
             openEndSource,
             programSource,
+            inversePreamble,
             inverseSource,
             endSource
           );
