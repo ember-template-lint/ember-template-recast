@@ -353,7 +353,23 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
-    QUnit.skip('adding children to self-closing element');
+    QUnit.test('adding children to an empty element', function(assert) {
+      let template = `<div></div>`;
+
+      let ast = parse(template);
+      ast.body[0].children.push(builders.text('some text'));
+
+      assert.equal(print(ast), '<div>some text</div>');
+    });
+
+    QUnit.test('adding children to a self closing element', function(assert) {
+      let template = `<Foo />`;
+
+      let ast = parse(template);
+      ast.body[0].children.push(builders.text('some text'));
+
+      assert.equal(print(ast), '<Foo>some text</Foo>');
+    });
   });
 
   QUnit.module('MustacheStatement', function() {

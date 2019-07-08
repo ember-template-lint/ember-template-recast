@@ -368,16 +368,22 @@ module.exports = class ParseResult {
 
           let closeSource = selfClosing ? '' : `</${original.tag}>`;
 
-          if (dirtyFields.has('children')) {
-            childrenSource = ast.children.map(child => this.print(child)).join('');
-            dirtyFields.delete('children');
-          }
-
           if (dirtyFields.has('tag')) {
             openSource = `<${ast.tag}`;
             closeSource = selfClosing ? '' : `</${ast.tag}>`;
 
             dirtyFields.delete('tag');
+          }
+
+          if (dirtyFields.has('children')) {
+            childrenSource = ast.children.map(child => this.print(child)).join('');
+
+            if (selfClosing) {
+              closeOpen = `>`;
+              closeSource = `</${ast.tag}>`;
+            }
+
+            dirtyFields.delete('children');
           }
 
           if (
