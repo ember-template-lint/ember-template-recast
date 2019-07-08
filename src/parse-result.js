@@ -4,25 +4,6 @@ const reLines = /(.*?(?:\r\n?|\n|$))/gm;
 const leadingWhitespace = /(^\s+)/;
 const charsBeforeEquals = /(^[^=]+)(\s+)?=(\s+)?(\S+)/;
 
-const NODE_TYPES_WITH_BEGIN_END = ['BlockStatement', 'ElementNode'];
-
-/**
-  Quick helper method to make it easier to find the children for a given input
-  node, `BlockStatement` is intentionally left out because of its support for
-  `inverse` / `program`: its not clear which should be the "children".
-*/
-function childrenFor(node) {
-  switch (node.type) {
-    case 'Block':
-    case 'Program':
-    case 'Template':
-      return node.body;
-
-    case 'ElementNode':
-      return node.children;
-  }
-}
-
 function isSynthetic(node) {
   if (node && node.loc) {
     return node.loc.source === '(synthetic)';
