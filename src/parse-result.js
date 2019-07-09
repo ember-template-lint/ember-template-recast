@@ -515,6 +515,36 @@ module.exports = class ParseResult {
           }
         }
         break;
+      case 'ConcatStatement':
+        {
+          let openQuote = nodeInfo.source[0];
+          let endQuote = nodeInfo.source[nodeInfo.source.length - 1];
+
+          let partsSource = this.sourceForLoc({
+            start: {
+              line: original.loc.start.line,
+              column: original.loc.start.column + 1,
+            },
+
+            end: {
+              line: original.loc.end.line,
+              column: original.loc.end.column - 1,
+            },
+          });
+
+          if (dirtyFields.has('parts')) {
+            partsSource = ast.parts.map(part => this.print(part)).join('');
+
+            dirtyFields.delete('parts');
+          }
+
+          output.push(openQuote, partsSource, endQuote);
+
+          if (dirtyFields.size > 0) {
+            throw new Error(`Unhandled mutations for ${ast.type}: ${Array.from(dirtyFields)}`);
+          }
+        }
+        break;
       case 'BlockStatement':
         {
           this._updateNodeInfoForParamsHash(ast, nodeInfo);
@@ -798,7 +828,6 @@ module.exports = class ParseResult {
           }
         }
         break;
-      case 'ConcatStatement':
       case 'TextNode':
       default:
         throw new Error(

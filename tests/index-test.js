@@ -1101,7 +1101,32 @@ QUnit.module('ember-template-recast', function() {
   });
 
   QUnit.module('ConcatStatement', function() {
-    QUnit.skip('can be updated');
+    QUnit.test('can add parts', function(assert) {
+      let template = `<div class="foo {{bar}}"></div>`;
+
+      let ast = parse(template);
+      ast.body[0].attributes[0].value.parts.push(builders.text(' baz'));
+
+      assert.equal(print(ast), `<div class="foo {{bar}} baz"></div>`);
+    });
+
+    QUnit.test('preserves quote style', function(assert) {
+      let template = `<div class='foo {{bar}}'></div>`;
+
+      let ast = parse(template);
+      ast.body[0].attributes[0].value.parts.push(builders.text(' baz'));
+
+      assert.equal(print(ast), `<div class='foo {{bar}} baz'></div>`);
+    });
+
+    QUnit.test('updating parts preserves custom whitespace', function(assert) {
+      let template = `<div class="foo {{\nbar\n}}"></div>`;
+
+      let ast = parse(template);
+      ast.body[0].attributes[0].value.parts.push(builders.text(' baz'));
+
+      assert.equal(print(ast), `<div class="foo {{\nbar\n}} baz"></div>`);
+    });
   });
 });
 
