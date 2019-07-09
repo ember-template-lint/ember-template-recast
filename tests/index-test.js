@@ -1156,6 +1156,17 @@ QUnit.module('ember-template-recast', function() {
     });
   });
 
+  QUnit.module('StringLiteral', function() {
+    QUnit.test('can be updated', function(assert) {
+      let template = `{{foo "blah"}}`;
+
+      let ast = parse(template);
+      ast.body[0].params[0].value = 'derp';
+
+      assert.equal(print(ast), `{{foo "derp"}}`);
+    });
+  });
+
   QUnit.module('TextNode', function() {
     QUnit.test('can be updated', function(assert) {
       let template = `Foo`;

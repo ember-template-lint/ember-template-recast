@@ -861,7 +861,26 @@ module.exports = class ParseResult {
         break;
       case 'TextNode':
         output.push(ast.chars);
+        break;
+      case 'StringLiteral':
+        {
+          let { source } = nodeInfo;
 
+          let openQuote = source[0];
+          let closeQuote = source[source.length - 1];
+          let valueSource = source.slice(1, -1);
+
+          if (dirtyFields.has('value')) {
+            valueSource = ast.value;
+            dirtyFields.delete('value');
+          }
+
+          output.push(openQuote, valueSource, closeQuote);
+
+          if (dirtyFields.size > 0) {
+            throw new Error(`Unhandled mutations for ${ast.type}: ${Array.from(dirtyFields)}`);
+          }
+        }
         break;
       default:
         throw new Error(
