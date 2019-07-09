@@ -469,6 +469,7 @@ module.exports = class ParseResult {
         }
         break;
       case 'MustacheStatement':
+      case 'ElementModifierStatement':
       case 'SubExpression':
         {
           this._updateNodeInfoForParamsHash(ast, nodeInfo);
@@ -798,8 +799,6 @@ module.exports = class ParseResult {
         break;
       case 'ConcatStatement':
       case 'TextNode':
-      case 'ElementModifierStatement':
-      case 'CommentStatement':
       default:
         throw new Error(
           `ember-template-recast does not have the ability to update ${ast.type}. Please open an issue so we can add support.`
