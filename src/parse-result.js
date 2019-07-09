@@ -502,7 +502,7 @@ module.exports = class ParseResult {
               this.sourceForLoc({
                 start: original.loc.start,
                 end: original.path.loc.start,
-              }) + _print(ast.path);
+              }) + this.print(ast.path);
 
             dirtyFields.delete('path');
           }
@@ -881,6 +881,9 @@ module.exports = class ParseResult {
             throw new Error(`Unhandled mutations for ${ast.type}: ${Array.from(dirtyFields)}`);
           }
         }
+        break;
+      case 'BooleanLiteral':
+        output.push(ast.value);
         break;
       default:
         throw new Error(

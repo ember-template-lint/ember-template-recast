@@ -1167,6 +1167,26 @@ QUnit.module('ember-template-recast', function() {
     });
   });
 
+  QUnit.module('BooleanLiteral', function() {
+    QUnit.test('can be updated in MustacheStatement .path position', function(assert) {
+      let template = `{{true}}`;
+
+      let ast = parse(template);
+      ast.body[0].path.value = false;
+
+      assert.equal(print(ast), `{{false}}`);
+    });
+
+    QUnit.test('can be updated in MustacheStatement .hash position', function(assert) {
+      let template = `{{foo thing=true}}`;
+
+      let ast = parse(template);
+      ast.body[0].hash.pairs[0].value.value = false;
+
+      assert.equal(print(ast), `{{foo thing=false}}`);
+    });
+  });
+
   QUnit.module('TextNode', function() {
     QUnit.test('can be updated', function(assert) {
       let template = `Foo`;
