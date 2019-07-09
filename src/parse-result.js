@@ -478,10 +478,6 @@ module.exports = class ParseResult {
             childrenSource,
             closeSource
           );
-
-          if (dirtyFields.size > 0) {
-            throw new Error(`Unhandled mutations for ${ast.type}: ${Array.from(dirtyFields)}`);
-          }
         }
         break;
       case 'MustacheStatement':
@@ -757,10 +753,6 @@ module.exports = class ParseResult {
             inverseSource,
             endSource
           );
-
-          if (dirtyFields.size > 0) {
-            throw new Error(`Unhandled mutations for ${ast.type}: ${Array.from(dirtyFields)}`);
-          }
         }
         break;
       case 'HashPair':
@@ -783,10 +775,6 @@ module.exports = class ParseResult {
           }
 
           output.push(keySource, postKeyWhitespace, '=', postEqualsWhitespace, valueSource);
-
-          if (dirtyFields.size > 0) {
-            throw new Error(`Unhandled mutations for ${ast.type}: ${Array.from(dirtyFields)}`);
-          }
         }
         break;
       case 'AttrNode':
@@ -836,14 +824,19 @@ module.exports = class ParseResult {
             valueSource,
             closeQuote
           );
-
-          if (dirtyFields.size > 0) {
-            throw new Error(`Unhandled mutations for ${ast.type}: ${Array.from(dirtyFields)}`);
-          }
         }
         break;
       case 'PathExpression':
-        output.push(ast.original);
+        {
+          let { source } = nodeInfo;
+
+          if (dirtyFields.has('original')) {
+            source = ast.original;
+            dirtyFields.delete('original');
+          }
+
+          output.push(source);
+        }
         break;
       case 'MustacheCommentStatement':
       case 'CommentStatement':
@@ -860,14 +853,19 @@ module.exports = class ParseResult {
           }
 
           output.push(openSource, valueSource, endSource);
-
-          if (dirtyFields.size > 0) {
-            throw new Error(`Unhandled mutations for ${ast.type}: ${Array.from(dirtyFields)}`);
-          }
         }
         break;
       case 'TextNode':
-        output.push(ast.chars);
+        {
+          let { source } = nodeInfo.source;
+
+          if (dirtyFields.has('chars')) {
+            source = ast.chars;
+            dirtyFields.delete('chars');
+          }
+
+          output.push(source);
+        }
         break;
       case 'StringLiteral':
         {
@@ -883,19 +881,32 @@ module.exports = class ParseResult {
           }
 
           output.push(openQuote, valueSource, closeQuote);
-
-          if (dirtyFields.size > 0) {
-            throw new Error(`Unhandled mutations for ${ast.type}: ${Array.from(dirtyFields)}`);
-          }
         }
         break;
       case 'BooleanLiteral':
-        output.push(ast.value);
+        {
+          let { source } = nodeInfo.source;
+
+          if (dirtyFields.has('value')) {
+            source = ast.value;
+            dirtyFields.delete('value');
+          }
+
+          output.push(source);
+        }
         break;
       default:
         throw new Error(
           `ember-template-recast does not have the ability to update ${ast.type}. Please open an issue so we can add support.`
         );
+    }
+
+    if (dirtyFields.size > 0) {
+      throw new Error(
+        `ember-template-recast could not handle the mutations of \`${Array.from(
+          dirtyFields
+        )}\` on ${ast.type}`
+      );
     }
 
     return output.join('');
