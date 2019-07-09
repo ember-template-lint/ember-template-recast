@@ -794,6 +794,20 @@ module.exports = class ParseResult {
             valueSource,
           ] = source.match(attrNodeParts);
 
+          let openQuote = '';
+          let closeQuote = '';
+
+          if (
+            original.value.type === 'TextNode' &&
+            original.value.chars.length > 0 &&
+            ((valueSource.startsWith(`'`) && valueSource.endsWith(`'`)) ||
+              (valueSource.startsWith(`"`) && valueSource.endsWith(`"`)))
+          ) {
+            openQuote = valueSource[0];
+            closeQuote = valueSource[valueSource.length - 1];
+            valueSource = valueSource.slice(1, -1);
+          }
+
           if (dirtyFields.has('name')) {
             nameSource = ast.name;
 
@@ -806,7 +820,15 @@ module.exports = class ParseResult {
             dirtyFields.delete('value');
           }
 
-          output.push(nameSource, postNameWhitespace, equals, postEqualsWhitespace, valueSource);
+          output.push(
+            nameSource,
+            postNameWhitespace,
+            equals,
+            postEqualsWhitespace,
+            openQuote,
+            valueSource,
+            closeQuote
+          );
 
           if (dirtyFields.size > 0) {
             throw new Error(`Unhandled mutations for ${ast.type}: ${Array.from(dirtyFields)}`);

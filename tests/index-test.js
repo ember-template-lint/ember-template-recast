@@ -1000,6 +1000,33 @@ QUnit.module('ember-template-recast', function() {
 
       assert.equal(print(ast), '<Foo \n  bar = {{ bar }} />');
     });
+
+    QUnit.test('quotes are preserved when updated a TextNode value', function(assert) {
+      let template = `<div class="lol"></div>`;
+
+      let ast = parse(template);
+      ast.body[0].attributes[0].value.chars = 'hahah';
+
+      assert.equal(print(ast), '<div class="hahah"></div>');
+    });
+
+    QUnit.test('can update a quoteless attribute value', function(assert) {
+      let template = `<div class=wat></div>`;
+
+      let ast = parse(template);
+      ast.body[0].attributes[0].value.chars = 'zomgyasss';
+
+      assert.equal(print(ast), '<div class=zomgyasss></div>');
+    });
+
+    QUnit.test('quotes are preserved when updating a ConcatStatement value', function(assert) {
+      let template = `<div class="lol {{foo}}"></div>`;
+
+      let ast = parse(template);
+      ast.body[0].attributes[0].value.parts[0].chars = 'hahah ';
+
+      assert.equal(print(ast), '<div class="hahah {{foo}}"></div>');
+    });
   });
 
   QUnit.module('HashPair', function() {
@@ -1611,7 +1638,7 @@ QUnit.module('multi-line', function(hooks) {
 
     assert.equal(
       code,
-      `${Array(10).join('x')}<div data-foo=${Array(10).join('x')}></div>${Array(10).join('x')}`
+      `${Array(10).join('x')}<div data-foo="${Array(10).join('x')}"></div>${Array(10).join('x')}`
     );
   });
 
