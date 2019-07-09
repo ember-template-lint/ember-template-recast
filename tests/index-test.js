@@ -1090,7 +1090,14 @@ QUnit.module('ember-template-recast', function() {
   });
 
   QUnit.module('CommentStatement', function() {
-    QUnit.skip('can be updated');
+    QUnit.test('can be updated', function(assert) {
+      let template = `<!-- something -->`;
+
+      let ast = parse(template);
+      ast.body[0].value = ' otherthing ';
+
+      assert.equal(print(ast), `<!-- otherthing -->`);
+    });
   });
 
   QUnit.module('ConcatStatement', function() {

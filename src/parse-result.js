@@ -778,6 +778,7 @@ module.exports = class ParseResult {
         output.push(ast.original);
         break;
       case 'MustacheCommentStatement':
+      case 'CommentStatement':
         {
           let indexOfValue = nodeInfo.source.indexOf(original.value);
           let openSource = nodeInfo.source.substring(0, indexOfValue);
