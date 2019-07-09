@@ -884,6 +884,7 @@ module.exports = class ParseResult {
         }
         break;
       case 'BooleanLiteral':
+      case 'NumberLiteral':
         {
           let { source } = nodeInfo.source;
 

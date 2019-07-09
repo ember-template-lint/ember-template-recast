@@ -1167,6 +1167,17 @@ QUnit.module('ember-template-recast', function() {
     });
   });
 
+  QUnit.module('NumberLiteral', function() {
+    QUnit.test('can be updated', function(assert) {
+      let template = `{{foo 42}}`;
+
+      let ast = parse(template);
+      ast.body[0].params[0].value = 0;
+
+      assert.equal(print(ast), `{{foo 0}}`);
+    });
+  });
+
   QUnit.module('BooleanLiteral', function() {
     QUnit.test('can be updated in MustacheStatement .path position', function(assert) {
       let template = `{{true}}`;
