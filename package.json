@@ -1,6 +1,6 @@
 {
   "name": "ember-template-recast",
-  "version": "2.0.2",
+  "version": "3.0.0",
   "description": "Non-destructive template transformer.",
   "license": "MIT",
   "author": "Robert Jackson <me@rwjblue.com>",

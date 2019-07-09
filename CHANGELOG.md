@@ -1,3 +1,14 @@
+## v3.0.0 (2019-07-09)
+
+#### :boom: Breaking Change
+* [#70](https://github.com/ember-template-lint/ember-template-recast/pull/70) Complete rewrite of mutation engine ([@rwjblue](https://github.com/rwjblue))
+
+#### :rocket: Enhancement
+* [#70](https://github.com/ember-template-lint/ember-template-recast/pull/70) Complete rewrite of mutation engine ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 1
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+
 ## v2.0.2 (2019-07-05)
 
 #### :bug: Bug Fix
