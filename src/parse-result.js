@@ -296,6 +296,8 @@ module.exports = class ParseResult {
     let { original } = nodeInfo;
 
     switch (ast.type) {
+      case 'Program':
+      case 'Block':
       case 'Template':
         {
           let body = ast.body.map(node => this.print(node)).join('');
@@ -774,8 +776,6 @@ module.exports = class ParseResult {
       case 'PathExpression':
         output.push(ast.original);
         break;
-      case 'Program':
-      case 'Block':
       case 'MustacheCommentStatement':
         {
           let indexOfValue = nodeInfo.source.indexOf(original.value);
@@ -799,15 +799,11 @@ module.exports = class ParseResult {
       case 'ConcatStatement':
       case 'TextNode':
       case 'ElementModifierStatement':
-      case 'PartialStatement':
       case 'CommentStatement':
-      case 'Hash':
-      case 'StringLiteral':
-      case 'NumberLiteral':
-      case 'UndefinedLiteral':
-      case 'NullLiteral':
-      case 'BooleanLiteral':
-        break;
+      default:
+        throw new Error(
+          `ember-template-recast does not have the ability to update ${ast.type}. Please open an issue so we can add support.`
+        );
     }
 
     return output.join('');
