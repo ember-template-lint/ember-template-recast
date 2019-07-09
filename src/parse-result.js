@@ -776,9 +776,28 @@ module.exports = class ParseResult {
         break;
       case 'Program':
       case 'Block':
+      case 'MustacheCommentStatement':
+        {
+          let indexOfValue = nodeInfo.source.indexOf(original.value);
+          let openSource = nodeInfo.source.substring(0, indexOfValue);
+          let valueSource = original.value;
+          let endSource = nodeInfo.source.substring(indexOfValue + valueSource.length);
+
+          if (dirtyFields.has('value')) {
+            valueSource = ast.value;
+
+            dirtyFields.delete('value');
+          }
+
+          output.push(openSource, valueSource, endSource);
+
+          if (dirtyFields.size > 0) {
+            throw new Error(`Unhandled mutations for ${ast.type}: ${Array.from(dirtyFields)}`);
+          }
+        }
+        break;
       case 'ConcatStatement':
       case 'TextNode':
-      case 'MustacheCommentStatement':
       case 'ElementModifierStatement':
       case 'PartialStatement':
       case 'CommentStatement':

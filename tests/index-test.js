@@ -1059,7 +1059,23 @@ QUnit.module('ember-template-recast', function() {
   });
 
   QUnit.module('MustacheCommentStatement', function() {
-    QUnit.skip('can be updated');
+    QUnit.test('can be updated', function(assert) {
+      let template = `<div {{!-- something here --}}></div>`;
+
+      let ast = parse(template);
+      ast.body[0].comments[0].value = ' otherthing ';
+
+      assert.equal(print(ast), `<div {{!-- otherthing --}}></div>`);
+    });
+
+    QUnit.test('comments without `--` are preserved', function(assert) {
+      let template = `<div {{! something here }}></div>`;
+
+      let ast = parse(template);
+      ast.body[0].comments[0].value = ' otherthing ';
+
+      assert.equal(print(ast), `<div {{! otherthing }}></div>`);
+    });
   });
 
   QUnit.module('ElementModifierStatement', function() {
