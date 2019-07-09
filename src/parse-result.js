@@ -50,6 +50,15 @@ module.exports = class ParseResult {
       node.loc.end.column = node.loc.end.column - columnOffset;
     }
 
+    // TODO: this sucks, manually working around https://github.com/glimmerjs/glimmer-vm/pull/954
+    if (
+      node.type === 'ConcatStatement' &&
+      node.parts[0].type === 'TextNode' &&
+      node.parts[0].loc.start.column > node.loc.start.column + 1
+    ) {
+      node.parts[0].loc.start.column = node.parts[0].loc.start.column - 1;
+    }
+
     this.nodeInfo.set(node, nodeInfo);
 
     let hasLocInfo = !!node.loc;
