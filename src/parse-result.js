@@ -309,8 +309,15 @@ module.exports = class ParseResult {
       case 'Block':
       case 'Template':
         {
-          let body = ast.body.map(node => this.print(node)).join('');
-          output.push(body);
+          let bodySource = nodeInfo.source;
+
+          if (dirtyFields.has('body')) {
+            bodySource = ast.body.map(node => this.print(node)).join('');
+
+            dirtyFields.delete('body');
+          }
+
+          output.push(bodySource);
         }
         break;
       case 'ElementNode':
