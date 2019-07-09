@@ -838,6 +838,9 @@ module.exports = class ParseResult {
         }
         break;
       case 'TextNode':
+        output.push(ast.chars);
+
+        break;
       default:
         throw new Error(
           `ember-template-recast does not have the ability to update ${ast.type}. Please open an issue so we can add support.`

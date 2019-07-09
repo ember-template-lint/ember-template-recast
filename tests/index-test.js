@@ -1128,6 +1128,26 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), `<div class="foo {{\nbar\n}} baz"></div>`);
     });
   });
+
+  QUnit.module('TextNode', function() {
+    QUnit.test('can be updated', function(assert) {
+      let template = `Foo`;
+
+      let ast = parse(template);
+      ast.body[0].chars = 'Bar';
+
+      assert.equal(print(ast), 'Bar');
+    });
+
+    QUnit.test('can be updated as value of AttrNode', function(assert) {
+      let template = `<div class="lol"></div>`;
+
+      let ast = parse(template);
+      ast.body[0].attributes[0].value.chars = 'hahah';
+
+      assert.equal(print(ast), '<div class="hahah"></div>');
+    });
+  });
 });
 
 QUnit.module('transform', () => {
