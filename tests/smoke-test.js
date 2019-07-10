@@ -359,4 +359,78 @@ QUnit.module('"real life" smoke tests', function() {
       );
     });
   });
+
+  QUnit.module('angle-bracket-codemod mockup', function() {
+    function isComponent(node) {
+      return ['foo-bar'].includes(node.path.original);
+    }
+
+    function transformTagName(key) {
+      return key
+        .split('-')
+        .map(text => text[0].toUpperCase() + text.slice(1))
+        .join('');
+    }
+
+    function codemod(env) {
+      let b = env.syntax.builders;
+
+      return {
+        MustacheStatement(node) {
+          if (!isComponent(node)) {
+            return;
+          }
+
+          let tagName = transformTagName(node.path.original);
+
+          return b.element(
+            { name: tagName, selfClosing: true },
+            {
+              attrs: node.hash.pairs.map(pair => {
+                let value = b.mustache(pair.value);
+
+                if (pair.value.type === 'SubExpression') {
+                  pair.value.type = 'MustacheStatement';
+                  value = pair.value;
+                }
+
+                return b.attr(`@${pair.key}`, value);
+              }),
+            }
+          );
+        },
+      };
+    }
+
+    QUnit.test('works for simple mustache', function(assert) {
+      let template = stripIndent`
+        {{foo-bar baz=qux}}
+      `;
+
+      let { code } = transform(template, codemod);
+
+      assert.equal(code, `<FooBar @baz={{qux}} />`);
+    });
+
+    QUnit.test('preserves nested invocation whitespace', function(assert) {
+      let template = stripIndent`
+        {{foo-bar baz=(something
+          goes=here
+          and=here
+        )}}
+      `;
+
+      let { code } = transform(template, codemod);
+
+      assert.equal(
+        code,
+        stripIndent`
+        <FooBar @baz={{something
+          goes=here
+          and=here
+        }} />
+      `
+      );
+    });
+  });
 });
