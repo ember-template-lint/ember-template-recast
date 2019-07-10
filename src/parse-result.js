@@ -516,6 +516,20 @@ module.exports = class ParseResult {
             dirtyFields.delete('path');
           }
 
+          if (dirtyFields.has('type')) {
+            // we only support going from SubExpression -> MustacheStatement
+            if (original.type !== 'SubExpression' || ast.type !== 'MustacheStatement') {
+              throw new Error(
+                `ember-template-recast only supports updating the 'type' for SubExpression to MustacheStatement (you attempted to change ${original.type} to ${ast.type})`
+              );
+            }
+
+            openSource = `{{${ast.path.original}`;
+            endSource = '}}';
+
+            dirtyFields.delete('type');
+          }
+
           this._rebuildParamsHash(ast, nodeInfo, dirtyFields);
 
           output.push(
@@ -527,10 +541,6 @@ module.exports = class ParseResult {
             nodeInfo.postHashWhitespace,
             endSource
           );
-
-          if (dirtyFields.size > 0) {
-            throw new Error(`Unhandled mutations for ${ast.type}: ${Array.from(dirtyFields)}`);
-          }
         }
         break;
       case 'ConcatStatement':
@@ -557,10 +567,6 @@ module.exports = class ParseResult {
           }
 
           output.push(openQuote, partsSource, endQuote);
-
-          if (dirtyFields.size > 0) {
-            throw new Error(`Unhandled mutations for ${ast.type}: ${Array.from(dirtyFields)}`);
-          }
         }
         break;
       case 'BlockStatement':
@@ -904,7 +910,7 @@ module.exports = class ParseResult {
         break;
       default:
         throw new Error(
-          `ember-template-recast does not have the ability to update ${ast.type}. Please open an issue so we can add support.`
+          `ember-template-recast does not have the ability to update ${original.type}. Please open an issue so we can add support.`
         );
     }
 
@@ -912,7 +918,7 @@ module.exports = class ParseResult {
       throw new Error(
         `ember-template-recast could not handle the mutations of \`${Array.from(
           dirtyFields
-        )}\` on ${ast.type}`
+        )}\` on ${original.type}`
       );
     }
 
