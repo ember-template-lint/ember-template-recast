@@ -29,6 +29,7 @@ module.exports = class ParseResult {
   wrapNode(ancestor, node) {
     this.ancestor.set(node, ancestor);
     let nodeInfo = {
+      node,
       original: JSON.parse(JSON.stringify(node)),
       source: this.sourceForLoc(node.loc),
     };
@@ -285,6 +286,11 @@ module.exports = class ParseResult {
     }
 
     let nodeInfo = this.nodeInfo.get(ast);
+
+    // this ensures that we are operating on the actual node and not a
+    // proxy (we can get Proxies here when transforms splice body/children)
+    ast = nodeInfo.node;
+
     // make a copy of the dirtyFields, so we can easily track
     // unhandled dirtied fields
     let dirtyFields = new Set(this.dirtyFields.get(ast));
