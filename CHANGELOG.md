@@ -1,3 +1,11 @@
+## v3.1.1 (2019-07-11)
+
+#### :house: Internal
+* [#75](https://github.com/ember-template-lint/ember-template-recast/pull/75) Remove duplicated @glimmer/syntax printer implementation. ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 1
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+
 ## v3.1.0 (2019-07-11)
 
 #### :rocket: Enhancement
