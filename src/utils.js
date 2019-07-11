@@ -32,6 +32,22 @@ function sortByLoc(a, b) {
   return 1;
 }
 
+function compact(array) {
+  const newArray = [];
+  array.forEach(a => {
+    if (typeof a !== 'undefined' && a !== null && a !== '') {
+      newArray.push(a);
+    }
+  });
+  return newArray;
+}
+
+function compactJoin(array, delimeter = '') {
+  return compact(array).join(delimeter);
+}
+
 module.exports = {
   sortByLoc,
+  compact,
+  compactJoin,
 };

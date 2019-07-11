@@ -1,11 +1,30 @@
 const { preprocess, print: _print } = require('@glimmer/syntax');
-const { sortByLoc } = require('./utils');
+const { sortByLoc, compactJoin } = require('./utils');
 
 const reLines = /(.*?(?:\r\n?|\n|$))/gm;
 const leadingWhitespace = /(^\s+)/;
 const trailingWhitespace = /(\s+)$/;
 const attrNodeParts = /(^[^=]+)(\s+)?(=)?(\s+)?(\S+)?/;
 const hashPairParts = /(^[^=]+)(\s+)?=(\s+)?(\S+)/;
+
+const voidElements = new Set([
+  'area',
+  'base',
+  'br',
+  'col',
+  'command',
+  'embed',
+  'hr',
+  'img',
+  'input',
+  'keygen',
+  'link',
+  'meta',
+  'param',
+  'source',
+  'track',
+  'wbr',
+]);
 
 module.exports = class ParseResult {
   constructor(template) {
@@ -29,6 +48,7 @@ module.exports = class ParseResult {
   wrapNode(ancestor, node) {
     this.ancestor.set(node, ancestor);
     let nodeInfo = {
+      node,
       original: JSON.parse(JSON.stringify(node)),
       source: this.sourceForLoc(node.loc),
     };
@@ -284,18 +304,296 @@ module.exports = class ParseResult {
       return '';
     }
 
-    let nodeInfo = this.nodeInfo.get(ast);
+    // TODO: this isn't quite right, it forces the whole subtree
+    // to be reprinted which isn't correct
+    if (this.nodeInfo.has(ast)) {
+      return this._printKnownNode(ast);
+    } else {
+      return this._printNewNode(ast);
+    }
+  }
+
+  /*
+    TODO: this is _nearly_ copied from @glimmer/syntax directly (with some small changes)
+
+    We should tweak the printer in @glimmer/syntax to allow a custom print function to be used instead of directly
+    recursing. This would allow us to use our own custom "reprint" code but still do the "right thing" for new nodes.
+  */
+  _printNewNode(ast) {
+    if (!ast) {
+      return '';
+    }
+
+    const parseResult = this;
+
+    function buildEach(asts) {
+      return asts.map(node => parseResult.print(node));
+    }
+
+    function pathParams(ast) {
+      let path;
+
+      switch (ast.type) {
+        case 'MustacheStatement':
+        case 'SubExpression':
+        case 'ElementModifierStatement':
+        case 'BlockStatement':
+          path = parseResult.print(ast.path);
+          break;
+        case 'PartialStatement':
+          path = parseResult.print(ast.name);
+          break;
+        default:
+          throw new Error('unreachable');
+      }
+
+      return compactJoin([path, buildEach(ast.params).join(' '), parseResult.print(ast.hash)], ' ');
+    }
+
+    function blockParams(block) {
+      const params = block.program.blockParams;
+      if (params.length) {
+        return ` as |${params.join(' ')}|`;
+      }
+
+      return null;
+    }
+
+    function openBlock(block) {
+      return compactJoin([
+        '{{',
+        block.openStrip.open ? '~' : null,
+        '#',
+        pathParams(block),
+        blockParams(block),
+        block.openStrip.close ? '~' : null,
+        '}}',
+      ]);
+    }
+
+    function closeBlock(block) {
+      return compactJoin([
+        '{{',
+        block.closeStrip.open ? '~' : null,
+        '/',
+        parseResult.print(block.path),
+        block.closeStrip.close ? '~' : null,
+        '}}',
+      ]);
+    }
+
+    const output = [];
+
+    switch (ast.type) {
+      case 'Program':
+      case 'Block':
+      case 'Template':
+        {
+          const chainBlock = ast.chained && ast.body[0];
+          if (chainBlock) {
+            chainBlock.chained = true;
+          }
+          const body = buildEach(ast.body).join('');
+          output.push(body);
+        }
+        break;
+      case 'ElementNode':
+        output.push('<', ast.tag);
+        if (ast.attributes.length) {
+          output.push(' ', buildEach(ast.attributes).join(' '));
+        }
+        if (ast.modifiers.length) {
+          output.push(' ', buildEach(ast.modifiers).join(' '));
+        }
+        if (ast.comments.length) {
+          output.push(' ', buildEach(ast.comments).join(' '));
+        }
+
+        if (ast.blockParams.length) {
+          output.push(' ', 'as', ' ', `|${ast.blockParams.join(' ')}|`);
+        }
+
+        if (voidElements.has(ast.tag)) {
+          if (ast.selfClosing) {
+            output.push(' /');
+          }
+
+          output.push('>');
+        } else if (ast.selfClosing) {
+          output.push(' />');
+        } else {
+          output.push('>');
+          output.push.apply(output, buildEach(ast.children));
+          output.push('</', ast.tag, '>');
+        }
+        break;
+      case 'AttrNode':
+        if (ast.value.type === 'TextNode') {
+          if (ast.value.chars !== '') {
+            output.push(ast.name, '=');
+            output.push('"', ast.value.chars, '"');
+          } else {
+            output.push(ast.name);
+          }
+        } else {
+          output.push(ast.name, '=');
+          // ast.value is mustache or concat
+          output.push(parseResult.print(ast.value));
+        }
+        break;
+      case 'ConcatStatement':
+        output.push('"');
+        ast.parts.forEach(node => {
+          if (node.type === 'TextNode') {
+            output.push(node.chars);
+          } else {
+            output.push(parseResult.print(node));
+          }
+        });
+        output.push('"');
+        break;
+      case 'TextNode':
+        output.push(ast.chars);
+        break;
+      case 'MustacheStatement':
+        {
+          output.push(
+            compactJoin([
+              ast.escaped ? '{{' : '{{{',
+              ast.strip.open ? '~' : null,
+              pathParams(ast),
+              ast.strip.close ? '~' : null,
+              ast.escaped ? '}}' : '}}}',
+            ])
+          );
+        }
+        break;
+      case 'MustacheCommentStatement':
+        {
+          output.push(compactJoin(['{{!--', ast.value, '--}}']));
+        }
+        break;
+      case 'ElementModifierStatement':
+        {
+          output.push(compactJoin(['{{', pathParams(ast), '}}']));
+        }
+        break;
+      case 'PathExpression':
+        output.push(ast.original);
+        break;
+      case 'SubExpression':
+        {
+          output.push('(', pathParams(ast), ')');
+        }
+        break;
+      case 'BooleanLiteral':
+        output.push(ast.value ? 'true' : 'false');
+        break;
+      case 'BlockStatement':
+        {
+          const lines = [];
+
+          if (ast.chained) {
+            lines.push(
+              compactJoin([
+                '{{',
+                ast.inverseStrip.open ? '~' : null,
+                'else ',
+                pathParams(ast),
+                ast.inverseStrip.close ? '~' : null,
+                '}}',
+              ])
+            );
+          } else {
+            lines.push(openBlock(ast));
+          }
+
+          lines.push(parseResult.print(ast.program));
+
+          if (ast.inverse) {
+            if (!ast.inverse.chained) {
+              lines.push(
+                compactJoin([
+                  '{{',
+                  ast.inverseStrip.open ? '~' : null,
+                  'else',
+                  ast.inverseStrip.close ? '~' : null,
+                  '}}',
+                ])
+              );
+            }
+            lines.push(parseResult.print(ast.inverse));
+          }
+
+          if (!ast.chained) {
+            lines.push(closeBlock(ast));
+          }
+
+          output.push(lines.join(''));
+        }
+        break;
+      case 'PartialStatement':
+        {
+          output.push(compactJoin(['{{>', pathParams(ast), '}}']));
+        }
+        break;
+      case 'CommentStatement':
+        {
+          output.push(compactJoin(['<!--', ast.value, '-->']));
+        }
+        break;
+      case 'StringLiteral':
+        {
+          output.push(`"${ast.value}"`);
+        }
+        break;
+      case 'NumberLiteral':
+        {
+          output.push(String(ast.value));
+        }
+        break;
+      case 'UndefinedLiteral':
+        {
+          output.push('undefined');
+        }
+        break;
+      case 'NullLiteral':
+        {
+          output.push('null');
+        }
+        break;
+      case 'Hash':
+        {
+          output.push(
+            ast.pairs
+              .map(pair => {
+                return parseResult.print(pair);
+              })
+              .join(' ')
+          );
+        }
+        break;
+      case 'HashPair':
+        {
+          output.push(`${ast.key}=${parseResult.print(ast.value)}`);
+        }
+        break;
+    }
+    return output.join('');
+  }
+
+  _printKnownNode(_ast) {
+    let nodeInfo = this.nodeInfo.get(_ast);
+
+    // this ensures that we are operating on the actual node and not a
+    // proxy (we can get Proxies here when transforms splice body/children)
+    let ast = nodeInfo.node;
+
     // make a copy of the dirtyFields, so we can easily track
     // unhandled dirtied fields
     let dirtyFields = new Set(this.dirtyFields.get(ast));
     if (dirtyFields.size === 0 && nodeInfo !== undefined) {
       return nodeInfo.source;
-    }
-
-    // TODO: this isn't quite right, it forces the whole subtree
-    // to be reprinted which isn't correct
-    if (nodeInfo === undefined) {
-      return _print(ast, { entityEncoding: 'raw' });
     }
 
     // TODO: splice the original source **excluding** "children"
@@ -510,6 +808,20 @@ module.exports = class ParseResult {
             dirtyFields.delete('path');
           }
 
+          if (dirtyFields.has('type')) {
+            // we only support going from SubExpression -> MustacheStatement
+            if (original.type !== 'SubExpression' || ast.type !== 'MustacheStatement') {
+              throw new Error(
+                `ember-template-recast only supports updating the 'type' for SubExpression to MustacheStatement (you attempted to change ${original.type} to ${ast.type})`
+              );
+            }
+
+            openSource = `{{${ast.path.original}`;
+            endSource = '}}';
+
+            dirtyFields.delete('type');
+          }
+
           this._rebuildParamsHash(ast, nodeInfo, dirtyFields);
 
           output.push(
@@ -521,10 +833,6 @@ module.exports = class ParseResult {
             nodeInfo.postHashWhitespace,
             endSource
           );
-
-          if (dirtyFields.size > 0) {
-            throw new Error(`Unhandled mutations for ${ast.type}: ${Array.from(dirtyFields)}`);
-          }
         }
         break;
       case 'ConcatStatement':
@@ -551,10 +859,6 @@ module.exports = class ParseResult {
           }
 
           output.push(openQuote, partsSource, endQuote);
-
-          if (dirtyFields.size > 0) {
-            throw new Error(`Unhandled mutations for ${ast.type}: ${Array.from(dirtyFields)}`);
-          }
         }
         break;
       case 'BlockStatement':
@@ -898,7 +1202,7 @@ module.exports = class ParseResult {
         break;
       default:
         throw new Error(
-          `ember-template-recast does not have the ability to update ${ast.type}. Please open an issue so we can add support.`
+          `ember-template-recast does not have the ability to update ${original.type}. Please open an issue so we can add support.`
         );
     }
 
@@ -906,7 +1210,7 @@ module.exports = class ParseResult {
       throw new Error(
         `ember-template-recast could not handle the mutations of \`${Array.from(
           dirtyFields
-        )}\` on ${ast.type}`
+        )}\` on ${original.type}`
       );
     }
 
