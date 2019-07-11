@@ -1,3 +1,15 @@
+## v3.1.0 (2019-07-11)
+
+#### :rocket: Enhancement
+* [#74](https://github.com/ember-template-lint/ember-template-recast/pull/74) Add recursive printing support ([@rwjblue](https://github.com/rwjblue))
+
+#### :house: Internal
+* [#73](https://github.com/ember-template-lint/ember-template-recast/pull/73) Split tests out into multiple files. ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 2
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+- [@dependabot-preview[bot]](https://github.com/apps/dependabot-preview)
+
 ## v3.0.0 (2019-07-09)
 
 #### :boom: Breaking Change
