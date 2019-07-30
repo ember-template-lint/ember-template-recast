@@ -120,6 +120,15 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '<Foo data-foo data-bar="foo" />');
     });
 
+    QUnit.test('adding attribute after valueless attribute', function(assert) {
+      let template = '<Foo\n  data-foo-bar="derp"\n  @whatever={{qux}}\n/>';
+
+      let ast = parse(template);
+      ast.body[0].attributes.push(builders.attr('data-bar', builders.text('foo')));
+
+      assert.equal(print(ast), '<Foo\n  data-bar\n  data-foo-bar="derp"\n  @whatever={{qux}}\n/>');
+    });
+
     QUnit.test('adding valueless attribute when no open parts existed', function(assert) {
       let template = '<Foo />';
 
