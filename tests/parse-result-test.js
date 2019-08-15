@@ -328,6 +328,29 @@ QUnit.module('ember-template-recast', function() {
 
       assert.equal(print(ast), '<Foo>some text</Foo>');
     });
+
+    QUnit.test('moving a child to another ElementNode', function(assert) {
+      let template = stripIndent`
+        <Foo>{{
+          special-formatting-here
+        }}</Foo>
+      `;
+
+      let ast = parse(template);
+      let child = ast.body[0].children.pop();
+      ast.body.unshift(builders.text('\n'));
+      ast.body.unshift(child);
+
+      assert.equal(
+        print(ast),
+        stripIndent`
+          {{
+            special-formatting-here
+          }}
+          <Foo></Foo>
+        `
+      );
+    });
   });
 
   QUnit.module('MustacheStatement', function() {
@@ -992,7 +1015,7 @@ QUnit.module('ember-template-recast', function() {
     });
   });
 
-  QUnit.todo('can remove during traversal by returning `null`', function(assert) {
+  QUnit.test('can remove during traversal by returning `null`', function(assert) {
     let template = stripIndent`
     <p>here is some multiline string</p>
     {{ other-stuff }}

@@ -75,6 +75,10 @@ module.exports = class ParseResult {
       },
 
       set: (target, property, value) => {
+        if (propertyProxyMap.has(property)) {
+          propertyProxyMap.set(property, value);
+        }
+
         Reflect.set(target, property, value);
 
         if (hasLocInfo) {
@@ -87,6 +91,10 @@ module.exports = class ParseResult {
       },
 
       deleteProperty: (target, property) => {
+        if (propertyProxyMap.has(property)) {
+          propertyProxyMap.delete(property);
+        }
+
         let result = Reflect.deleteProperty(target, property);
 
         if (hasLocInfo) {
@@ -105,6 +113,7 @@ module.exports = class ParseResult {
 
     for (let key in node) {
       let value = node[key];
+
       if (typeof value === 'object' && value !== null) {
         let propertyProxy = this.wrapNode({ node, key }, value);
 
