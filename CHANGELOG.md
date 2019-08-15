@@ -1,3 +1,12 @@
+## v3.1.2 (2019-08-15)
+
+#### :bug: Bug Fix
+* [#90](https://github.com/ember-template-lint/ember-template-recast/pull/90) Ensure proxy mapping is maintained during set/delete. ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 2
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+- [@dependabot-preview[bot]](https://github.com/apps/dependabot-preview)
+
 ## v3.1.1 (2019-07-11)
 
 #### :house: Internal
