@@ -1,3 +1,12 @@
+## v3.1.3 (2019-08-16)
+
+#### :bug: Bug Fix
+* [#92](https://github.com/ember-template-lint/ember-template-recast/pull/92) Fix mutating an element attribute with an initial valueless attribute. ([@rwjblue](https://github.com/rwjblue))
+* [#91](https://github.com/ember-template-lint/ember-template-recast/pull/91) Ensure updating a void element does not print a closing tag. ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 1
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+
 ## v3.1.2 (2019-08-15)
 
 #### :bug: Bug Fix
