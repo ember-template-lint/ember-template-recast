@@ -1,9 +1,8 @@
-const { preprocess, print: _print } = require('@glimmer/syntax');
+const { preprocess, print: _print, traverse } = require('@glimmer/syntax');
 const { sortByLoc } = require('./utils');
 
 const reLines = /(.*?(?:\r\n?|\n|$))/gm;
 const leadingWhitespace = /(^\s+)/;
-const trailingWhitespace = /(\s+)$/;
 const attrNodeParts = /(^[^=]+)(\s+)?(=)?(\s+)?(\S+)?/;
 const hashPairParts = /(^[^=]+)(\s+)?=(\s+)?(\S+)/;
 
@@ -26,6 +25,44 @@ const voidTagNames = new Set([
   'wbr',
 ]);
 
+function getLines(source) {
+  let result = source.match(reLines);
+
+  return result.slice(0, -1);
+}
+
+/*
+  This is needed to address issues in the glimmer-vm AST _before_ any of the nodes and node
+  values are cached. The specific issues being worked around are:
+
+  * https://github.com/glimmerjs/glimmer-vm/pull/953
+  * https://github.com/glimmerjs/glimmer-vm/pull/954
+*/
+function fixASTIssues(ast) {
+  traverse(ast, {
+    AttrNode(node) {
+      // TODO: manually working around https://github.com/glimmerjs/glimmer-vm/pull/953
+      if (node.value.type === 'TextNode' && node.value.chars === '') {
+        // \n is not valid within an attribute name (it would indicate two attributes)
+        // always assume the attribute ends on the starting line
+        node.loc.end.line = node.loc.start.line;
+        node.loc.end.column = node.loc.start.column + node.name.length;
+      }
+    },
+    ConcatStatement(node) {
+      // TODO: manually working around https://github.com/glimmerjs/glimmer-vm/pull/954
+      if (
+        node.parts[0].type === 'TextNode' &&
+        node.parts[0].loc.start.column > node.loc.start.column + 1
+      ) {
+        node.parts[0].loc.start.column = node.parts[0].loc.start.column - 1;
+      }
+    },
+  });
+
+  return ast;
+}
+
 module.exports = class ParseResult {
   constructor(template) {
     let ast = preprocess(template, {
@@ -35,7 +72,9 @@ module.exports = class ParseResult {
       },
     });
 
-    this.source = template.match(reLines);
+    ast = fixASTIssues(ast);
+
+    this.source = getLines(template);
     this._originalAst = ast;
 
     this.nodeInfo = new Map();
@@ -52,33 +91,6 @@ module.exports = class ParseResult {
       original: JSON.parse(JSON.stringify(node)),
       source: this.sourceForLoc(node.loc),
     };
-
-    // TODO: this sucks, manually working around https://github.com/glimmerjs/glimmer-vm/pull/953
-    if (node.type === 'AttrNode' && node.value.type === 'TextNode' && node.value.chars === '') {
-      let extraneousWhitespaceMatch = nodeInfo.source.match(trailingWhitespace);
-      let lineOffset = 0;
-      let columnOffset = 0;
-      if (extraneousWhitespaceMatch) {
-        let [, whitespace] = extraneousWhitespaceMatch;
-        let whitespaceLines = whitespace.match(reLines);
-
-        lineOffset = whitespaceLines.length - 1;
-        columnOffset = whitespaceLines[whitespaceLines.length - 1].length;
-      }
-      nodeInfo.source = nodeInfo.source.trimRight();
-      node.loc.end.line = node.loc.end.line - lineOffset;
-      node.loc.end.column = node.loc.end.column - columnOffset;
-    }
-
-    // TODO: this sucks, manually working around https://github.com/glimmerjs/glimmer-vm/pull/954
-    if (
-      node.type === 'ConcatStatement' &&
-      node.parts[0].type === 'TextNode' &&
-      node.parts[0].loc.start.column > node.loc.start.column + 1
-    ) {
-      node.parts[0].loc.start.column = node.parts[0].loc.start.column - 1;
-    }
-
     this.nodeInfo.set(node, nodeInfo);
 
     let hasLocInfo = !!node.loc;
@@ -162,7 +174,10 @@ module.exports = class ParseResult {
 
     while (currentLine < lastLine) {
       currentLine++;
-      line = this.source[currentLine];
+      // for templates that are completely empty the outer Template loc is line
+      // 0, column 0 for both start and end defaulting to empty string prevents
+      // more complicated logic below
+      line = this.source[currentLine] || '';
 
       if (currentLine === firstLine) {
         if (firstLine === lastLine) {
@@ -390,6 +405,7 @@ module.exports = class ParseResult {
               end: originalOpenParts[1].loc.start,
             });
           }
+
           let openPartsSource = originalOpenParts
             .map(part => this.sourceForLoc(part.loc))
             .join(joinOpenPartsWith);

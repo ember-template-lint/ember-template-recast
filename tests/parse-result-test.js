@@ -149,6 +149,37 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
+    QUnit.test('modifying attribute after valueless attribute', function(assert) {
+      let template = '<Foo data-foo data-derp={{hmmm}} />';
+
+      let ast = parse(template);
+      ast.body[0].attributes[1].value.path = builders.path('this.hmmm');
+
+      assert.equal(print(ast), '<Foo data-foo data-derp={{this.hmmm}} />');
+    });
+
+    QUnit.test('modifying attribute after valueless attribute with special whitespace', function(
+      assert
+    ) {
+      let template = stripIndent`
+        <Foo
+          data-foo
+          data-derp={{hmmm}}
+        />`;
+
+      let ast = parse(template);
+      ast.body[0].attributes[1].value.path = builders.path('this.hmmm');
+
+      assert.equal(
+        print(ast),
+        stripIndent`
+          <Foo
+            data-foo
+            data-derp={{this.hmmm}}
+          />`
+      );
+    });
+
     QUnit.test('adding attribute after valueless attribute', function(assert) {
       let template = '<Foo data-foo />';
 
