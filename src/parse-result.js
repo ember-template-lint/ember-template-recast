@@ -7,6 +7,25 @@ const trailingWhitespace = /(\s+)$/;
 const attrNodeParts = /(^[^=]+)(\s+)?(=)?(\s+)?(\S+)?/;
 const hashPairParts = /(^[^=]+)(\s+)?=(\s+)?(\S+)/;
 
+const voidTagNames = new Set([
+  'area',
+  'base',
+  'br',
+  'col',
+  'command',
+  'embed',
+  'hr',
+  'img',
+  'input',
+  'keygen',
+  'link',
+  'meta',
+  'param',
+  'source',
+  'track',
+  'wbr',
+]);
+
 module.exports = class ParseResult {
   constructor(template) {
     let ast = preprocess(template, {
@@ -427,11 +446,16 @@ module.exports = class ParseResult {
               })
             : '';
 
-          let closeSource = selfClosing ? '' : `</${original.tag}>`;
+          let closeSource = selfClosing
+            ? ''
+            : voidTagNames.has(original.tag)
+            ? ''
+            : `</${original.tag}>`;
 
           if (dirtyFields.has('tag')) {
             openSource = `<${ast.tag}`;
-            closeSource = selfClosing ? '' : `</${ast.tag}>`;
+
+            closeSource = selfClosing ? '' : voidTagNames.has(ast.tag) ? '' : `</${ast.tag}>`;
 
             dirtyFields.delete('tag');
           }
