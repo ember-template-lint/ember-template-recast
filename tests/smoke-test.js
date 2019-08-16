@@ -523,8 +523,8 @@ QUnit.module('"real life" smoke tests', function() {
         code,
         stripIndent`
         <FooBar 
-          @goes=here
-          @and=here
+          @goes={{here}}
+          @and={{here}}
         }} />
       `
       );
