@@ -4,6 +4,44 @@ const { stripIndent } = require('common-tags');
 
 QUnit.module('ember-template-recast', function() {
   QUnit.module('ElementNode', function() {
+    QUnit.test('creating void element', function(assert) {
+      let template = ``;
+
+      let ast = parse(template);
+      ast.body.push(builders.element('img'));
+
+      assert.equal(print(ast), `<img>`);
+    });
+
+    QUnit.test('updating attributes on a non-self-closing void element', function(assert) {
+      let template = `<img src="{{something}}">`;
+
+      let ast = parse(template);
+      ast.body[0].attributes[0].value.parts[0].path = builders.path('this.something');
+
+      assert.equal(print(ast), `<img src="{{this.something}}">`);
+    });
+
+    QUnit.test('changing an element to a void element does not print closing tag', function(
+      assert
+    ) {
+      let template = `<div data-foo="{{something}}"></div>`;
+
+      let ast = parse(template);
+      ast.body[0].tag = 'img';
+
+      assert.equal(print(ast), `<img data-foo="{{something}}">`);
+    });
+
+    QUnit.test('updating attributes on a self-closing void element', function(assert) {
+      let template = `<img src="{{something}}" />`;
+
+      let ast = parse(template);
+      ast.body[0].attributes[0].value.parts[0].path = builders.path('this.something');
+
+      assert.equal(print(ast), `<img src="{{this.something}}" />`);
+    });
+
     QUnit.test('rename element tagname', function(assert) {
       let template = stripIndent`
       <div data-foo='single quoted'>
