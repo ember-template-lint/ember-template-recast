@@ -2,6 +2,82 @@ const { transform } = require('..');
 const { stripIndent } = require('common-tags');
 
 QUnit.module('"real life" smoke tests', function() {
+  QUnit.module('hash pair mutation order should not matter GH#86', function() {
+    QUnit.test('change, add, remove', function(assert) {
+      let template = stripIndent`
+        {{foo-bar-baz
+          unchanged="unchanged"
+          hello="world"
+          foo="bar"
+        }}
+      `;
+
+      let { code } = transform(template, function(env) {
+        let { builders: b } = env.syntax;
+
+        return {
+          Hash(node) {
+            node.pairs.forEach(curr => {
+              if (curr.key === 'foo') {
+                curr.value = b.string('baaaaar');
+              }
+            });
+            node.pairs.push(b.pair('somethingnew', b.number(123)));
+            node.pairs = node.pairs.filter(curr => curr.key !== 'hello');
+          },
+        };
+      });
+
+      assert.equal(
+        code,
+        stripIndent`
+          {{foo-bar-baz
+            unchanged="unchanged"
+            foo="baaaaar"
+            somethingnew=123
+          }}
+        `
+      );
+    });
+
+    QUnit.test('remove, change, add', function(assert) {
+      let template = stripIndent`
+        {{foo-bar-baz
+          unchanged="unchanged"
+          hello="world"
+          foo="bar"
+        }}
+      `;
+
+      let { code } = transform(template, function(env) {
+        let { builders: b } = env.syntax;
+
+        return {
+          Hash(node) {
+            node.pairs = node.pairs.filter(curr => curr.key !== 'hello');
+            node.pairs.forEach(curr => {
+              if (curr.key === 'foo') {
+                curr.value = b.string('baaaaar');
+              }
+            });
+            node.pairs.push(b.pair('somethingnew', b.number(123)));
+          },
+        };
+      });
+
+      assert.equal(
+        code,
+        stripIndent`
+          {{foo-bar-baz
+            unchanged="unchanged"
+            foo="baaaaar"
+            somethingnew=123
+          }}
+        `
+      );
+    });
+  });
+
   QUnit.module('whitespace and removed hash pairs', function() {
     QUnit.test('Multi-line removed hash pair causes line removal', function(assert) {
       let template = stripIndent`
