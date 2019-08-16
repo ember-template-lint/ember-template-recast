@@ -525,7 +525,7 @@ QUnit.module('"real life" smoke tests', function() {
         <FooBar 
           @goes={{here}}
           @and={{here}}
-        }} />
+        />
       `
       );
     });
