@@ -38,6 +38,7 @@ function transform(template, plugin) {
 }
 
 module.exports = {
+  builders,
   parse,
   print,
   transform,
