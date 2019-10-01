@@ -211,5 +211,44 @@ QUnit.module('ember-template-recast', function() {
 
       assert.equal(code, '{{foo-bar hello="world"}}{{#baz}}Hello!{{/baz}}');
     });
+
+    QUnit.test('nested else-if', function(assert) {
+      let template = `
+        {{#if a}}
+          {{foo}}
+        {{else if b}}
+          {{bar}}
+        {{else if c}}
+          {{baz}}
+        {{else}}
+          {{qux}}
+        {{/if}}
+      `;
+
+      let expected = `
+        {{#if a}}
+          {{oof}}
+        {{else if b}}
+          {{rab}}
+        {{else if c}}
+          {{zab}}
+        {{else}}
+          {{xuq}}
+        {{/if}}
+      `;
+
+      let { code } = transform(template, () => {
+        return {
+          MustacheStatement(node) {
+            node.path.original = node.path.original
+              .split('')
+              .reverse()
+              .join('');
+          },
+        };
+      });
+
+      assert.equal(code, expected);
+    });
   });
 });
