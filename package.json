@@ -67,5 +67,8 @@
     "github": {
       "release": true
     }
+  },
+  "resolutions": {
+    "handlebars": "4.1.2"
   }
 }
