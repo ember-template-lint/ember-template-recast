@@ -1,3 +1,19 @@
+## v3.2.0 (2019-10-02)
+
+#### :rocket: Enhancement
+* [#123](https://github.com/ember-template-lint/ember-template-recast/pull/123) Reexport `builders` from `@glimmer/syntax` ([@Turbo87](https://github.com/Turbo87))
+
+#### :memo: Documentation
+* [#93](https://github.com/ember-template-lint/ember-template-recast/pull/93) Add tests ensuring hash mutation order does not matter. ([@rwjblue](https://github.com/rwjblue))
+
+#### :house: Internal
+* [#127](https://github.com/ember-template-lint/ember-template-recast/pull/127) Re-roll yarn.lock to avoid issues with yarn@1.19.0 ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 3
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+- Tobias Bieniek ([@Turbo87](https://github.com/Turbo87))
+- [@dependabot-preview[bot]](https://github.com/apps/dependabot-preview)
+
 ## v3.1.3 (2019-08-16)
 
 #### :bug: Bug Fix
