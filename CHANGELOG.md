@@ -1,3 +1,12 @@
+## v3.2.1 (2019-10-10)
+
+#### :bug: Bug Fix
+* [#132](https://github.com/ember-template-lint/ember-template-recast/pull/132) Ensure chained inverses are properly printed. ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 2
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+- [@dependabot-preview[bot]](https://github.com/apps/dependabot-preview)
+
 ## v3.2.0 (2019-10-02)
 
 #### :rocket: Enhancement
