@@ -725,8 +725,8 @@ module.exports = class ParseResult {
 
           let inverseSource = hadInverse ? this.sourceForLoc(original.inverse.loc) : '';
 
-          let endSource;
-          {
+          let endSource = '';
+          if (!ast.wasChained) {
             let firstOpenCurlyFromEndIndex = nodeInfo.source.lastIndexOf('{');
             let secondOpenCurlyFromEndIndex = nodeInfo.source.lastIndexOf(
               '{',
@@ -789,9 +789,10 @@ module.exports = class ParseResult {
               inversePreamble = '';
             } else {
               if (ast.inverse.chained) {
-                inverseSource = ast.inverse.body[0].program.body
-                  .map(child => this.print(child))
-                  .join('');
+                inversePreamble = '';
+                let inverseBody = ast.inverse.body[0];
+                inverseBody.wasChained = true;
+                inverseSource = this.print(inverseBody);
               } else {
                 inverseSource = ast.inverse.body.map(child => this.print(child)).join('');
               }

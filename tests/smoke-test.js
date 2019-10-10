@@ -2,6 +2,145 @@ const { transform } = require('..');
 const { stripIndent } = require('common-tags');
 
 QUnit.module('"real life" smoke tests', function() {
+  QUnit.module('nested else conditionals GH#126', function() {
+    QUnit.test('without mutation', function(assert) {
+      let template = `
+        {{#if a}}
+          {{foo}}
+        {{else if b}}
+          {{bar}}
+        {{else if c}}
+          {{baz}}
+        {{else}}
+          {{qux}}
+        {{/if}}
+      `;
+
+      let { code } = transform(template, () => {
+        return {};
+      });
+
+      assert.equal(code, template);
+    });
+
+    QUnit.test('with mutation inside component invocation with `else let` branches', function(
+      assert
+    ) {
+      let template = `
+        {{#foo-bar}}
+          {{foo}}
+        {{else let b as |baz|}}
+          {{bar}}
+        {{else}}
+          {{qux}}
+        {{/foo-bar}}
+      `;
+
+      let expected = `
+        {{#foo-bar}}
+          {{oof}}
+        {{else let b as |baz|}}
+          {{rab}}
+        {{else}}
+          {{xuq}}
+        {{/foo-bar}}
+      `;
+
+      let { code } = transform(template, () => {
+        return {
+          MustacheStatement(node) {
+            node.path.original = node.path.original
+              .split('')
+              .reverse()
+              .join('');
+          },
+        };
+      });
+
+      assert.equal(code, expected);
+    });
+
+    QUnit.test('with mutation inside component invocation with `else if` branches', function(
+      assert
+    ) {
+      let template = `
+        {{#foo-bar}}
+          {{foo}}
+        {{else if b}}
+          {{bar}}
+        {{else if c}}
+          {{baz}}
+        {{else}}
+          {{qux}}
+        {{/foo-bar}}
+      `;
+
+      let expected = `
+        {{#foo-bar}}
+          {{oof}}
+        {{else if b}}
+          {{rab}}
+        {{else if c}}
+          {{zab}}
+        {{else}}
+          {{xuq}}
+        {{/foo-bar}}
+      `;
+
+      let { code } = transform(template, () => {
+        return {
+          MustacheStatement(node) {
+            node.path.original = node.path.original
+              .split('')
+              .reverse()
+              .join('');
+          },
+        };
+      });
+
+      assert.equal(code, expected);
+    });
+
+    QUnit.test('with mutation inside `if`/`else if` branches', function(assert) {
+      let template = `
+        {{#if a}}
+          {{foo}}
+        {{else if b}}
+          {{bar}}
+        {{else if c}}
+          {{baz}}
+        {{else}}
+          {{qux}}
+        {{/if}}
+      `;
+
+      let expected = `
+        {{#if a}}
+          {{oof}}
+        {{else if b}}
+          {{rab}}
+        {{else if c}}
+          {{zab}}
+        {{else}}
+          {{xuq}}
+        {{/if}}
+      `;
+
+      let { code } = transform(template, () => {
+        return {
+          MustacheStatement(node) {
+            node.path.original = node.path.original
+              .split('')
+              .reverse()
+              .join('');
+          },
+        };
+      });
+
+      assert.equal(code, expected);
+    });
+  });
+
   QUnit.module('hash pair mutation order should not matter GH#86', function() {
     QUnit.test('change, add, remove', function(assert) {
       let template = stripIndent`
