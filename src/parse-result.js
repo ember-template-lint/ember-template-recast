@@ -826,9 +826,8 @@ module.exports = class ParseResult {
       case 'HashPair':
         {
           let { source } = nodeInfo;
-          let [, keySource, postKeyWhitespace, postEqualsWhitespace, valueSource] = source.match(
-            hashPairParts
-          );
+          let [, keySource, postKeyWhitespace, postEqualsWhitespace] = source.match(hashPairParts);
+          let valueSource = this.sourceForLoc(original.value.loc);
 
           if (dirtyFields.has('key')) {
             keySource = ast.key;
@@ -848,14 +847,10 @@ module.exports = class ParseResult {
       case 'AttrNode':
         {
           let { source } = nodeInfo;
-          let [
-            ,
-            nameSource,
-            postNameWhitespace,
-            equals,
-            postEqualsWhitespace,
-            valueSource,
-          ] = source.match(attrNodeParts);
+          let [, nameSource, postNameWhitespace, equals, postEqualsWhitespace] = source.match(
+            attrNodeParts
+          );
+          let valueSource = this.sourceForLoc(original.value.loc);
 
           // does not include ConcatStatement because `_print` automatically
           // adds a `"` around them, meaning we do not need to add our own quotes
