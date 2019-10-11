@@ -1,3 +1,17 @@
+## v3.2.2 (2019-10-11)
+
+#### :bug: Bug Fix
+* [#137](https://github.com/ember-template-lint/ember-template-recast/pull/137) Ensure AttrNode and HashPair values are preserved if changing name/key. ([@rwjblue](https://github.com/rwjblue))
+* [#136](https://github.com/ember-template-lint/ember-template-recast/pull/136) Fix issues with adding to a `ConcatStatement` ([@rwjblue](https://github.com/rwjblue))
+* [#135](https://github.com/ember-template-lint/ember-template-recast/pull/135) Ensure `TextNode`s are quoted in `AttrNode.value` ([@rwjblue](https://github.com/rwjblue))
+
+#### :house: Internal
+* [#134](https://github.com/ember-template-lint/ember-template-recast/pull/134) package.json: Add more metadata ([@Turbo87](https://github.com/Turbo87))
+
+#### Committers: 2
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+- Tobias Bieniek ([@Turbo87](https://github.com/Turbo87))
+
 ## v3.2.1 (2019-10-10)
 
 #### :bug: Bug Fix
