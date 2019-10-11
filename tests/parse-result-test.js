@@ -159,6 +159,26 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
+    QUnit.test('modifying an attribute name (GH#112)', function(assert) {
+      let template = stripIndent`
+        <div
+          data-foo='some thing here'
+          data-bar=hahaha
+        ></div>`;
+
+      let ast = parse(template);
+      ast.body[0].attributes[0].name = 'data-test';
+
+      assert.equal(
+        print(ast),
+        stripIndent`
+          <div
+            data-test='some thing here'
+            data-bar=hahaha
+          ></div>`
+      );
+    });
+
     QUnit.test('modifying attribute after valueless attribute', function(assert) {
       let template = '<Foo data-foo data-derp={{hmmm}} />';
 
@@ -811,6 +831,27 @@ QUnit.module('ember-template-recast', function() {
       ast.body[0].hash.pairs.push(builders.pair('hello', builders.string('world')));
 
       assert.equal(print(ast), '{{#foo-bar hello="world" as |a b c|}}Hi there!{{/foo-bar}}');
+    });
+
+    QUnit.test('changing a HashPair key with a StringLiteral value (GH#112)', function(assert) {
+      let template = `{{#foo-bar foo="some thing with a space"}}Hi there!{{/foo-bar}}`;
+
+      let ast = parse(template);
+      ast.body[0].hash.pairs[0].key = 'bar';
+
+      assert.equal(print(ast), '{{#foo-bar bar="some thing with a space"}}Hi there!{{/foo-bar}}');
+    });
+
+    QUnit.test('changing a HashPair key with a SubExpression value (GH#112)', function(assert) {
+      let template = `{{#foo-bar foo=(helper-here this.arg1 this.arg2)}}Hi there!{{/foo-bar}}`;
+
+      let ast = parse(template);
+      ast.body[0].hash.pairs[0].key = 'bar';
+
+      assert.equal(
+        print(ast),
+        '{{#foo-bar bar=(helper-here this.arg1 this.arg2)}}Hi there!{{/foo-bar}}'
+      );
     });
 
     QUnit.test('adding param with no params or hash', function(assert) {
