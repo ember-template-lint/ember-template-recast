@@ -1025,6 +1025,15 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '<Foo bar={{bar}} />');
     });
 
+    QUnit.test('updating concat statement value', function(assert) {
+      let template = '<Foo class="{{foo}} static {{bar}}" />';
+
+      let ast = parse(template);
+      ast.body[0].attributes[0].value.parts.push(builders.text(' other-static'));
+
+      assert.equal(print(ast), '<Foo class="{{foo}} static {{bar}} other-static" />');
+    });
+
     QUnit.test('updating value from non-quotable to TextNode (GH#111)', function(assert) {
       let template = '<Foo bar={{foo}} />';
 
