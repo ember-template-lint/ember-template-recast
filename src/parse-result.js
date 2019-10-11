@@ -857,6 +857,10 @@ module.exports = class ParseResult {
             valueSource,
           ] = source.match(attrNodeParts);
 
+          // does not include ConcatStatement because `_print` automatically
+          // adds a `"` around them, meaning we do not need to add our own quotes
+          let wasQuotableValue = original.value.type === 'TextNode';
+
           let openQuote = '';
           let closeQuote = '';
 
@@ -878,6 +882,13 @@ module.exports = class ParseResult {
           }
 
           if (dirtyFields.has('value')) {
+            let newValueNeedsQuotes = ast.value.type === 'TextNode';
+
+            if (!wasQuotableValue && newValueNeedsQuotes) {
+              openQuote = '"';
+              closeQuote = '"';
+            }
+
             valueSource = this.print(ast.value);
 
             dirtyFields.delete('value');
