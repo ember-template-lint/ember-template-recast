@@ -10,6 +10,9 @@
     "recast",
     "templates"
   ],
+  "homepage": "https://github.com/ember-template-lint/ember-template-recast",
+  "bugs": "https://github.com/ember-template-lint/ember-template-recast/issues",
+  "repository": "github:ember-template-lint/ember-template-recast",
   "license": "MIT",
   "author": "Robert Jackson <me@rwjblue.com>",
   "files": [
