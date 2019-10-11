@@ -42,6 +42,16 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), `<img src="{{this.something}}" />`);
     });
 
+    QUnit.test('changing an attribute value from mustache to text node (GH#111)', function(assert) {
+      let template = `<FooBar @thing={{1234}} @baz={{derp}} />`;
+
+      let ast = parse(template);
+      ast.body[0].attributes[0].value = builders.text('static thing 1');
+      ast.body[0].attributes[1].value = builders.text('static thing 2');
+
+      assert.equal(print(ast), `<FooBar @thing="static thing 1" @baz="static thing 2" />`);
+    });
+
     QUnit.test('rename element tagname', function(assert) {
       let template = stripIndent`
       <div data-foo='single quoted'>
@@ -1013,6 +1023,28 @@ QUnit.module('ember-template-recast', function() {
       ast.body[0].attributes[0].value.path.original = 'bar';
 
       assert.equal(print(ast), '<Foo bar={{bar}} />');
+    });
+
+    QUnit.test('updating value from non-quotable to TextNode (GH#111)', function(assert) {
+      let template = '<Foo bar={{foo}} />';
+
+      let ast = parse(template);
+      ast.body[0].attributes[0].value = builders.text('hello!');
+
+      assert.equal(print(ast), '<Foo bar="hello!" />');
+    });
+
+    QUnit.test('updating value from non-quotable to ConcatStatement (GH#111)', function(assert) {
+      let template = '<Foo bar={{foo}} />';
+
+      let ast = parse(template);
+      ast.body[0].attributes[0].value = builders.concat([
+        builders.mustache('foo'),
+        builders.text(' static '),
+        builders.mustache('bar'),
+      ]);
+
+      assert.equal(print(ast), '<Foo bar="{{foo}} static {{bar}}" />');
     });
 
     QUnit.test('renaming valueless attribute', function(assert) {
