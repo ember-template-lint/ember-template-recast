@@ -52,32 +52,39 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), `<FooBar @thing="static thing 1" @baz="static thing 2" />`);
     });
 
-    QUnit.test('changing an attribute value from text node to mustache (GH #139)', function(assert) {
+    QUnit.test('changing an attribute value from text node to mustache (GH #139)', function(
+      assert
+    ) {
       let template = `<FooBar @foo="Hi, I'm a string!" />`;
 
       let ast = parse(template);
       ast.body[0].attributes[0].value = builders.mustache('my-awesome-helper', [
-        builders.string("hello"),
-        builders.string("world")
+        builders.string('hello'),
+        builders.string('world'),
       ]);
 
       assert.equal(print(ast), `<FooBar @foo={{my-awesome-helper "hello" "world"}} />`);
     });
 
-    QUnit.test('changing an attribute value from text node to concat statement (GH #139)', function(assert) {
+    QUnit.test('changing an attribute value from text node to concat statement (GH #139)', function(
+      assert
+    ) {
       let template = `<FooBar @foo="Hi, I'm a string!" />`;
 
       let ast = parse(template);
       ast.body[0].attributes[0].value = builders.concat([
-        builders.text("Hello "),
+        builders.text('Hello '),
         builders.mustache('my-awesome-helper', [
-          builders.string("hello"),
-          builders.string("world")
+          builders.string('hello'),
+          builders.string('world'),
         ]),
-        builders.text(" world")
+        builders.text(' world'),
       ]);
 
-      assert.equal(print(ast), `<FooBar @foo="Hello {{my-awesome-helper "hello" "world"}} world" />`);
+      assert.equal(
+        print(ast),
+        `<FooBar @foo="Hello {{my-awesome-helper "hello" "world"}} world" />`
+      );
     });
 
     QUnit.test('changing an attribute value from mustache to mustache', function(assert) {
@@ -85,8 +92,8 @@ QUnit.module('ember-template-recast', function() {
 
       let ast = parse(template);
       ast.body[0].attributes[0].value = builders.mustache('my-awesome-helper', [
-        builders.string("hello"),
-        builders.string("world")
+        builders.string('hello'),
+        builders.string('world'),
       ]);
 
       assert.equal(print(ast), `<FooBar @foo={{my-awesome-helper "hello" "world"}} />`);
