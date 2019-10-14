@@ -35,7 +35,7 @@
     "globby": "^10.0.1",
     "ora": "^4.0.2",
     "tmp": "^0.1.0",
-    "workerpool": "^5.0.0"
+    "workerpool": "^5.0.1"
   },
   "devDependencies": {
     "broccoli-test-helper": "^2.0.0",

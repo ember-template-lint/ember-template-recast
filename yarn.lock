@@ -4237,10 +4237,10 @@ wordwrap@~1.0.0:
   resolved "https://registry.yarnpkg.com/wordwrap/-/wordwrap-1.0.0.tgz#27584810891456a4171c8d0226441ade90cbcaeb"
   integrity sha1-J1hIEIkUVqQXHI0CJkQa3pDLyus=
 
-workerpool@^5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/workerpool/-/workerpool-5.0.0.tgz#5f6e882999172c4ed0acd09c3e25cc8f4516f30c"
-  integrity sha512-QGsdq7Bv7JBvJW5ngNB9dR8hu8T2Jd38blVKINdehHlipR1WUajiLNFBtSBC2R3zlCnTpNM1Q0o3ssnfcQt48w==
+workerpool@^5.0.1:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/workerpool/-/workerpool-5.0.1.tgz#bbafa774066c0f43dfce947ec20403d7fb87b519"
+  integrity sha512-Q9CGaz2zLdFIyr+VKct6bYQAMzeGy7XWSw9pDGLfPuU56Cg+iWflqjFGUqMqv3iMuS8EaXQTgH0qxaPi6AuhAA==
 
 wrap-ansi@^2.0.0:
   version "2.1.0"
