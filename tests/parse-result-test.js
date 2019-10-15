@@ -901,6 +901,27 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
+    QUnit.test('changing a HashPair value from StringLiteral to SubExpression', function(assert) {
+      let template = `{{#foo-bar foo="bar!"}}Hi there!{{/foo-bar}}`;
+
+      let ast = parse(template);
+      ast.body[0].hash.pairs[0].value = builders.sexpr('concat', [
+        builders.string('hello'),
+        builders.string('world'),
+      ]);
+
+      assert.equal(print(ast), '{{#foo-bar foo=(concat "hello" "world")}}Hi there!{{/foo-bar}}');
+    });
+
+    QUnit.test('changing a HashPair value from SubExpression to StringLiteral', function(assert) {
+      let template = `{{#foo-bar foo=(concat "hello" "world")}}Hi there!{{/foo-bar}}`;
+
+      let ast = parse(template);
+      ast.body[0].hash.pairs[0].value = builders.string('hello world!');
+
+      assert.equal(print(ast), '{{#foo-bar foo="hello world!"}}Hi there!{{/foo-bar}}');
+    });
+
     QUnit.test('adding param with no params or hash', function(assert) {
       let template = `{{#foo-bar}}Hi there!{{/foo-bar}}`;
 
