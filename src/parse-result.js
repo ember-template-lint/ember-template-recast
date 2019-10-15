@@ -882,6 +882,9 @@ module.exports = class ParseResult {
             if (!wasQuotableValue && newValueNeedsQuotes) {
               openQuote = '"';
               closeQuote = '"';
+            } else if (wasQuotableValue && !newValueNeedsQuotes) {
+              openQuote = '';
+              closeQuote = '';
             }
 
             valueSource = this.print(ast.value);

@@ -52,6 +52,53 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), `<FooBar @thing="static thing 1" @baz="static thing 2" />`);
     });
 
+    QUnit.test('changing an attribute value from text node to mustache (GH #139)', function(
+      assert
+    ) {
+      let template = `<FooBar @foo="Hi, I'm a string!" />`;
+
+      let ast = parse(template);
+      ast.body[0].attributes[0].value = builders.mustache('my-awesome-helper', [
+        builders.string('hello'),
+        builders.string('world'),
+      ]);
+
+      assert.equal(print(ast), `<FooBar @foo={{my-awesome-helper "hello" "world"}} />`);
+    });
+
+    QUnit.test('changing an attribute value from text node to concat statement (GH #139)', function(
+      assert
+    ) {
+      let template = `<FooBar @foo="Hi, I'm a string!" />`;
+
+      let ast = parse(template);
+      ast.body[0].attributes[0].value = builders.concat([
+        builders.text('Hello '),
+        builders.mustache('my-awesome-helper', [
+          builders.string('hello'),
+          builders.string('world'),
+        ]),
+        builders.text(' world'),
+      ]);
+
+      assert.equal(
+        print(ast),
+        `<FooBar @foo="Hello {{my-awesome-helper "hello" "world"}} world" />`
+      );
+    });
+
+    QUnit.test('changing an attribute value from mustache to mustache', function(assert) {
+      let template = `<FooBar @foo={{12345}} />`;
+
+      let ast = parse(template);
+      ast.body[0].attributes[0].value = builders.mustache('my-awesome-helper', [
+        builders.string('hello'),
+        builders.string('world'),
+      ]);
+
+      assert.equal(print(ast), `<FooBar @foo={{my-awesome-helper "hello" "world"}} />`);
+    });
+
     QUnit.test('rename element tagname', function(assert) {
       let template = stripIndent`
       <div data-foo='single quoted'>
@@ -852,6 +899,27 @@ QUnit.module('ember-template-recast', function() {
         print(ast),
         '{{#foo-bar bar=(helper-here this.arg1 this.arg2)}}Hi there!{{/foo-bar}}'
       );
+    });
+
+    QUnit.test('changing a HashPair value from StringLiteral to SubExpression', function(assert) {
+      let template = `{{#foo-bar foo="bar!"}}Hi there!{{/foo-bar}}`;
+
+      let ast = parse(template);
+      ast.body[0].hash.pairs[0].value = builders.sexpr('concat', [
+        builders.string('hello'),
+        builders.string('world'),
+      ]);
+
+      assert.equal(print(ast), '{{#foo-bar foo=(concat "hello" "world")}}Hi there!{{/foo-bar}}');
+    });
+
+    QUnit.test('changing a HashPair value from SubExpression to StringLiteral', function(assert) {
+      let template = `{{#foo-bar foo=(concat "hello" "world")}}Hi there!{{/foo-bar}}`;
+
+      let ast = parse(template);
+      ast.body[0].hash.pairs[0].value = builders.string('hello world!');
+
+      assert.equal(print(ast), '{{#foo-bar foo="hello world!"}}Hi there!{{/foo-bar}}');
     });
 
     QUnit.test('adding param with no params or hash', function(assert) {
