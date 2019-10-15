@@ -1,3 +1,11 @@
+## v3.2.3 (2019-10-15)
+
+#### :bug: Bug Fix
+* [#140](https://github.com/ember-template-lint/ember-template-recast/pull/140) Avoid invalid quotes when changing an `AttrNode` value from `TextNode` to `MustacheStatement` ([@zimmi88](https://github.com/zimmi88))
+
+#### Committers: 1
+- Tim Lindvall ([@zimmi88](https://github.com/zimmi88))
+
 ## v3.2.2 (2019-10-11)
 
 #### :bug: Bug Fix

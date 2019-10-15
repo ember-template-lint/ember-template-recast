@@ -1,6 +1,6 @@
 {
   "name": "ember-template-recast",
-  "version": "3.2.2",
+  "version": "3.2.3",
   "description": "Non-destructive template transformer.",
   "keywords": [
     "codemod",
