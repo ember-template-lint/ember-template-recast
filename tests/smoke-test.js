@@ -2,6 +2,64 @@ const { transform } = require('..');
 const { stripIndent } = require('common-tags');
 
 QUnit.module('"real life" smoke tests', function() {
+  QUnit.module('line endings', function() {
+    QUnit.test('preserves mixed line endings', function(assert) {
+      let template = `{{foo}}\r\n{{bar}}\n{{qux}}\r\n`;
+
+      let expected = `{{oof}}\r\n{{rab}}\n{{xuq}}\r\n`;
+
+      let { code } = transform(template, () => {
+        return {
+          MustacheStatement(node) {
+            node.path.original = node.path.original
+              .split('')
+              .reverse()
+              .join('');
+          },
+        };
+      });
+
+      assert.equal(code, expected);
+    });
+    QUnit.test('preserves \\r\\n line endings', function(assert) {
+      let template = `{{foo}}\r\n{{bar}}\r\n`;
+
+      let expected = `{{oof}}\r\n{{rab}}\r\n`;
+
+      let { code } = transform(template, () => {
+        return {
+          MustacheStatement(node) {
+            node.path.original = node.path.original
+              .split('')
+              .reverse()
+              .join('');
+          },
+        };
+      });
+
+      assert.equal(code, expected);
+    });
+
+    QUnit.test('preserves \\n line endings', function(assert) {
+      let template = `{{foo}}\n{{bar}}\n`;
+
+      let expected = `{{oof}}\n{{rab}}\n`;
+
+      let { code } = transform(template, () => {
+        return {
+          MustacheStatement(node) {
+            node.path.original = node.path.original
+              .split('')
+              .reverse()
+              .join('');
+          },
+        };
+      });
+
+      assert.equal(code, expected);
+    });
+  });
+
   QUnit.module('nested else conditionals GH#126', function() {
     QUnit.test('without mutation', function(assert) {
       let template = `
