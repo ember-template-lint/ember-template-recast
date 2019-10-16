@@ -1,6 +1,6 @@
 const http = require('http');
 const https = require('https');
-const { writeFile } = require('fs');
+const { writeFileSync } = require('fs');
 const { resolve, extname, join } = require('path');
 const colors = require('colors/safe');
 const globby = require('globby');
@@ -106,23 +106,27 @@ class StatsCollector {
   }
 }
 
-module.exports = function run(transformFile, filePaths, options) {
+module.exports = async function run(transformFile, filePaths, options) {
   const logger = options.silent ? silentLogger : verboseLogger;
   const stats = new StatsCollector(logger);
 
-  return Promise.all([loadTransform(transformFile), getAllFiles(filePaths)])
-    .then(([transformPath, files]) => spawnWorkers(transformPath, files, options, stats, logger))
-    .then(() => {
-      logger.stopSpinner({
-        symbol: '🎉',
-        text: 'Complete!',
-      });
-      stats.print();
-    })
-    .catch(err => {
-      logger.stopSpinner();
-      handleError(err, logger);
+  try {
+    const [transformPath, files] = await Promise.all([
+      loadTransform(transformFile),
+      getAllFiles(filePaths),
+    ]);
+
+    await spawnWorkers(transformPath, files, options, stats, logger);
+
+    logger.stopSpinner({
+      symbol: '🎉',
+      text: 'Complete!',
     });
+    stats.print();
+  } catch (err) {
+    logger.stopSpinner();
+    handleError(err, logger);
+  }
 };
 
 /**
@@ -130,21 +134,19 @@ module.exports = function run(transformFile, filePaths, options) {
  * @param {string} transformFile
  * @returns {Promise<string>}
  */
-function loadTransform(transformFile) {
+async function loadTransform(transformFile) {
   const isRemote = transformFile.startsWith('http');
 
   if (!isRemote) {
     return resolve(process.cwd(), transformFile);
   }
 
-  return new Promise((resolve, reject) => {
-    downloadFile(transformFile).then(contents => {
-      const filePath = tmp.fileSync();
-      writeFile(filePath.name, contents, 'utf8', err => {
-        err ? reject(err) : resolve(filePath.name);
-      });
-    });
-  });
+  const contents = await downloadFile(transformFile);
+  const filePath = tmp.fileSync();
+
+  writeFileSync(filePath.name, contents, 'utf8');
+
+  return filePath.name;
 }
 
 /**
@@ -170,7 +172,7 @@ function downloadFile(url) {
  * @param {string[]} paths
  * @returns {Promise<string[]>}
  */
-function getAllFiles(paths) {
+async function getAllFiles(paths) {
   const patterns = paths.map(path => {
     const ext = extname(path);
     if (ext === '') {
@@ -180,13 +182,12 @@ function getAllFiles(paths) {
     return path;
   });
 
-  return globby(patterns, { absolute: true, gitignore: true }).then(files => {
-    if (files.length < 1) {
-      throw new NoFilesError();
-    }
+  const files = await globby(patterns, { absolute: true, gitignore: true });
+  if (files.length < 1) {
+    throw new NoFilesError();
+  }
 
-    return files;
-  });
+  return files;
 }
 
 /**
@@ -199,7 +200,7 @@ function getAllFiles(paths) {
  * @param {Logger} logger
  * @returns {Promise<void>}
  */
-function spawnWorkers(transformPath, files, { cpus, dry }, stats, logger) {
+async function spawnWorkers(transformPath, files, { cpus, dry }, stats, logger) {
   const processCount = Math.min(files.length, cpus);
 
   logger.info(`Processing ${files.length} file${files.length !== 1 ? 's' : ''}…`);
@@ -210,19 +211,18 @@ function spawnWorkers(transformPath, files, { cpus, dry }, stats, logger) {
   const pool = workerpool.pool(require.resolve('./worker.js'), { maxWorkers: cpus });
 
   let i = 0;
-  const worker = queue.async.asyncify(file => {
-    return pool.exec('run', [transformPath, file, { dry }]).then(message => {
-      stats.update(message);
-      logger.updateSpinner(`Processed ${i++} files`);
-    });
+  const worker = queue.async.asyncify(async file => {
+    const message = await pool.exec('run', [transformPath, file, { dry }]);
+
+    stats.update(message);
+    logger.updateSpinner(`Processed ${i++} files`);
   });
 
-  return queue(worker, files, cpus)
-    .catch(err => {
-      pool.terminate();
-      return Promise.reject(err);
-    })
-    .then(() => pool.terminate());
+  try {
+    await queue(worker, files, cpus);
+  } finally {
+    pool.terminate();
+  }
 }
 
 function handleError(err, logger) {
