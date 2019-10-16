@@ -1,8 +1,9 @@
 const http = require('http');
 const https = require('https');
 const { writeFileSync } = require('fs');
-const { resolve, extname, join } = require('path');
+const { resolve } = require('path');
 const colors = require('colors/safe');
+const slash = require('slash');
 const globby = require('globby');
 const ora = require('ora');
 const queue = require('async-promise-queue');
@@ -173,16 +174,18 @@ function downloadFile(url) {
  * @returns {Promise<string[]>}
  */
 async function getAllFiles(paths) {
-  const patterns = paths.map(path => {
-    const ext = extname(path);
-    if (ext === '') {
-      path = join(path, '**', '*.{hbs,handlebars}');
-    }
-
-    return path;
+  const files = await globby(paths, {
+    // must specify a properly escaped `cwd` because globby infers from
+    // process.cwd() directly and without correcting back to posix paths
+    // asserts if the individual file path isn't "in" the cwd
+    // https://github.com/sindresorhus/globby/pull/137
+    cwd: slash(process.cwd()),
+    expandDirectories: {
+      extensions: ['hbs', 'handlebars'],
+    },
+    absolute: true,
+    gitignore: true,
   });
-
-  const files = await globby(patterns, { absolute: true, gitignore: true });
   if (files.length < 1) {
     throw new NoFilesError();
   }
