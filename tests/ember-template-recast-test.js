@@ -1,18 +1,10 @@
-const { spawn } = require('child_process');
+const execa = require('execa');
 const { readFileSync } = require('fs');
 const { join } = require('path');
 const { createTempDir } = require('broccoli-test-helper');
 
 function run(args, cwd) {
-  return new Promise(resolve => {
-    const recast = spawn(join(__dirname, '../bin/ember-template-recast.js'), args, { cwd });
-
-    const out = { stdout: '', stderr: '' };
-    recast.stdout.on('data', data => (out.stdout += data));
-    recast.stderr.on('data', data => (out.stderr += data));
-
-    recast.on('close', () => resolve(out));
-  });
+  return execa(require.resolve('../bin/ember-template-recast'), args, { cwd });
 }
 
 QUnit.module('ember-template-recast executable', function({ beforeEach, afterEach }) {
@@ -46,8 +38,7 @@ QUnit.module('ember-template-recast executable', function({ beforeEach, afterEac
         `Processing 3 files…
 Spawning 1 worker…
 Ok:        2
-Unchanged: 1
-`
+Unchanged: 1`
       );
 
       assert.deepEqual(out.files, {
@@ -67,8 +58,7 @@ Unchanged: 1
         `Processing 3 files…
 Spawning 1 worker…
 Ok:        2
-Unchanged: 1
-`
+Unchanged: 1`
       );
 
       assert.deepEqual(out.files, {
@@ -109,8 +99,7 @@ Unchanged: 1
 Spawning 1 worker…
 Ok:        2
 Unchanged: 1
-Errored:   1
-`
+Errored:   1`
         ),
         'Status message includes error count'
       );
@@ -148,8 +137,7 @@ Errored:   1
         `Processing 300 files…
 Spawning 4 workers…
 Ok:        300
-Unchanged: 0
-`
+Unchanged: 0`
       );
 
       const files = this.fixture.read();
