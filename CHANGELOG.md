@@ -1,3 +1,19 @@
+## v3.2.4 (2019-10-16)
+
+#### :bug: Bug Fix
+* [#147](https://github.com/ember-template-lint/ember-template-recast/pull/147) Fix `ember-template-recast` bin script file selection for Windows users ([@rwjblue](https://github.com/rwjblue))
+
+#### :house: Internal
+* [#143](https://github.com/ember-template-lint/ember-template-recast/pull/143) Add Windows and macOS CI testing. ([@rwjblue](https://github.com/rwjblue))
+* [#146](https://github.com/ember-template-lint/ember-template-recast/pull/146) Refactor runner to leverage async/await. ([@rwjblue](https://github.com/rwjblue))
+* [#145](https://github.com/ember-template-lint/ember-template-recast/pull/145) Use `execa` instead of `child_process.spawn` in tests. ([@rwjblue](https://github.com/rwjblue))
+* [#144](https://github.com/ember-template-lint/ember-template-recast/pull/144) Remove TravisCI setup. ([@rwjblue](https://github.com/rwjblue))
+* [#142](https://github.com/ember-template-lint/ember-template-recast/pull/142) Add GitHub Actions CI. ([@rwjblue](https://github.com/rwjblue))
+* [#141](https://github.com/ember-template-lint/ember-template-recast/pull/141) Add tests ensuring line endings are preserved properly. ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 1
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+
 ## v3.2.3 (2019-10-15)
 
 #### :bug: Bug Fix
