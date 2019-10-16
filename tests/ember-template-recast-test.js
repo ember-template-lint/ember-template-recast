@@ -2,6 +2,7 @@ const execa = require('execa');
 const { readFileSync } = require('fs');
 const { join } = require('path');
 const { createTempDir } = require('broccoli-test-helper');
+const slash = require('slash');
 
 function run(args, cwd) {
   return execa(require.resolve('../bin/ember-template-recast'), args, { cwd });
@@ -104,10 +105,13 @@ Errored:   1`
         'Status message includes error count'
       );
 
-      assert.ok(
-        stdout.includes(join(this.fixture.path(), 'files/bad-template.hbs')),
-        'Output includes full path to bad template'
-      );
+      let badFilePath = slash(join(this.fixture.path(), 'files/bad-template.hbs'));
+
+      assert.pushResult({
+        result: stdout.includes(badFilePath),
+        message: `Expected output to include full path to the invalid template (${badFilePath}): \n\n${stdout}`,
+      });
+
       assert.ok(
         stdout.includes('Error: Parse error on line 1:'),
         'Output includes error stacktrace'
