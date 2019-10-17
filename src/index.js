@@ -3,8 +3,8 @@ const ParseResult = require('./parse-result');
 
 const PARSE_RESULT_FOR = new WeakMap();
 
-function parse(template) {
-  let result = new ParseResult(template);
+function parse(template, config) {
+  let result = new ParseResult(template, config);
 
   PARSE_RESULT_FOR.set(result.ast, result);
 

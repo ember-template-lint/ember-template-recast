@@ -64,13 +64,15 @@ function fixASTIssues(ast) {
 }
 
 module.exports = class ParseResult {
-  constructor(template) {
-    let ast = preprocess(template, {
+  constructor(template, config) {
+    let recastOptions = {
       mode: 'codemod',
       parseOptions: {
         ignoreStandalone: true,
       },
-    });
+    };
+    let options = Object.assign({}, config, recastOptions);
+    let ast = preprocess(template, options);
 
     ast = fixASTIssues(ast);
 
