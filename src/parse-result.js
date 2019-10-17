@@ -67,9 +67,6 @@ module.exports = class ParseResult {
   constructor(template) {
     let ast = preprocess(template, {
       mode: 'codemod',
-      parseOptions: {
-        ignoreStandalone: true,
-      },
     });
 
     ast = fixASTIssues(ast);
