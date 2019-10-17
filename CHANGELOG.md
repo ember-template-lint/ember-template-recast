@@ -1,3 +1,11 @@
+## v3.2.5 (2019-10-17)
+
+#### :bug: Bug Fix
+* [#148](https://github.com/ember-template-lint/ember-template-recast/pull/148) Fix invalid recursive dirtying when mutating nodes (significant performance improvement). ([@zimmi88](https://github.com/zimmi88))
+
+#### Committers: 1
+- Tim Lindvall ([@zimmi88](https://github.com/zimmi88))
+
 ## v3.2.4 (2019-10-16)
 
 #### :bug: Bug Fix
