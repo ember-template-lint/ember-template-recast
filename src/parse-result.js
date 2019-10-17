@@ -205,9 +205,8 @@ module.exports = class ParseResult {
     dirtyFields.add(property);
 
     let ancestor = this.ancestor.get(node);
-    while (ancestor !== null) {
+    if (ancestor !== null) {
       this.markAsDirty(ancestor.node, ancestor.key);
-      ancestor = this.ancestor.get(ancestor.node);
     }
   }
 
