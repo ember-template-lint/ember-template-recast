@@ -14,7 +14,9 @@ const template = `
   baz="stuff"
 }}
 `;
-let ast = templateRecast.parse(template);
+// [optional] a config passed to @glimmer parser (@glimmer/syntax's `preprocess`)
+const config = {};
+let ast = templateRecast.parse(template, config);
 // now you can work with `ast`
 ```
 
