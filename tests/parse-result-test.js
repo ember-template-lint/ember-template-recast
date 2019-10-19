@@ -1402,4 +1402,43 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '<div class="hahah"></div>');
     });
   });
+
+  QUnit.module('parse() has a second argument: `options`', function() {
+    QUnit.test('options is passed to @glimmer/syntax parser', function(assert) {
+      let template = `Text`;
+
+      function plugin() {
+        return {
+          visitor: {
+            TextNode(node) {
+              node.hey = '👋';
+            },
+          },
+        };
+      }
+
+      let config = {
+        plugins: {
+          ast: [plugin],
+        },
+      };
+      let ast = parse(template, config);
+
+      assert.equal(ast.body[0].hey, '👋');
+    });
+
+    // this prevents @glimmer/syntax parser being turned in precompile mode by accident
+    QUnit.test('`mode` option is always set to codemod', function(assert) {
+      // The following template
+      // contains an additional space after the BlockStatement's opening block.
+      // In precompile mode, it would be removed.
+      // In codemod mode it is not.
+      let template = `{{#foo}} \n{{/foo}}`;
+
+      let codemodAst = parse(template);
+      let precompileAst = parse(template, { mode: 'precompile' });
+
+      assert.deepEqual(JSON.stringify(codemodAst), JSON.stringify(precompileAst));
+    });
+  });
 });
