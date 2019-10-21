@@ -722,7 +722,21 @@ module.exports = class ParseResult {
             }
           }
 
-          let inverseSource = hadInverse ? this.sourceForLoc(original.inverse.loc) : '';
+          // GH #149
+          // In the event we're dealing with a chain of if/else-if/else, the inverse
+          // should encompass the entirety of the chain. Sadly, the loc param of
+          // original.inverse in this case only captures the block of the first inverse
+          // not the entire chain. We instead look at the loc param of the nested body
+          // node, which does report the entire chain.
+          // In this case, because it also includes the preamble, we must also trim
+          // that from our final inverse source.
+          let inverseSource;
+          if (hadInverse && original.inverse.chained) {
+            inverseSource = this.sourceForLoc(original.inverse.body[0].loc) || '';
+            inverseSource = inverseSource.slice(inversePreamble.length);
+          } else {
+            inverseSource = hadInverse ? this.sourceForLoc(original.inverse.loc) : '';
+          }
 
           let endSource = '';
           if (!ast.wasChained) {
