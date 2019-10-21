@@ -706,4 +706,104 @@ QUnit.module('"real life" smoke tests', function() {
       );
     });
   });
+
+  QUnit.test(
+    'If/else-if/else chains with edits early in the chain should be fully printed (GH #149)',
+    function(assert) {
+      let template = `
+      {{#if a}}
+        {{foo}}
+      {{else if b}}
+        {{bar}}
+      {{else if c}}
+        {{baz}}
+      {{else}}
+        {{#if d}}
+          {{qux}}
+        {{/if}}
+      {{/if}}
+    `;
+
+      let expected = `
+      {{#if a}}
+        {{oof}}
+      {{else if b}}
+        {{bar}}
+      {{else if c}}
+        {{baz}}
+      {{else}}
+        {{#if d}}
+          {{qux}}
+        {{/if}}
+      {{/if}}
+    `;
+
+      let { code } = transform(template, () => {
+        return {
+          MustacheStatement(node) {
+            if (node.path.original === 'foo') {
+              node.path.original = 'oof';
+            }
+          },
+        };
+      });
+
+      assert.equal(code, expected);
+    }
+  );
+
+  QUnit.test('If/else-if/else chains with multiple edits are accurate (GH #149)', function(assert) {
+    let template = `
+      {{#if a}}
+        {{foo}}
+      {{else if b}}
+        {{bar}}
+      {{else if c}}
+        {{baz}}
+      {{else}}
+        {{#if d}}
+          {{qux}}
+        {{else}}
+          {{quack}}
+        {{/if}}
+      {{/if}}
+      <div class="hello-world">
+        Hello!
+      </div>
+    `;
+
+    let expected = `
+      {{#if a}}
+        {{oof}}
+      {{else if b}}
+        {{bar}}
+      {{else if c}}
+        {{baz}}
+      {{else}}
+        {{#if d}}
+          {{qux}}
+        {{else}}
+          {{honk}}
+        {{/if}}
+      {{/if}}
+      <div class="hello-world">
+        Hello!
+      </div>
+    `;
+
+    let { code } = transform(template, () => {
+      return {
+        MustacheStatement(node) {
+          if (node.path.original === 'foo') {
+            node.path.original = 'oof';
+          }
+          if (node.path.original === 'quack') {
+            node.path.original = 'honk';
+          }
+        },
+      };
+    });
+
+    assert.equal(code, expected);
+  });
 });
