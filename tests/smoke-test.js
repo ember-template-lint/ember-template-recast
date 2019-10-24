@@ -159,6 +159,33 @@ QUnit.module('"real life" smoke tests', function() {
       assert.equal(code, expected);
     });
 
+    QUnit.test('with `if` branch containing whitespace controls', function(assert) {
+      let template = `
+        {{#if foo~}}
+          {{foo}}
+        {{/if}}
+      `;
+
+      let expected = `
+        {{#if foo~}}
+          {{oof}}
+        {{/if}}
+      `;
+
+      let { code } = transform(template, () => {
+        return {
+          MustacheStatement(node) {
+            node.path.original = node.path.original
+              .split('')
+              .reverse()
+              .join('');
+          },
+        };
+      });
+
+      assert.equal(code, expected);
+    });
+
     QUnit.test('with mutation inside `if`/`else if` branches', function(assert) {
       let template = `
         {{#if a}}
