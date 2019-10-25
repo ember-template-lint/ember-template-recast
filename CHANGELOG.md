@@ -1,3 +1,14 @@
+## v3.2.7 (2019-10-25)
+
+#### :rocket: Enhancement
+* [#154](https://github.com/ember-template-lint/ember-template-recast/pull/154) fix: Make it possible to annotate nodes ([@dcyriller](https://github.com/dcyriller))
+
+#### :house: Internal
+* [#153](https://github.com/ember-template-lint/ember-template-recast/pull/153) Remove redundant `ignoreStandalone` option passed to `@glimmer/syntax` ([@dcyriller](https://github.com/dcyriller))
+
+#### Committers: 1
+- Cyrille David ([@dcyriller](https://github.com/dcyriller))
+
 ## v3.2.6 (2019-10-22)
 
 #### :bug: Bug Fix
