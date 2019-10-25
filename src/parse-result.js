@@ -989,12 +989,14 @@ module.exports = class ParseResult {
         );
     }
 
-    if (dirtyFields.size > 0) {
-      throw new Error(
-        `ember-template-recast could not handle the mutations of \`${Array.from(
-          dirtyFields
-        )}\` on ${original.type}`
-      );
+    for (let field of dirtyFields.values()) {
+      if (field in Object.keys(original)) {
+        throw new Error(
+          `ember-template-recast could not handle the mutations of \`${Array.from(
+            dirtyFields
+          )}\` on ${original.type}`
+        );
+      }
     }
 
     return output.join('');
