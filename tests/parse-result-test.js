@@ -1003,12 +1003,12 @@ QUnit.module('ember-template-recast', function() {
     QUnit.test(
       'adding child to end of inverse preserves whitespace and whitespace control when program is also present',
       function(assert) {
-        let template = `{{#foo-bar}}Goodbye{{~ else ~}}Hello{{/foo-bar}}`;
+        let template = `{{#foo-bar}}Goodbye\n  {{~ else ~}} Hello{{/foo-bar}}`;
 
         let ast = parse(template);
         ast.body[0].inverse.body.push(builders.text(' world!'));
 
-        assert.equal(print(ast), '{{#foo-bar}}Goodbye{{~ else ~}}Hello world!{{/foo-bar}}');
+        assert.equal(print(ast), '{{#foo-bar}}Goodbye\n  {{~ else ~}} Hello world!{{/foo-bar}}');
       }
     );
 
