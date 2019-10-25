@@ -1051,6 +1051,15 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '{{#foo-bar}}Goodbye{{/foo-bar}}');
     });
 
+    QUnit.test('annotating an "else if" node', function(assert) {
+      let template = '{{#if foo}}{{else if bar}}{{else}}{{/if}}';
+
+      let ast = parse(template);
+      ast.body[0].inverse.body[0]._isElseIfBlock = true;
+
+      assert.equal(print(ast), '{{#if foo}}{{else if bar}}{{else}}{{/if}}');
+    });
+
     QUnit.test('add block param (when none existed)', function(assert) {
       let template = `{{#foo-bar}}{{/foo-bar}}`;
 
