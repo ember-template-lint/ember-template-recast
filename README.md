@@ -39,7 +39,7 @@ templateRecast.print(ast);
     }}
 ```
 
-### traverse
+### transform
 
 Used to easily traverse (and possibly mutate) a given template. Returns the
 resulting AST and the printed template.
