@@ -48,17 +48,12 @@ The plugin argument has roughly the following interface:
 
 ```ts
 export interface ASTPluginBuilder {
-  (env: ASTPluginEnvironment): ASTPlugin;
+  (env: ASTPluginEnvironment): NodeVisitor;
 }
 
 export interface ASTPluginEnvironment {
   meta?: any;
   syntax: Syntax;
-}
-
-export interface ASTPlugin {
-  name: string;
-  visitor: NodeVisitor;
 }
 
 export interface Syntax {
