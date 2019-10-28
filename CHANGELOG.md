@@ -1,3 +1,17 @@
+## v3.2.8 (2019-10-28)
+
+#### :bug: Bug Fix
+* [#159](https://github.com/ember-template-lint/ember-template-recast/pull/159) Ensure templates with whitespace control are codemoded properly. ([@rwjblue](https://github.com/rwjblue))
+
+#### :memo: Documentation
+* [#158](https://github.com/ember-template-lint/ember-template-recast/pull/158) Fix transform documentation ([@dcyriller](https://github.com/dcyriller))
+* [#157](https://github.com/ember-template-lint/ember-template-recast/pull/157) Fix method name in README ([@dcyriller](https://github.com/dcyriller))
+
+#### Committers: 3
+- Cyrille David ([@dcyriller](https://github.com/dcyriller))
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+- [@dependabot-preview[bot]](https://github.com/apps/dependabot-preview)
+
 ## v3.2.7 (2019-10-25)
 
 #### :rocket: Enhancement
