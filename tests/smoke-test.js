@@ -487,6 +487,33 @@ QUnit.module('"real life" smoke tests', function() {
       );
     });
 
+    QUnit.test('`if` branch containing whitespace controls', function(assert) {
+      let template = `
+        {{#if foo~}}
+          {{foo}}
+        {{/if}}
+      `;
+
+      let expected = `
+        {{#if foo~}}
+          {{oof}}
+        {{/if}}
+      `;
+
+      let { code } = transform(template, () => {
+        return {
+          MustacheStatement(node) {
+            node.path.original = node.path.original
+              .split('')
+              .reverse()
+              .join('');
+          },
+        };
+      });
+
+      assert.equal(code, expected);
+    });
+
     QUnit.test('collapsing lines (full line replacment)', function(assert) {
       let template = stripIndent`
         here
