@@ -32,6 +32,7 @@ Once the prep work is completed, the actual release is straight forward:
 
 ```
 yarn install
+
 yarn release
 ```
 
