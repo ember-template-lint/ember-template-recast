@@ -4260,10 +4260,10 @@ wordwrap@~1.0.0:
   resolved "https://registry.yarnpkg.com/wordwrap/-/wordwrap-1.0.0.tgz#27584810891456a4171c8d0226441ade90cbcaeb"
   integrity sha1-J1hIEIkUVqQXHI0CJkQa3pDLyus=
 
-workerpool@^5.0.1:
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/workerpool/-/workerpool-5.0.1.tgz#bbafa774066c0f43dfce947ec20403d7fb87b519"
-  integrity sha512-Q9CGaz2zLdFIyr+VKct6bYQAMzeGy7XWSw9pDGLfPuU56Cg+iWflqjFGUqMqv3iMuS8EaXQTgH0qxaPi6AuhAA==
+workerpool@^5.0.2:
+  version "5.0.2"
+  resolved "https://registry.yarnpkg.com/workerpool/-/workerpool-5.0.2.tgz#8fd8f6c7250710b9c3143d5f7494db3b6633ce6e"
+  integrity sha512-RsXfHGFzbqrfrExTN1TyZobWXCN6+vbn9B1CsZ5zQ2ASA2kQaYONCGOAT88Ew+kNSaRq/XmApRC/HRSv9Z98Ng==
 
 wrap-ansi@^2.0.0:
   version "2.1.0"
