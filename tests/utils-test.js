@@ -9,7 +9,10 @@ QUnit.module('utils', function() {
 
       let actual = [a, b].sort(sortByLoc);
 
-      assert.deepEqual(actual.map(i => i.key), ['b', 'a']);
+      assert.deepEqual(
+        actual.map(i => i.key),
+        ['b', 'a']
+      );
     });
 
     QUnit.test('sorts nodes by their line numbers', function(assert) {
@@ -19,7 +22,10 @@ QUnit.module('utils', function() {
 
       let actual = [b, a, c].sort(sortByLoc);
 
-      assert.deepEqual(actual.map(i => i.key), ['a', 'c', 'b']);
+      assert.deepEqual(
+        actual.map(i => i.key),
+        ['a', 'c', 'b']
+      );
     });
 
     QUnit.test('when start line matches, sorts by starting column', function(assert) {
@@ -29,7 +35,10 @@ QUnit.module('utils', function() {
 
       let actual = [b, a, c].sort(sortByLoc);
 
-      assert.deepEqual(actual.map(i => i.key), ['a', 'c', 'b']);
+      assert.deepEqual(
+        actual.map(i => i.key),
+        ['a', 'c', 'b']
+      );
     });
   });
 });
