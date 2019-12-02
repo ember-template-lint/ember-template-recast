@@ -1,4 +1,4 @@
-const { traverse: _traverse, builders, Walker } = require('@glimmer/syntax');
+const { traverse, builders, Walker } = require('@glimmer/syntax');
 const ParseResult = require('./parse-result');
 
 const PARSE_RESULT_FOR = new WeakMap();
@@ -28,12 +28,12 @@ function transform(template, plugin) {
     parse,
     builders,
     print,
-    traverse: _traverse,
+    traverse,
     Walker,
   };
   let env = { syntax };
   let visitor = plugin(env);
-  _traverse(ast, visitor);
+  traverse(ast, visitor);
   return { ast, code: print(ast) };
 }
 
