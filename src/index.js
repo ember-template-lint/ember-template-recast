@@ -42,4 +42,5 @@ module.exports = {
   parse,
   print,
   transform,
+  traverse,
 };
