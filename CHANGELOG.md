@@ -1,3 +1,16 @@
+## v3.3.0 (2019-12-09)
+
+#### :rocket: Enhancement
+* [#179](https://github.com/ember-template-lint/ember-template-recast/pull/179) Reexport `traverse` function from `@glimmer/syntax` ([@Turbo87](https://github.com/Turbo87))
+
+#### :house: Internal
+* [#164](https://github.com/ember-template-lint/ember-template-recast/pull/164) Add `.gitattributes` file to better simulate a Windows environment ([@kellyselden](https://github.com/kellyselden))
+
+#### Committers: 3
+- Kelly Selden ([@kellyselden](https://github.com/kellyselden))
+- Tobias Bieniek ([@Turbo87](https://github.com/Turbo87))
+- [@dependabot-preview[bot]](https://github.com/apps/dependabot-preview)
+
 ## v3.2.8 (2019-10-28)
 
 #### :bug: Bug Fix
