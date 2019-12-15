@@ -833,4 +833,24 @@ QUnit.module('"real life" smoke tests', function() {
 
     assert.equal(code, expected);
   });
+
+  QUnit.test('mustache param slicing (GH #149)', function(assert) {
+    let template = `
+      <SomeComponent
+        class=""
+        @foo=42
+        @bar={{action this.baz}}
+      />
+    `;
+
+    let expected = template;
+
+    let { code } = transform(template, () => ({
+      MustacheStatement(node) {
+        node.params = node.params.slice();
+      },
+    }));
+
+    assert.equal(code, expected);
+  });
 });
