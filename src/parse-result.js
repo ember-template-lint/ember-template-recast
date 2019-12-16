@@ -1,5 +1,5 @@
 const { preprocess, print: _print, traverse } = require('@glimmer/syntax');
-const { sortByLoc } = require('./utils');
+const { sortByLoc, sourceForLoc } = require('./utils');
 
 const reLines = /(.*?(?:\r\n?|\n|$))/gm;
 const leadingWhitespace = /(^\s+)/;
@@ -157,39 +157,7 @@ module.exports = class ParseResult {
    in a proxy).
   */
   sourceForLoc(loc) {
-    if (!loc) {
-      return;
-    }
-
-    let firstLine = loc.start.line - 1;
-    let lastLine = loc.end.line - 1;
-    let currentLine = firstLine - 1;
-    let firstColumn = loc.start.column;
-    let lastColumn = loc.end.column;
-    let string = [];
-    let line;
-
-    while (currentLine < lastLine) {
-      currentLine++;
-      // for templates that are completely empty the outer Template loc is line
-      // 0, column 0 for both start and end defaulting to empty string prevents
-      // more complicated logic below
-      line = this.source[currentLine] || '';
-
-      if (currentLine === firstLine) {
-        if (firstLine === lastLine) {
-          string.push(line.slice(firstColumn, lastColumn));
-        } else {
-          string.push(line.slice(firstColumn));
-        }
-      } else if (currentLine === lastLine) {
-        string.push(line.slice(0, lastColumn));
-      } else {
-        string.push(line);
-      }
-    }
-
-    return string.join('');
+    return sourceForLoc(this.source, loc);
   }
 
   markAsDirty(node, property) {
