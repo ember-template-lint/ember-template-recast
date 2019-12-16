@@ -1,3 +1,11 @@
+## v3.3.1 (2019-12-16)
+
+#### :bug: Bug Fix
+* [#181](https://github.com/ember-template-lint/ember-template-recast/pull/181) Fix issue with mutation of `ElementNode`'s attributes when the first attribute value is `=""` ([@Turbo87](https://github.com/Turbo87))
+
+#### Committers: 1
+- Tobias Bieniek ([@Turbo87](https://github.com/Turbo87))
+
 ## v3.3.0 (2019-12-09)
 
 #### :rocket: Enhancement
