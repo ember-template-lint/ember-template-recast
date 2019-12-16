@@ -38,11 +38,14 @@ function getLines(source) {
   * https://github.com/glimmerjs/glimmer-vm/pull/953
   * https://github.com/glimmerjs/glimmer-vm/pull/954
 */
-function fixASTIssues(ast) {
+function fixASTIssues(sourceLines, ast) {
   traverse(ast, {
     AttrNode(node) {
+      let source = sourceForLoc(sourceLines, node.loc);
+      let isValueless = !source.includes('=');
+
       // TODO: manually working around https://github.com/glimmerjs/glimmer-vm/pull/953
-      if (node.value.type === 'TextNode' && node.value.chars === '') {
+      if (isValueless && node.value.type === 'TextNode' && node.value.chars === '') {
         // \n is not valid within an attribute name (it would indicate two attributes)
         // always assume the attribute ends on the starting line
         node.loc.end.line = node.loc.start.line;
@@ -69,9 +72,10 @@ module.exports = class ParseResult {
       mode: 'codemod',
     });
 
-    ast = fixASTIssues(ast);
+    let source = getLines(template);
 
-    this.source = getLines(template);
+    ast = fixASTIssues(source, ast);
+    this.source = source;
     this._originalAst = ast;
 
     this.nodeInfo = new Map();
