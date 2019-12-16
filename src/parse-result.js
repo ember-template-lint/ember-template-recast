@@ -251,6 +251,12 @@ module.exports = class ParseResult {
           joinWith = ' ';
         }
 
+        if (joinWith.trim() !== '') {
+          // if the autodetection above resulted in some non whitespace
+          // values, reset to `' '`
+          joinWith = ' ';
+        }
+
         nodeInfo.hashSource = ast.hash.pairs
           .map(pair => {
             return this.print(pair);
@@ -277,6 +283,12 @@ module.exports = class ParseResult {
       } else if (nodeInfo.hadHash) {
         joinWith = nodeInfo.postParamsWhitespace;
       } else {
+        joinWith = ' ';
+      }
+
+      if (joinWith.trim() !== '') {
+        // if the autodetection above resulted in some non whitespace
+        // values, reset to `' '`
         joinWith = ' ';
       }
       nodeInfo.paramsSource = ast.params.map(param => this.print(param)).join(joinWith);
@@ -372,6 +384,12 @@ module.exports = class ParseResult {
               start: originalOpenParts[0].loc.end,
               end: originalOpenParts[1].loc.start,
             });
+          }
+
+          if (joinOpenPartsWith.trim() !== '') {
+            // if the autodetection above resulted in some non whitespace
+            // values, reset to `' '`
+            joinOpenPartsWith = ' ';
           }
 
           let openPartsSource = originalOpenParts
