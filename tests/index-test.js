@@ -213,7 +213,7 @@ QUnit.module('ember-template-recast', function() {
     });
   });
 
-  QUnit.test('mustache param slicing (GH #149)', function(assert) {
+  QUnit.test('Build string from escaped string', function(assert) {
     let template = '{{foo-bar placeholder="Choose a \\"thing\\"..."}}';
 
     let { code } = transform(template, env => ({
