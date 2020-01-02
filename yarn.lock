@@ -31,7 +31,7 @@
   resolved "https://registry.yarnpkg.com/@glimmer/interfaces/-/interfaces-0.45.2.tgz#aa2e9f15394400cc73eb36a9bdabc6b43ecddd7a"
   integrity sha512-NTkThTKeXx4hcYyN/pmvOyKaO3BUExagKWmn79amdqoVGWx8aMNHh5XxUYz1OriRX8YFI6tUWwdc/KPIykTEhA==
 
-"@glimmer/syntax@^0.45.0":
+"@glimmer/syntax@^0.45.2":
   version "0.45.2"
   resolved "https://registry.yarnpkg.com/@glimmer/syntax/-/syntax-0.45.2.tgz#c56d49ceb32fdf5d31373d3b0df581fd5083751f"
   integrity sha512-5kRmZRyxeHT22henBYxWgZSE0bHAwLiGGsdEfgTtILmQEYHesEsz52/LxfA7/vGlgVyCNTgs6CMAQjkFbFWgcg==
