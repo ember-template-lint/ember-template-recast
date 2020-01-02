@@ -212,4 +212,20 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(code, '{{foo-bar hello="world"}}{{#baz}}Hello!{{/baz}}');
     });
   });
+
+  QUnit.test('mustache param slicing (GH #149)', function(assert) {
+    let template = '{{foo-bar placeholder="Choose a \\"thing\\"..."}}';
+
+    let { code } = transform(template, env => ({
+      MustacheStatement(node) {
+        let { builders: b } = env.syntax;
+        node.hash.pairs.push(b.pair('p1', b.string(node.hash.pairs[0].value.original)));
+      },
+    }));
+
+    assert.equal(
+      code,
+      '{{foo-bar placeholder="Choose a \\"thing\\"..." p1="Choose a \\"thing\\"..."}}'
+    );
+  });
 });
