@@ -1,3 +1,16 @@
+## v3.3.2 (2020-01-03)
+
+#### :bug: Bug Fix
+* [#195](https://github.com/ember-template-lint/ember-template-recast/pull/195) Ensure `StringLiteral`'s and `TextNode`'s are properly escaped. ([@tylerturdenpants](https://github.com/tylerturdenpants))
+
+#### :house: Internal
+* [#183](https://github.com/ember-template-lint/ember-template-recast/pull/183) Ensure attributes, params, hash are only joined with whitespace. ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 3
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+- Ryan Mark ([@tylerturdenpants](https://github.com/tylerturdenpants))
+- [@dependabot-preview[bot]](https://github.com/apps/dependabot-preview)
+
 ## v3.3.1 (2019-12-16)
 
 #### :bug: Bug Fix
