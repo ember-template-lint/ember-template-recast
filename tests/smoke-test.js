@@ -853,4 +853,27 @@ QUnit.module('"real life" smoke tests', function() {
 
     assert.equal(code, expected);
   });
+
+  QUnit.test('No space after path when creating a new hash', function(assert) {
+    let template = '{{foo-bar (query-params foo="baz")}}';
+
+    let { code } = transform(template, env => {
+      let { builders: b } = env.syntax;
+
+      return {
+        MustacheStatement(node) {
+          if (node.path && node.path.original === 'foo-bar') {
+            let models = node.params.slice();
+            let _qpParam = b.attr(
+              '@query',
+              b.mustache(b.path('hash'), [], models[models.length - 1].hash)
+            );
+            return b.element({ name: 'FooBar', selfClosing: true }, { attrs: [_qpParam] });
+          }
+        },
+      };
+    });
+
+    assert.equal(code, '<FooBar @query={{hash foo="baz"}} />');
+  });
 });
