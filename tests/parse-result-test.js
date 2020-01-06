@@ -206,6 +206,32 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
+    QUnit.test('creating an element with complex attributes', function(assert) {
+      let template = '';
+
+      let ast = parse(template);
+
+      ast.body.push(
+        builders.element(
+          { name: 'FooBar', selfClosing: true },
+          {
+            attrs: [
+              builders.attr(
+                '@thing',
+                builders.mustache(
+                  builders.path('hash'),
+                  [],
+                  builders.hash([builders.pair('something', builders.path('bar'))])
+                )
+              ),
+            ],
+          }
+        )
+      );
+
+      assert.equal(print(ast), `<FooBar @thing={{hash something=bar}} />`);
+    });
+
     QUnit.test('modifying an attribute name (GH#112)', function(assert) {
       let template = stripIndent`
         <div
