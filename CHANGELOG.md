@@ -1,3 +1,11 @@
+## v3.3.3 (2020-01-06)
+
+#### :bug: Bug Fix
+* [#198](https://github.com/ember-template-lint/ember-template-recast/pull/198) Fix issue when reusing an existing `Hash` in a new `MustacheStatement`/`SubExpression` ([@tylerturdenpants](https://github.com/tylerturdenpants))
+
+#### Committers: 1
+- Ryan Mark ([@tylerturdenpants](https://github.com/tylerturdenpants))
+
 ## v3.3.2 (2020-01-03)
 
 #### :bug: Bug Fix
