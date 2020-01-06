@@ -1,3 +1,11 @@
+## v4.0.0 (2020-01-06)
+
+#### :boom: Breaking Change
+* [#197](https://github.com/ember-template-lint/ember-template-recast/pull/197) Drop Node 8 support. ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 1
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+
 ## v3.3.3 (2020-01-06)
 
 #### :bug: Bug Fix
