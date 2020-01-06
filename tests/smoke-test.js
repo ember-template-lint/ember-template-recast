@@ -854,7 +854,7 @@ QUnit.module('"real life" smoke tests', function() {
     assert.equal(code, expected);
   });
 
-  QUnit.test('Space after path when creating a new hash', function(assert) {
+  QUnit.test('reusing existing hash preserves spacing', function(assert) {
     let template = '{{foo-bar (query-params foo="baz")}}';
 
     let { code } = transform(template, env => {
