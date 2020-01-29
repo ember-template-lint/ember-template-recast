@@ -22,6 +22,16 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), `<img src="{{this.something}}">`);
     });
 
+    QUnit.test('test descriptions with carets pass', function(assert) {
+      let template = `it('<' function() {
+      'something';
+      })`;
+
+      let ast = parse(template);
+
+      assert.equal(print(ast), template);
+    });
+
     QUnit.test('changing an element to a void element does not print closing tag', function(
       assert
     ) {
@@ -1211,7 +1221,7 @@ QUnit.module('ember-template-recast', function() {
 
     QUnit.test('mutations retain custom whitespace formatting', function(assert) {
       let template = stripIndent`
-        <Foo 
+        <Foo
           bar = {{ foo }} />
       `;
 
