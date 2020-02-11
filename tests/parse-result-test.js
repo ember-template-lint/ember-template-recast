@@ -1221,7 +1221,7 @@ QUnit.module('ember-template-recast', function() {
 
     QUnit.test('mutations retain custom whitespace formatting', function(assert) {
       let template = stripIndent`
-        <Foo
+        <Foo 
           bar = {{ foo }} />
       `;
 
