@@ -1221,13 +1221,26 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '<Foo \n  bar = {{ bar }} />');
     });
 
-    QUnit.test('quotes are preserved when updated a TextNode value', function(assert) {
+    QUnit.test('quotes are preserved when updated a TextNode value (double quote)', function(
+      assert
+    ) {
       let template = `<div class="lol"></div>`;
 
       let ast = parse(template);
       ast.body[0].attributes[0].value.chars = 'hahah';
 
       assert.equal(print(ast), '<div class="hahah"></div>');
+    });
+
+    QUnit.test('quotes are preserved when updated a TextNode value (single quote)', function(
+      assert
+    ) {
+      let template = `<div class='lol'></div>`;
+
+      let ast = parse(template);
+      ast.body[0].attributes[0].value.chars = 'hahah';
+
+      assert.equal(print(ast), `<div class='hahah'></div>`);
     });
 
     QUnit.test('can update a quoteless attribute value', function(assert) {
@@ -1436,5 +1449,18 @@ QUnit.module('ember-template-recast', function() {
 
       assert.equal(print(ast), '<div class="hahah"></div>');
     });
+
+    QUnit.test(
+      'an AttrNode values quotes are removed when inserted in alternate positions (e.g. content)',
+      function(assert) {
+        let template = `<div class="lol"></div>`;
+
+        let ast = parse(template);
+        let text = ast.body[0].attributes[0].value;
+        ast.body[0].children.push(text);
+
+        assert.equal(print(ast), '<div class="lol">lol</div>');
+      }
+    );
   });
 });
