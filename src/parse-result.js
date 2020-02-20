@@ -3,7 +3,7 @@ const { sortByLoc, sourceForLoc } = require('./utils');
 
 const reLines = /(.*?(?:\r\n?|\n|$))/gm;
 const leadingWhitespace = /(^\s+)/;
-const attrNodeParts = /(^[^=]+)(\s+)?(=)?(\s+)?(\S+)?/;
+const attrNodeParts = /(^[^=]+)(\s+)?(=)?(\s+)?(['"])?(\S+)?/;
 const hashPairParts = /(^[^=]+)(\s+)?=(\s+)?(\S+)/;
 
 const voidTagNames = new Set([
@@ -52,13 +52,28 @@ function fixASTIssues(sourceLines, ast) {
         node.loc.end.column = node.loc.start.column + node.name.length;
       }
     },
-    ConcatStatement(node) {
-      // TODO: manually working around https://github.com/glimmerjs/glimmer-vm/pull/954
-      if (
-        node.parts[0].type === 'TextNode' &&
-        node.parts[0].loc.start.column > node.loc.start.column + 1
-      ) {
-        node.parts[0].loc.start.column = node.parts[0].loc.start.column - 1;
+    TextNode(node, path) {
+      let source = sourceForLoc(sourceLines, node.loc);
+      switch (path.parentNode.type) {
+        case 'AttrNode': {
+          if (
+            node.chars.length > 0 &&
+            ((source.startsWith(`'`) && source.endsWith(`'`)) ||
+              (source.startsWith(`"`) && source.endsWith(`"`)))
+          ) {
+            node.loc.end.column = node.loc.end.column - 1;
+            node.loc.start.column = node.loc.start.column + 1;
+          }
+          break;
+        }
+        case 'ConcatStatement': {
+          // TODO: manually working around https://github.com/glimmerjs/glimmer-vm/pull/954
+          let isFirstPart = path.parentNode.parts.indexOf(node) === 0;
+
+          if (isFirstPart && node.loc.start.column > path.parentNode.loc.start.column + 1) {
+            node.loc.start.column = node.loc.start.column - 1;
+          }
+        }
       }
     },
   });
@@ -87,11 +102,13 @@ module.exports = class ParseResult {
 
   wrapNode(ancestor, node) {
     this.ancestor.set(node, ancestor);
+
     let nodeInfo = {
       node,
       original: JSON.parse(JSON.stringify(node)),
       source: this.sourceForLoc(node.loc),
     };
+
     this.nodeInfo.set(node, nodeInfo);
 
     let hasLocInfo = !!node.loc;
@@ -586,9 +603,6 @@ module.exports = class ParseResult {
         break;
       case 'ConcatStatement':
         {
-          let openQuote = nodeInfo.source[0];
-          let endQuote = nodeInfo.source[nodeInfo.source.length - 1];
-
           let partsSource = this.sourceForLoc({
             start: {
               line: original.loc.start.line,
@@ -607,7 +621,7 @@ module.exports = class ParseResult {
             dirtyFields.delete('parts');
           }
 
-          output.push(openQuote, partsSource, endQuote);
+          output.push(partsSource);
         }
         break;
       case 'BlockStatement':
@@ -847,28 +861,19 @@ module.exports = class ParseResult {
       case 'AttrNode':
         {
           let { source } = nodeInfo;
-          let [, nameSource, postNameWhitespace, equals, postEqualsWhitespace] = source.match(
-            attrNodeParts
-          );
+          let [
+            ,
+            nameSource,
+            postNameWhitespace,
+            equals,
+            postEqualsWhitespace,
+            quote,
+          ] = source.match(attrNodeParts);
           let valueSource = this.sourceForLoc(original.value.loc);
 
           // does not include ConcatStatement because `_print` automatically
           // adds a `"` around them, meaning we do not need to add our own quotes
           let wasQuotableValue = original.value.type === 'TextNode';
-
-          let openQuote = '';
-          let closeQuote = '';
-
-          if (
-            original.value.type === 'TextNode' &&
-            original.value.chars.length > 0 &&
-            ((valueSource.startsWith(`'`) && valueSource.endsWith(`'`)) ||
-              (valueSource.startsWith(`"`) && valueSource.endsWith(`"`)))
-          ) {
-            openQuote = valueSource[0];
-            closeQuote = valueSource[valueSource.length - 1];
-            valueSource = valueSource.slice(1, -1);
-          }
 
           if (dirtyFields.has('name')) {
             nameSource = ast.name;
@@ -880,11 +885,9 @@ module.exports = class ParseResult {
             let newValueNeedsQuotes = ast.value.type === 'TextNode';
 
             if (!wasQuotableValue && newValueNeedsQuotes) {
-              openQuote = '"';
-              closeQuote = '"';
+              quote = '"';
             } else if (wasQuotableValue && !newValueNeedsQuotes) {
-              openQuote = '';
-              closeQuote = '';
+              quote = '';
             }
 
             valueSource = this.print(ast.value);
@@ -897,9 +900,9 @@ module.exports = class ParseResult {
             postNameWhitespace,
             equals,
             postEqualsWhitespace,
-            openQuote,
+            quote,
             valueSource,
-            closeQuote
+            quote
           );
         }
         break;
