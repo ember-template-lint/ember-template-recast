@@ -1200,6 +1200,88 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '<Foo bar="{{foo}} static {{bar}}" />');
     });
 
+    QUnit.test(
+      'can determine if an AttrNode was valueless (required by ember-template-lint)',
+      function(assert) {
+        assert.strictEqual(
+          parse(`<Foo bar={{foo}} />`).body[0].attributes[0].isValueless,
+          false,
+          'MustacheStatement attribute value'
+        );
+        assert.strictEqual(
+          parse(`<Foo bar="foo {{bar}}" />`).body[0].attributes[0].isValueless,
+          false,
+          'ConcatStatement attribute value'
+        );
+        assert.strictEqual(
+          parse(`<Foo bar='foo {{bar}}' />`).body[0].attributes[0].isValueless,
+          false,
+          'ConcatStatement attribute value'
+        );
+        assert.strictEqual(
+          parse(`<Foo bar="foo" />`).body[0].attributes[0].isValueless,
+          false,
+          'TextNode attribute value'
+        );
+        assert.strictEqual(
+          parse(`<Foo bar='foo' />`).body[0].attributes[0].isValueless,
+          false,
+          'TextNode attribute value'
+        );
+        assert.strictEqual(
+          parse(`<Foo bar=foo />`).body[0].attributes[0].isValueless,
+          false,
+          'TextNode attribute value'
+        );
+        assert.strictEqual(
+          parse(`<Foo bar />`).body[0].attributes[0].isValueless,
+          true,
+          'valueless attribute'
+        );
+      }
+    );
+
+    QUnit.test(
+      'can determine type of quotes used from AST (required by ember-template-lint)',
+      function(assert) {
+        assert.strictEqual(
+          parse(`<Foo bar={{foo}} />`).body[0].attributes[0].quoteType,
+          null,
+          'mustache attribute values are `null`'
+        );
+        assert.strictEqual(
+          parse(`<Foo bar="foo {{bar}}" />`).body[0].attributes[0].quoteType,
+          `"`,
+          'ConcatStatement attribute values show double quotes'
+        );
+        assert.strictEqual(
+          parse(`<Foo bar='foo {{bar}}' />`).body[0].attributes[0].quoteType,
+          `'`,
+          'ConcatStatement attribute values show single quotes'
+        );
+        assert.strictEqual(
+          parse(`<Foo bar="foo" />`).body[0].attributes[0].quoteType,
+          `"`,
+          'TextNode attribute values show double quotes'
+        );
+        assert.strictEqual(
+          parse(`<Foo bar='foo' />`).body[0].attributes[0].quoteType,
+          `'`,
+          'TextNode attribute values show single quotes'
+        );
+        assert.strictEqual(
+          parse(`<Foo bar=foo />`).body[0].attributes[0].quoteType,
+          null,
+          'TextNode attribute values for quoteless'
+        );
+        assert.strictEqual(
+          parse(`<Foo bar />`).body[0].attributes[0].quoteType,
+          null,
+          'valueless attribute'
+        );
+      }
+    );
+
     QUnit.test('renaming valueless attribute', function(assert) {
       let template = '<Foo data-bar />';
 

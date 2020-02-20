@@ -42,7 +42,8 @@ function fixASTIssues(sourceLines, ast) {
   traverse(ast, {
     AttrNode(node) {
       let source = sourceForLoc(sourceLines, node.loc);
-      let isValueless = !source.includes('=');
+      let [, , , equals, , quote] = source.match(attrNodeParts);
+      let isValueless = !equals;
 
       // TODO: manually working around https://github.com/glimmerjs/glimmer-vm/pull/953
       if (isValueless && node.value.type === 'TextNode' && node.value.chars === '') {
@@ -51,6 +52,9 @@ function fixASTIssues(sourceLines, ast) {
         node.loc.end.line = node.loc.start.line;
         node.loc.end.column = node.loc.start.column + node.name.length;
       }
+
+      node.isValueless = isValueless;
+      node.quoteType = quote ? quote : null;
     },
     TextNode(node, path) {
       let source = sourceForLoc(sourceLines, node.loc);
