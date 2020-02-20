@@ -1,3 +1,11 @@
+## v4.1.0 (2020-02-20)
+
+#### :rocket: Enhancement
+* [#219](https://github.com/ember-template-lint/ember-template-recast/pull/219) Expose metadata (isValueless / quoteType) on AttrNode's ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 1
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+
 ## v4.0.1 (2020-02-20)
 
 #### :bug: Bug Fix
