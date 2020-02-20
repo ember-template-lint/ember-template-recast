@@ -1,3 +1,15 @@
+## v4.0.1 (2020-02-20)
+
+#### :bug: Bug Fix
+* [#216](https://github.com/ember-template-lint/ember-template-recast/pull/216) Fix quoting for `TextNode`'s originally used as an `AttrNode` value. ([@rwjblue](https://github.com/rwjblue))
+
+#### :house: Internal
+* [#217](https://github.com/ember-template-lint/ember-template-recast/pull/217) Update minimum dependency versions. ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 2
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+- [@dependabot-preview[bot]](https://github.com/apps/dependabot-preview)
+
 ## v4.0.0 (2020-01-06)
 
 #### :boom: Breaking Change
