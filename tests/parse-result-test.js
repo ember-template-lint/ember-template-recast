@@ -147,6 +147,39 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
+    QUnit.test(
+      'adding attribute to ElementNode preserves block param formatting (`\\nas |foo|`)',
+      function(assert) {
+        let template = `<Foo\nas |bar|></Foo>`;
+
+        let ast = parse(template);
+        ast.body[0].attributes.push(builders.attr('data-test', builders.string('wheee')));
+
+        assert.equal(print(ast), `<Foo data-test="wheee"\nas |bar|></Foo>`);
+      }
+    );
+
+    QUnit.test('an attribute containing `as |foo|` does not confuse updates 😈', function(assert) {
+      let template = `<Foo data-whatever="as |foo|" as |bar|></Foo>`;
+
+      let ast = parse(template);
+      ast.body[0].attributes.push(builders.attr('data-test', builders.string('wheee')));
+
+      assert.equal(print(ast), `<Foo data-whatever="as |foo|" data-test="wheee" as |bar|></Foo>`);
+    });
+
+    QUnit.test(
+      'adding attribute to ElementNode preserves block param formatting (`as\\n|foo|`)',
+      function(assert) {
+        let template = `<Foo as\n|bar|></Foo>`;
+
+        let ast = parse(template);
+        ast.body[0].attributes.push(builders.attr('data-test', builders.string('wheee')));
+
+        assert.equal(print(ast), `<Foo data-test="wheee" as\n|bar|></Foo>`);
+      }
+    );
+
     QUnit.test('adding attribute to ElementNode with block params', function(assert) {
       let template = `<Foo as |bar|></Foo>`;
 
@@ -987,6 +1020,40 @@ QUnit.module('ember-template-recast', function() {
           print(ast),
           '{{#foo-bar \n   \nthis.first \n   \nthis.foo}}Hi there!{{/foo-bar}}'
         );
+      }
+    );
+
+    QUnit.test('adding param to preserves block param formatting (`\\nas |foo|`)', function(
+      assert
+    ) {
+      let template = `{{#foo-bar\nas |bar|}}{{/foo-bar}}`;
+
+      let ast = parse(template);
+      ast.body[0].params.push(builders.path('this.foo'));
+
+      assert.equal(print(ast), `{{#foo-bar this.foo\nas |bar|}}{{/foo-bar}}`);
+    });
+
+    QUnit.test('a named argument containing `as |foo|` does not confuse updates 😈', function(
+      assert
+    ) {
+      let template = `{{#foo-bar data-bar="as |derp|"\nas |bar|}}{{/foo-bar}}`;
+
+      let ast = parse(template);
+      ast.body[0].params.push(builders.path('this.foo'));
+
+      assert.equal(print(ast), `{{#foo-bar this.foo data-bar="as |derp|"\nas |bar|}}{{/foo-bar}}`);
+    });
+
+    QUnit.test(
+      'adding a positional argument preserves block param formatting (`as\\n|foo|`)',
+      function(assert) {
+        let template = `{{#foo-bar as\n|bar|}}{{/foo-bar}}`;
+
+        let ast = parse(template);
+        ast.body[0].params.push(builders.path('this.foo'));
+
+        assert.equal(print(ast), `{{#foo-bar this.foo as\n|bar|}}{{/foo-bar}}`);
       }
     );
 

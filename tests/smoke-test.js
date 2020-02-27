@@ -624,6 +624,32 @@ QUnit.module('"real life" smoke tests', function() {
       );
     });
 
+    QUnit.test('Supports block param on a new line', function(assert) {
+      let template = stripIndent`
+        <SomeComponent @arg={{property}} as
+        |foo|>
+        </SomeComponent>
+      `;
+
+      let { code } = transform(template, env => {
+        let { builders: b } = env.syntax;
+        return {
+          TextNode(node) {
+            return b.path(`this.property`);
+          },
+        };
+      });
+
+      assert.equal(
+        code,
+        stripIndent`
+          <SomeComponent @arg={{this.property}} as
+          |foo|>
+          </SomeComponent>
+        `
+      );
+    });
+
     QUnit.test('supports multi-line replacements with interleaving', function(assert) {
       let template = stripIndent`
         <br>
