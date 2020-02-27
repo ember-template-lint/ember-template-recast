@@ -133,6 +133,14 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '<Qux bar="baz"/>');
     });
 
+    QUnit.test('rename self-closing element tagname with trailing whitespace', function(assert) {
+      let ast = parse('<Foo />');
+
+      ast.body[0].tag = 'Qux';
+
+      assert.equal(print(ast), '<Qux />');
+    });
+
     QUnit.test('adding attribute when none originally existed', function(assert) {
       let template = stripIndent`
       <div></div>`;
