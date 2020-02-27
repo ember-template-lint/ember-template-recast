@@ -1,3 +1,11 @@
+## v4.1.1 (2020-02-27)
+
+#### :bug: Bug Fix
+* [#223](https://github.com/ember-template-lint/ember-template-recast/pull/223) Ensure updating self-closing ElementNode preserves trailing whitespace. ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 1
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+
 ## v4.1.0 (2020-02-20)
 
 #### :rocket: Enhancement
