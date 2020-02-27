@@ -388,16 +388,23 @@ module.exports = class ParseResult {
             .concat(original.attributes, original.modifiers, original.comments)
             .sort(sortByLoc);
 
-          let postTagWhitespace =
-            originalOpenParts.length > 0
-              ? this.sourceForLoc({
-                  start: {
-                    line: original.loc.start.line,
-                    column: original.loc.start.column + 1 /* < */ + original.tag.length,
-                  },
-                  end: originalOpenParts[0].loc.start,
-                })
-              : '';
+          let postTagWhitespace;
+          if (originalOpenParts.length > 0) {
+            postTagWhitespace = this.sourceForLoc({
+              start: {
+                line: original.loc.start.line,
+                column: original.loc.start.column + 1 /* < */ + original.tag.length,
+              },
+              end: originalOpenParts[0].loc.start,
+            });
+          } else if (selfClosing) {
+            postTagWhitespace = nodeInfo.source.substring(
+              openSource.length,
+              nodeInfo.source.length - 2
+            );
+          } else {
+            postTagWhitespace = '';
+          }
 
           let joinOpenPartsWith = ' ';
           if (originalOpenParts.length > 1) {
@@ -488,6 +495,7 @@ module.exports = class ParseResult {
 
             if (selfClosing) {
               closeOpen = `>`;
+              postTagWhitespace = '';
               closeSource = `</${ast.tag}>`;
               ast.selfClosing = false;
             }
