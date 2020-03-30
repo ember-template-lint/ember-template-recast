@@ -3328,17 +3328,17 @@ registry-url@^5.0.0:
   dependencies:
     rc "^1.2.8"
 
-release-it-lerna-changelog@^2.1.1:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/release-it-lerna-changelog/-/release-it-lerna-changelog-2.1.1.tgz#491848b59835190850f8becb7c7b1810fbced276"
-  integrity sha512-SVXfFsAXHgWyjVB8qdpnCEKgBe8XI+QlVflCnmswdjK3yCnswD817qO8M3WIdiCJ+f7neItRK6IXmJlH5Ax+bw==
+release-it-lerna-changelog@^2.1.2:
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/release-it-lerna-changelog/-/release-it-lerna-changelog-2.1.2.tgz#7173be48422d873c5160ce5a3231863fcd8ef513"
+  integrity sha512-JxOVXjBcdsuwW6r2EgWhjF3ta3Fu3lxOt8yw9VdnEJjM6uOD7S0WMR4L5B3zu9Z+1UXF1VqOasUi0mMliU6fmw==
   dependencies:
     execa "^4.0.0"
     lerna-changelog "^1.0.1"
-    release-it "^13.3.0"
+    release-it "^13.3.2"
     tmp "^0.1.0"
 
-release-it@^13.3.0, release-it@^13.5.0:
+release-it@^13.3.2, release-it@^13.5.0:
   version "13.5.0"
   resolved "https://registry.yarnpkg.com/release-it/-/release-it-13.5.0.tgz#716ec42c4c06ae1b5f7c667466aa62b3c645faaf"
   integrity sha512-jArSTUaGzQiWjEUCwWG5chNmE1xNTaI9HQQhPPIJfzk+cL6KvT5MwRkaUQeJbTkrqlB5UjIM9sF35OMndEUuUA==
