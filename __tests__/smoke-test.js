@@ -1,9 +1,9 @@
 const { transform } = require('..');
 const { stripIndent } = require('common-tags');
 
-QUnit.module('"real life" smoke tests', function () {
-  QUnit.module('line endings', function () {
-    QUnit.test('preserves mixed line endings', function (assert) {
+describe('"real life" smoke tests', function () {
+  describe('line endings', function () {
+    test('preserves mixed line endings', function (assert) {
       let template = `{{foo}}\r\n{{bar}}\n{{qux}}\r\n`;
 
       let expected = `{{oof}}\r\n{{rab}}\n{{xuq}}\r\n`;
@@ -18,7 +18,7 @@ QUnit.module('"real life" smoke tests', function () {
 
       assert.equal(code, expected);
     });
-    QUnit.test('preserves \\r\\n line endings', function (assert) {
+    test('preserves \\r\\n line endings', function (assert) {
       let template = `{{foo}}\r\n{{bar}}\r\n`;
 
       let expected = `{{oof}}\r\n{{rab}}\r\n`;
@@ -34,7 +34,7 @@ QUnit.module('"real life" smoke tests', function () {
       assert.equal(code, expected);
     });
 
-    QUnit.test('preserves \\n line endings', function (assert) {
+    test('preserves \\n line endings', function (assert) {
       let template = `{{foo}}\n{{bar}}\n`;
 
       let expected = `{{oof}}\n{{rab}}\n`;
@@ -51,8 +51,8 @@ QUnit.module('"real life" smoke tests', function () {
     });
   });
 
-  QUnit.module('nested else conditionals GH#126', function () {
-    QUnit.test('without mutation', function (assert) {
+  describe('nested else conditionals GH#126', function () {
+    test('without mutation', function (assert) {
       let template = `
         {{#if a}}
           {{foo}}
@@ -72,7 +72,7 @@ QUnit.module('"real life" smoke tests', function () {
       assert.equal(code, template);
     });
 
-    QUnit.test('with mutation inside component invocation with `else let` branches', function (
+    test('with mutation inside component invocation with `else let` branches', function (
       assert
     ) {
       let template = `
@@ -106,7 +106,7 @@ QUnit.module('"real life" smoke tests', function () {
       assert.equal(code, expected);
     });
 
-    QUnit.test('with mutation inside component invocation with `else if` branches', function (
+    test('with mutation inside component invocation with `else if` branches', function (
       assert
     ) {
       let template = `
@@ -144,7 +144,7 @@ QUnit.module('"real life" smoke tests', function () {
       assert.equal(code, expected);
     });
 
-    QUnit.test('with mutation inside `if`/`else if` branches', function (assert) {
+    test('with mutation inside `if`/`else if` branches', function (assert) {
       let template = `
         {{#if a}}
           {{foo}}
@@ -181,8 +181,8 @@ QUnit.module('"real life" smoke tests', function () {
     });
   });
 
-  QUnit.module('hash pair mutation order should not matter GH#86', function () {
-    QUnit.test('change, add, remove', function (assert) {
+  describe('hash pair mutation order should not matter GH#86', function () {
+    test('change, add, remove', function (assert) {
       let template = stripIndent`
         {{foo-bar-baz
           unchanged="unchanged"
@@ -219,7 +219,7 @@ QUnit.module('"real life" smoke tests', function () {
       );
     });
 
-    QUnit.test('remove, change, add', function (assert) {
+    test('remove, change, add', function (assert) {
       let template = stripIndent`
         {{foo-bar-baz
           unchanged="unchanged"
@@ -257,8 +257,8 @@ QUnit.module('"real life" smoke tests', function () {
     });
   });
 
-  QUnit.module('whitespace and removed hash pairs', function () {
-    QUnit.test('Multi-line removed hash pair causes line removal', function (assert) {
+  describe('whitespace and removed hash pairs', function () {
+    test('Multi-line removed hash pair causes line removal', function (assert) {
       let template = stripIndent`
         {{#foo-bar
           prop="abc"
@@ -288,7 +288,7 @@ QUnit.module('"real life" smoke tests', function () {
       );
     });
 
-    QUnit.test('whitespace is preserved when mutating a positional param', function (assert) {
+    test('whitespace is preserved when mutating a positional param', function (assert) {
       let template = stripIndent`
         {{some-helper positional}}
         {{#block positional}}
@@ -319,7 +319,7 @@ QUnit.module('"real life" smoke tests', function () {
       );
     });
 
-    QUnit.test('Same-line removed hash pair from middle collapses excess whitespace', function (
+    test('Same-line removed hash pair from middle collapses excess whitespace', function (
       assert
     ) {
       let template = stripIndent`
@@ -347,7 +347,7 @@ QUnit.module('"real life" smoke tests', function () {
       );
     });
 
-    QUnit.test('Whitespace properly collapsed when the removed prop is last', function (assert) {
+    test('Whitespace properly collapsed when the removed prop is last', function (assert) {
       let template = stripIndent`
         {{#hello-world}}
           {{#foo-bar prop="abc" yetAnotherProp="xyz" anotherProp=123}}
@@ -372,7 +372,7 @@ QUnit.module('"real life" smoke tests', function () {
       );
     });
 
-    QUnit.test(
+    test(
       'Whitespace properly collapsed when the removed prop is last and the contents of the tag are spaced',
       function (assert) {
         let template = stripIndent`
@@ -398,7 +398,7 @@ QUnit.module('"real life" smoke tests', function () {
       }
     );
 
-    QUnit.test('Whitespace is left alone for replacements with whitespace on both sides', function (
+    test('Whitespace is left alone for replacements with whitespace on both sides', function (
       assert
     ) {
       let template = stripIndent`
@@ -426,7 +426,7 @@ QUnit.module('"real life" smoke tests', function () {
     });
   });
 
-  QUnit.module('multi-line', function (hooks) {
+  describe('multi-line', function (hooks) {
     let i = 0;
     hooks.beforeEach(() => (i = 0));
     function funkyIf(b) {
@@ -438,7 +438,7 @@ QUnit.module('"real life" smoke tests', function () {
       );
     }
 
-    QUnit.test('supports multi-line replacements', function (assert) {
+    test('supports multi-line replacements', function (assert) {
       let template = stripIndent`
         {{bar}}
 
@@ -469,7 +469,7 @@ QUnit.module('"real life" smoke tests', function () {
       );
     });
 
-    QUnit.test('`if` branch containing whitespace controls', function (assert) {
+    test('`if` branch containing whitespace controls', function (assert) {
       let template = `
         {{#if foo~}}
           {{foo}}
@@ -493,7 +493,7 @@ QUnit.module('"real life" smoke tests', function () {
       assert.equal(code, expected);
     });
 
-    QUnit.test('collapsing lines (full line replacment)', function (assert) {
+    test('collapsing lines (full line replacment)', function (assert) {
       let template = stripIndent`
         here
         is
@@ -514,7 +514,7 @@ QUnit.module('"real life" smoke tests', function () {
       assert.equal(code, 'here is a single line string');
     });
 
-    QUnit.test('collapsing lines when start line has non-replaced content', function (assert) {
+    test('collapsing lines when start line has non-replaced content', function (assert) {
       let template = stripIndent`
         <div
            data-foo={{baz}}></div>here
@@ -535,7 +535,7 @@ QUnit.module('"real life" smoke tests', function () {
       assert.equal(code, '<div\n   data-foo={{baz}}></div>here is a single line string');
     });
 
-    QUnit.test('collapsing lines when end line has non-replaced content', function (assert) {
+    test('collapsing lines when end line has non-replaced content', function (assert) {
       let template = stripIndent`
         here
         is
@@ -557,7 +557,7 @@ QUnit.module('"real life" smoke tests', function () {
       assert.equal(code, 'here is a single line string<div\ndata-foo={{bar}}></div>');
     });
 
-    QUnit.test('collapsing lines when start and end lines have non-replaced content', function (
+    test('collapsing lines when start and end lines have non-replaced content', function (
       assert
     ) {
       let template = stripIndent`{{ foo }}
@@ -579,7 +579,7 @@ QUnit.module('"real life" smoke tests', function () {
       assert.equal(code, '{{ foo }}here is a single line string{{ bar }}');
     });
 
-    QUnit.test('Can handle multi-line column expansion', function (assert) {
+    test('Can handle multi-line column expansion', function (assert) {
       let template = `
         <div data-foo="bar"></div>here
         is
@@ -603,7 +603,7 @@ QUnit.module('"real life" smoke tests', function () {
       );
     });
 
-    QUnit.test('supports multi-line replacements with interleaving', function (assert) {
+    test('supports multi-line replacements with interleaving', function (assert) {
       let template = stripIndent`
         <br>
         {{bar}}
@@ -639,7 +639,7 @@ QUnit.module('"real life" smoke tests', function () {
     });
   });
 
-  QUnit.module('angle-bracket-codemod mockup', function () {
+  describe('angle-bracket-codemod mockup', function () {
     function isComponent(node) {
       return ['foo-bar'].includes(node.path.original);
     }
@@ -681,7 +681,7 @@ QUnit.module('"real life" smoke tests', function () {
       };
     }
 
-    QUnit.test('works for simple mustache', function (assert) {
+    test('works for simple mustache', function (assert) {
       let template = stripIndent`
         {{foo-bar baz=qux}}
       `;
@@ -691,7 +691,7 @@ QUnit.module('"real life" smoke tests', function () {
       assert.equal(code, `<FooBar @baz={{qux}} />`);
     });
 
-    QUnit.test('preserves nested invocation whitespace', function (assert) {
+    test('preserves nested invocation whitespace', function (assert) {
       let template = stripIndent`
         {{foo-bar baz=(something
           goes=here
@@ -713,7 +713,7 @@ QUnit.module('"real life" smoke tests', function () {
     });
   });
 
-  QUnit.test(
+  test(
     'If/else-if/else chains with edits early in the chain should be fully printed (GH #149)',
     function (assert) {
       let template = `
@@ -758,7 +758,7 @@ QUnit.module('"real life" smoke tests', function () {
     }
   );
 
-  QUnit.test('If/else-if/else chains with multiple edits are accurate (GH #149)', function (
+  test('If/else-if/else chains with multiple edits are accurate (GH #149)', function (
     assert
   ) {
     let template = `
@@ -815,7 +815,7 @@ QUnit.module('"real life" smoke tests', function () {
     assert.equal(code, expected);
   });
 
-  QUnit.test('mustache param slicing (GH #149)', function (assert) {
+  test('mustache param slicing (GH #149)', function (assert) {
     let template = `
       <SomeComponent
         class=""
@@ -835,7 +835,7 @@ QUnit.module('"real life" smoke tests', function () {
     assert.equal(code, expected);
   });
 
-  QUnit.test('reusing existing hash preserves spacing', function (assert) {
+  test('reusing existing hash preserves spacing', function (assert) {
     let template = '{{foo-bar (query-params foo="baz")}}';
 
     let { code } = transform(template, (env) => {

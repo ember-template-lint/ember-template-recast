@@ -8,7 +8,7 @@ function run(args, cwd) {
   return execa(require.resolve('../bin/ember-template-recast'), args, { cwd });
 }
 
-QUnit.module('ember-template-recast executable', function ({ beforeEach, afterEach }) {
+describe('ember-template-recast executable', function ({ beforeEach, afterEach }) {
   beforeEach(function () {
     return createTempDir().then((fixture) => {
       this.fixture = fixture;
@@ -30,7 +30,7 @@ QUnit.module('ember-template-recast executable', function ({ beforeEach, afterEa
     }
   });
 
-  QUnit.test('updating files', function (assert) {
+  test('updating files', function (assert) {
     return run(['files', '-c', '1'], this.fixture.path()).then(({ stdout }) => {
       const out = this.fixture.read();
 
@@ -50,7 +50,7 @@ Unchanged: 1`
     });
   });
 
-  QUnit.test('dry run', function (assert) {
+  test('dry run', function (assert) {
     return run(['files', '-c', '1', '-d'], this.fixture.path()).then(({ stdout }) => {
       const out = this.fixture.read();
 
@@ -70,7 +70,7 @@ Unchanged: 1`
     });
   });
 
-  QUnit.test('with a bad transform', function (assert) {
+  test('with a bad transform', function (assert) {
     this.fixture.write({
       'bad-transform.js': 'module.exports = syntax error',
     });
@@ -84,7 +84,7 @@ Unchanged: 1`
     });
   });
 
-  QUnit.test('with a bad template', function (assert) {
+  test('with a bad template', function (assert) {
     this.fixture.write({
       files: {
         'bad-template.hbs': `{{ not { valid (mustache) }`,
@@ -126,7 +126,7 @@ Errored:   1`
     });
   });
 
-  QUnit.test('concurrency', function (assert) {
+  test('concurrency', function (assert) {
     const files = Array(300)
       .fill(1)
       .reduce((acc, _, i) => Object.assign(acc, { [`file${i}.hbs`]: '{{hello-world}}' }), {});
