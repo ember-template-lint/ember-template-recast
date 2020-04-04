@@ -1,5 +1,4 @@
 const execa = require('execa');
-const { readFileSync } = require('fs');
 const { join } = require('path');
 const { createTempDir } = require('broccoli-test-helper');
 const slash = require('slash');
@@ -25,7 +24,7 @@ module.exports = function ({ source }, { parse, visit }) {
 `;
 
 describe('ember-template-recast executable', function () {
-  let fixture, input;
+  let fixture;
 
   beforeEach(function () {
     return createTempDir().then((_fixture) => {
