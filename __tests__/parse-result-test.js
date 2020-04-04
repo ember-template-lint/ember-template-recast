@@ -22,8 +22,7 @@ describe('ember-template-recast', function () {
       expect(print(ast)).toEqual(`<img src="{{this.something}}">`);
     });
 
-    test('changing an element to a void element does not print closing tag', function (
-    ) {
+    test('changing an element to a void element does not print closing tag', function () {
       let template = `<div data-foo="{{something}}"></div>`;
 
       let ast = parse(template);
@@ -41,8 +40,7 @@ describe('ember-template-recast', function () {
       expect(print(ast)).toEqual(`<img src="{{this.something}}" />`);
     });
 
-    test('changing an attribute value from mustache to text node (GH#111)', function (
-    ) {
+    test('changing an attribute value from mustache to text node (GH#111)', function () {
       let template = `<FooBar @thing={{1234}} @baz={{derp}} />`;
 
       let ast = parse(template);
@@ -52,8 +50,7 @@ describe('ember-template-recast', function () {
       expect(print(ast)).toEqual(`<FooBar @thing="static thing 1" @baz="static thing 2" />`);
     });
 
-    test('changing an attribute value from text node to mustache (GH #139)', function (
-    ) {
+    test('changing an attribute value from text node to mustache (GH #139)', function () {
       let template = `<FooBar @foo="Hi, I'm a string!" />`;
 
       let ast = parse(template);
@@ -65,24 +62,23 @@ describe('ember-template-recast', function () {
       expect(print(ast)).toEqual(`<FooBar @foo={{my-awesome-helper "hello" "world"}} />`);
     });
 
-    test(
-      'changing an attribute value from text node to concat statement (GH #139)',
-      function () {
-        let template = `<FooBar @foo="Hi, I'm a string!" />`;
+    test('changing an attribute value from text node to concat statement (GH #139)', function () {
+      let template = `<FooBar @foo="Hi, I'm a string!" />`;
 
-        let ast = parse(template);
-        ast.body[0].attributes[0].value = builders.concat([
-          builders.text('Hello '),
-          builders.mustache('my-awesome-helper', [
-            builders.string('hello'),
-            builders.string('world'),
-          ]),
-          builders.text(' world'),
-        ]);
+      let ast = parse(template);
+      ast.body[0].attributes[0].value = builders.concat([
+        builders.text('Hello '),
+        builders.mustache('my-awesome-helper', [
+          builders.string('hello'),
+          builders.string('world'),
+        ]),
+        builders.text(' world'),
+      ]);
 
-        expect(print(ast)).toEqual(`<FooBar @foo="Hello {{my-awesome-helper "hello" "world"}} world" />`);
-      }
-    );
+      expect(print(ast)).toEqual(
+        `<FooBar @foo="Hello {{my-awesome-helper "hello" "world"}} world" />`
+      );
+    });
 
     test('changing an attribute value from mustache to mustache', function () {
       let template = `<FooBar @foo={{12345}} />`;
@@ -135,17 +131,14 @@ describe('ember-template-recast', function () {
       expect(print(ast)).toEqual('<Qux />');
     });
 
-    test(
-      'Rename tag and convert from self-closing with attributes to block element',
-      function () {
-        let ast = parse('<Foo bar="baz" />');
+    test('Rename tag and convert from self-closing with attributes to block element', function () {
+      let ast = parse('<Foo bar="baz" />');
 
-        ast.body[0].tag = 'Qux';
-        ast.body[0].children = [builders.text('bay')];
+      ast.body[0].tag = 'Qux';
+      ast.body[0].children = [builders.text('bay')];
 
-        expect(print(ast)).toEqual('<Qux bar="baz">bay</Qux>');
-      }
-    );
+      expect(print(ast)).toEqual('<Qux bar="baz">bay</Qux>');
+    });
 
     test('convert from self-closing with attributes to block element', function () {
       let ast = parse('<Foo bar="baz" />');
@@ -155,16 +148,13 @@ describe('ember-template-recast', function () {
       expect(print(ast)).toEqual('<Foo bar="baz">bay</Foo>');
     });
 
-    test(
-      'convert from self-closing with specially spaced attributes to block element',
-      function () {
-        let ast = parse('<Foo\n  bar="baz"\n />');
+    test('convert from self-closing with specially spaced attributes to block element', function () {
+      let ast = parse('<Foo\n  bar="baz"\n />');
 
-        ast.body[0].children = [builders.text('bay')];
+      ast.body[0].children = [builders.text('bay')];
 
-        expect(print(ast)).toEqual('<Foo\n  bar="baz"\n >bay</Foo>');
-      }
-    );
+      expect(print(ast)).toEqual('<Foo\n  bar="baz"\n >bay</Foo>');
+    });
 
     test('Convert self-closing element with modifiers block element', function () {
       let ast = parse('<Foo {{on "click" this.doSomething}} />');
@@ -194,8 +184,7 @@ describe('ember-template-recast', function () {
       expect(print(ast)).toEqual(`<Foo data-test="wheee" as |bar|></Foo>`);
     });
 
-    test('adding attribute to ElementNode with block params (extra whitespace)', function (
-    ) {
+    test('adding attribute to ElementNode with block params (extra whitespace)', function () {
       let template = `<Foo as |\nbar\n  |></Foo>`;
 
       let ast = parse(template);
@@ -285,8 +274,7 @@ describe('ember-template-recast', function () {
       expect(print(ast)).toEqual('<Foo data-foo data-derp={{this.hmmm}} />');
     });
 
-    test('modifying attribute after valueless attribute with special whitespace', function (
-    ) {
+    test('modifying attribute after valueless attribute with special whitespace', function () {
       let template = stripIndent`
         <Foo
           data-foo
@@ -372,8 +360,7 @@ describe('ember-template-recast', function () {
       <div class="foo"></div>`);
     });
 
-    test('removing a modifier with no other attributes/comments/modifiers', function (
-    ) {
+    test('removing a modifier with no other attributes/comments/modifiers', function () {
       let template = stripIndent`
       <div {{on "click" this.blah}}></div>`;
 
@@ -424,8 +411,7 @@ describe('ember-template-recast', function () {
       expect(print(ast)).toEqual(`<MyFoo class="foo"></MyFoo>`);
     });
 
-    test('removing a block param preserves formatting of "open element closing"', function (
-    ) {
+    test('removing a block param preserves formatting of "open element closing"', function () {
       let template = stripIndent`
         <MyFoo
           class="foo"
@@ -441,8 +427,7 @@ describe('ember-template-recast', function () {
       ></MyFoo>`);
     });
 
-    test('interleaved attributes and modifiers are not modified when unchanged', function (
-    ) {
+    test('interleaved attributes and modifiers are not modified when unchanged', function () {
       let template = `<div data-test="foo" {{on "click" this.bar}} data-blah="derp"></div>`;
 
       let ast = parse(template);
@@ -569,8 +554,7 @@ describe('ember-template-recast', function () {
       }}`);
     });
 
-    test('MustacheStatements retain whitespace when multiline replacements occur', function (
-    ) {
+    test('MustacheStatements retain whitespace when multiline replacements occur', function () {
       let template = stripIndent`
         <p></p>
         {{ other-stuff }}
@@ -650,8 +634,7 @@ describe('ember-template-recast', function () {
         }}`);
     });
 
-    test('infers indentation of hash when no existing hash existed but params do', function (
-    ) {
+    test('infers indentation of hash when no existing hash existed but params do', function () {
       let template = stripIndent`
         {{foo-bar
           someParam
@@ -666,23 +649,20 @@ describe('ember-template-recast', function () {
         }}`);
     });
 
-    test(
-      'infers indentation of new HashPairs when existing hash with single entry (but no params)',
-      function () {
-        let template = stripIndent`
+    test('infers indentation of new HashPairs when existing hash with single entry (but no params)', function () {
+      let template = stripIndent`
         {{foo-bar
           stuff=here
         }}`;
-        let ast = parse(template);
-        ast.body[0].hash.pairs.push(builders.pair('some', builders.string('other-thing')));
+      let ast = parse(template);
+      ast.body[0].hash.pairs.push(builders.pair('some', builders.string('other-thing')));
 
-        expect(print(ast)).toEqual(stripIndent`
+      expect(print(ast)).toEqual(stripIndent`
         {{foo-bar
           stuff=here
           some="other-thing"
         }}`);
-      }
-    );
+    });
 
     test('can add literal hash pair values', function () {
       let template = stripIndent`
@@ -837,7 +817,9 @@ describe('ember-template-recast', function () {
       ast.body[0].hash.pairs.push(builders.pair('hello', builders.string('world')));
       ast.body[0].hash.pairs.push(builders.pair('foo', builders.string('bar')));
 
-      expect(print(ast)).toEqual('{{#foo-bar hello="world" foo="bar"}}Hi there!{{/foo-bar}}{{baz}}');
+      expect(print(ast)).toEqual(
+        '{{#foo-bar hello="world" foo="bar"}}Hi there!{{/foo-bar}}{{baz}}'
+      );
     });
 
     test('replacing empty hash w/ block params works', function () {
@@ -873,7 +855,9 @@ describe('ember-template-recast', function () {
       let ast = parse(template);
       ast.body[0].hash.pairs[0].key = 'bar';
 
-      expect(print(ast)).toEqual('{{#foo-bar bar=(helper-here this.arg1 this.arg2)}}Hi there!{{/foo-bar}}');
+      expect(print(ast)).toEqual(
+        '{{#foo-bar bar=(helper-here this.arg1 this.arg2)}}Hi there!{{/foo-bar}}'
+      );
     });
 
     test('changing a HashPair value from StringLiteral to SubExpression', function () {
@@ -924,17 +908,16 @@ describe('ember-template-recast', function () {
       expect(print(ast)).toEqual('{{#foo-bar this.first this.foo}}Hi there!{{/foo-bar}}');
     });
 
-    test(
-      'adding param with existing params infers indentation from existing params',
-      function () {
-        let template = `{{#foo-bar \n   \nthis.first}}Hi there!{{/foo-bar}}`;
+    test('adding param with existing params infers indentation from existing params', function () {
+      let template = `{{#foo-bar \n   \nthis.first}}Hi there!{{/foo-bar}}`;
 
-        let ast = parse(template);
-        ast.body[0].params.push(builders.path('this.foo'));
+      let ast = parse(template);
+      ast.body[0].params.push(builders.path('this.foo'));
 
-        expect(print(ast)).toEqual('{{#foo-bar \n   \nthis.first \n   \nthis.foo}}Hi there!{{/foo-bar}}');
-      }
-    );
+      expect(print(ast)).toEqual(
+        '{{#foo-bar \n   \nthis.first \n   \nthis.foo}}Hi there!{{/foo-bar}}'
+      );
+    });
 
     test('adding child to end of program', function () {
       let template = `{{#foo-bar}}Hello{{/foo-bar}}`;
@@ -972,29 +955,23 @@ describe('ember-template-recast', function () {
       expect(print(ast)).toEqual('{{#foo-bar}}{{else}}ZOMG! Hello{{/foo-bar}}');
     });
 
-    test(
-      'adding child to end of inverse preserves whitespace and whitespace control when program is also present',
-      function () {
-        let template = `{{#foo-bar}}Goodbye\n  {{~ else ~}} Hello{{/foo-bar}}`;
+    test('adding child to end of inverse preserves whitespace and whitespace control when program is also present', function () {
+      let template = `{{#foo-bar}}Goodbye\n  {{~ else ~}} Hello{{/foo-bar}}`;
 
-        let ast = parse(template);
-        ast.body[0].inverse.body.push(builders.text(' world!'));
+      let ast = parse(template);
+      ast.body[0].inverse.body.push(builders.text(' world!'));
 
-        expect(print(ast)).toEqual('{{#foo-bar}}Goodbye\n  {{~ else ~}} Hello world!{{/foo-bar}}');
-      }
-    );
+      expect(print(ast)).toEqual('{{#foo-bar}}Goodbye\n  {{~ else ~}} Hello world!{{/foo-bar}}');
+    });
 
-    test(
-      'adding child to end of inverse preserves whitespace and whitespace control',
-      function () {
-        let template = `{{#foo-bar}}{{~ else ~}}Hello{{/foo-bar}}`;
+    test('adding child to end of inverse preserves whitespace and whitespace control', function () {
+      let template = `{{#foo-bar}}{{~ else ~}}Hello{{/foo-bar}}`;
 
-        let ast = parse(template);
-        ast.body[0].inverse.body.push(builders.text(' world!'));
+      let ast = parse(template);
+      ast.body[0].inverse.body.push(builders.text(' world!'));
 
-        expect(print(ast)).toEqual('{{#foo-bar}}{{~ else ~}}Hello world!{{/foo-bar}}');
-      }
-    );
+      expect(print(ast)).toEqual('{{#foo-bar}}{{~ else ~}}Hello world!{{/foo-bar}}');
+    });
 
     test('add child in an {{else if foo}} chain', function () {
       let template = `{{#if foo}}{{else if baz}}Hello{{/if}}`;
@@ -1140,31 +1117,25 @@ describe('ember-template-recast', function () {
       expect(print(ast)).toEqual('<Foo bar="{{foo}} static {{bar}}" />');
     });
 
-    test(
-      'can determine if an AttrNode was valueless (required by ember-template-lint)',
-      function () {
-        expect(parse(`<Foo bar={{foo}} />`).body[0].attributes[0].isValueless).toBe(false);
-        expect(parse(`<Foo bar="foo {{bar}}" />`).body[0].attributes[0].isValueless).toBe(false);
-        expect(parse(`<Foo bar='foo {{bar}}' />`).body[0].attributes[0].isValueless).toBe(false);
-        expect(parse(`<Foo bar="foo" />`).body[0].attributes[0].isValueless).toBe(false);
-        expect(parse(`<Foo bar='foo' />`).body[0].attributes[0].isValueless).toBe(false);
-        expect(parse(`<Foo bar=foo />`).body[0].attributes[0].isValueless).toBe(false);
-        expect(parse(`<Foo bar />`).body[0].attributes[0].isValueless).toBe(true);
-      }
-    );
+    test('can determine if an AttrNode was valueless (required by ember-template-lint)', function () {
+      expect(parse(`<Foo bar={{foo}} />`).body[0].attributes[0].isValueless).toBe(false);
+      expect(parse(`<Foo bar="foo {{bar}}" />`).body[0].attributes[0].isValueless).toBe(false);
+      expect(parse(`<Foo bar='foo {{bar}}' />`).body[0].attributes[0].isValueless).toBe(false);
+      expect(parse(`<Foo bar="foo" />`).body[0].attributes[0].isValueless).toBe(false);
+      expect(parse(`<Foo bar='foo' />`).body[0].attributes[0].isValueless).toBe(false);
+      expect(parse(`<Foo bar=foo />`).body[0].attributes[0].isValueless).toBe(false);
+      expect(parse(`<Foo bar />`).body[0].attributes[0].isValueless).toBe(true);
+    });
 
-    test(
-      'can determine type of quotes used from AST (required by ember-template-lint)',
-      function () {
-        expect(parse(`<Foo bar={{foo}} />`).body[0].attributes[0].quoteType).toBe(null);
-        expect(parse(`<Foo bar="foo {{bar}}" />`).body[0].attributes[0].quoteType).toBe(`"`);
-        expect(parse(`<Foo bar='foo {{bar}}' />`).body[0].attributes[0].quoteType).toBe(`'`);
-        expect(parse(`<Foo bar="foo" />`).body[0].attributes[0].quoteType).toBe(`"`);
-        expect(parse(`<Foo bar='foo' />`).body[0].attributes[0].quoteType).toBe(`'`);
-        expect(parse(`<Foo bar=foo />`).body[0].attributes[0].quoteType).toBe(null);
-        expect(parse(`<Foo bar />`).body[0].attributes[0].quoteType).toBe(null);
-      }
-    );
+    test('can determine type of quotes used from AST (required by ember-template-lint)', function () {
+      expect(parse(`<Foo bar={{foo}} />`).body[0].attributes[0].quoteType).toBe(null);
+      expect(parse(`<Foo bar="foo {{bar}}" />`).body[0].attributes[0].quoteType).toBe(`"`);
+      expect(parse(`<Foo bar='foo {{bar}}' />`).body[0].attributes[0].quoteType).toBe(`'`);
+      expect(parse(`<Foo bar="foo" />`).body[0].attributes[0].quoteType).toBe(`"`);
+      expect(parse(`<Foo bar='foo' />`).body[0].attributes[0].quoteType).toBe(`'`);
+      expect(parse(`<Foo bar=foo />`).body[0].attributes[0].quoteType).toBe(null);
+      expect(parse(`<Foo bar />`).body[0].attributes[0].quoteType).toBe(null);
+    });
 
     test('renaming valueless attribute', function () {
       let template = '<Foo data-bar />';
@@ -1187,8 +1158,7 @@ describe('ember-template-recast', function () {
       expect(print(ast)).toEqual('<Foo \n  bar = {{ bar }} />');
     });
 
-    test('quotes are preserved when updated a TextNode value (double quote)', function (
-    ) {
+    test('quotes are preserved when updated a TextNode value (double quote)', function () {
       let template = `<div class="lol"></div>`;
 
       let ast = parse(template);
@@ -1197,8 +1167,7 @@ describe('ember-template-recast', function () {
       expect(print(ast)).toEqual('<div class="hahah"></div>');
     });
 
-    test('quotes are preserved when updated a TextNode value (single quote)', function (
-    ) {
+    test('quotes are preserved when updated a TextNode value (single quote)', function () {
       let template = `<div class='lol'></div>`;
 
       let ast = parse(template);
@@ -1262,8 +1231,7 @@ describe('ember-template-recast', function () {
     expect(code).toEqual('\n{{ other-stuff }}');
   });
 
-  test('can replace with many items during traversal by returning an array', function (
-  ) {
+  test('can replace with many items during traversal by returning an array', function () {
     let template = stripIndent`
     <p>here is some multiline string</p>
     {{other-stuff}}
@@ -1413,17 +1381,14 @@ describe('ember-template-recast', function () {
       expect(print(ast)).toEqual('<div class="hahah"></div>');
     });
 
-    test(
-      'an AttrNode values quotes are removed when inserted in alternate positions (e.g. content)',
-      function () {
-        let template = `<div class="lol"></div>`;
+    test('an AttrNode values quotes are removed when inserted in alternate positions (e.g. content)', function () {
+      let template = `<div class="lol"></div>`;
 
-        let ast = parse(template);
-        let text = ast.body[0].attributes[0].value;
-        ast.body[0].children.push(text);
+      let ast = parse(template);
+      let text = ast.body[0].attributes[0].value;
+      ast.body[0].children.push(text);
 
-        expect(print(ast)).toEqual('<div class="lol">lol</div>');
-      }
-    );
+      expect(print(ast)).toEqual('<div class="lol">lol</div>');
+    });
   });
 });

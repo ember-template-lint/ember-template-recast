@@ -123,13 +123,15 @@ describe('ember-template-recast', function () {
         };
       });
 
-      expect(result.code).toEqual([
-        '\n',
-        '{{!-- template-lint-disable no-table-tag --}}',
-        '<table>',
-        '<tbody></tbody>',
-        '</table>',
-      ].join('\n'));
+      expect(result.code).toEqual(
+        [
+          '\n',
+          '{{!-- template-lint-disable no-table-tag --}}',
+          '<table>',
+          '<tbody></tbody>',
+          '</table>',
+        ].join('\n')
+      );
     });
 
     test('can accept an AST', function () {
@@ -189,8 +191,7 @@ describe('ember-template-recast', function () {
       expect(code).toEqual('{{foo-bar}}');
     });
 
-    test('pushing new item on to empty hash pair on MustacheStatement works', function (
-    ) {
+    test('pushing new item on to empty hash pair on MustacheStatement works', function () {
       let template = '{{foo-bar}}{{#baz}}Hello!{{/baz}}';
       let { code } = transform(template, (env) => {
         let { builders: b } = env.syntax;

@@ -97,13 +97,15 @@ Unchanged: 1`);
     return run(['files', '-c', '1'], fixture.path()).then(({ stdout }) => {
       const out = fixture.read();
 
-      expect(stdout.includes(
-        `Processing 4 files…
+      expect(
+        stdout.includes(
+          `Processing 4 files…
 Spawning 1 worker…
 Ok:        2
 Unchanged: 1
 Errored:   1`
-      )).toBeTruthy();
+        )
+      ).toBeTruthy();
 
       let badFilePath = slash(join(fixture.path(), 'files/bad-template.hbs'));
 

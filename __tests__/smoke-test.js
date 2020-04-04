@@ -72,8 +72,7 @@ describe('"real life" smoke tests', function () {
       expect(code).toEqual(template);
     });
 
-    test('with mutation inside component invocation with `else let` branches', function (
-    ) {
+    test('with mutation inside component invocation with `else let` branches', function () {
       let template = `
         {{#foo-bar}}
           {{foo}}
@@ -105,8 +104,7 @@ describe('"real life" smoke tests', function () {
       expect(code).toEqual(expected);
     });
 
-    test('with mutation inside component invocation with `else if` branches', function (
-    ) {
+    test('with mutation inside component invocation with `else if` branches', function () {
       let template = `
         {{#foo-bar}}
           {{foo}}
@@ -305,8 +303,7 @@ describe('"real life" smoke tests', function () {
       `);
     });
 
-    test('Same-line removed hash pair from middle collapses excess whitespace', function (
-    ) {
+    test('Same-line removed hash pair from middle collapses excess whitespace', function () {
       let template = stripIndent`
         {{#hello-world}}
           {{#foo-bar prop="abc"  anotherProp=123  yetAnotherProp="xyz"}}
@@ -351,31 +348,27 @@ describe('"real life" smoke tests', function () {
         {{/hello-world}}`);
     });
 
-    test(
-      'Whitespace properly collapsed when the removed prop is last and the contents of the tag are spaced',
-      function () {
-        let template = stripIndent`
+    test('Whitespace properly collapsed when the removed prop is last and the contents of the tag are spaced', function () {
+      let template = stripIndent`
           {{#hello-world}}
             {{ foo-bar prop="abc" yetAnotherProp="xyz" anotherProp=123 }}
           {{/hello-world}}`;
 
-        let { code } = transform(template, function () {
-          return {
-            Hash(ast) {
-              ast.pairs = ast.pairs.filter((pair) => pair.key !== 'anotherProp');
-            },
-          };
-        });
+      let { code } = transform(template, function () {
+        return {
+          Hash(ast) {
+            ast.pairs = ast.pairs.filter((pair) => pair.key !== 'anotherProp');
+          },
+        };
+      });
 
-        expect(code).toEqual(stripIndent`
+      expect(code).toEqual(stripIndent`
           {{#hello-world}}
             {{ foo-bar prop="abc" yetAnotherProp="xyz" }}
           {{/hello-world}}`);
-      }
-    );
+    });
 
-    test('Whitespace is left alone for replacements with whitespace on both sides', function (
-    ) {
+    test('Whitespace is left alone for replacements with whitespace on both sides', function () {
       let template = stripIndent`
           {{#hello-world foo="foo" bar="bar" as |yieldedProp|}}
             {{yieldedProp.something-something}}
@@ -527,8 +520,7 @@ describe('"real life" smoke tests', function () {
       expect(code).toEqual('here is a single line string<div\ndata-foo={{bar}}></div>');
     });
 
-    test('collapsing lines when start and end lines have non-replaced content', function (
-    ) {
+    test('collapsing lines when start and end lines have non-replaced content', function () {
       let template = stripIndent`{{ foo }}
         here
         is
@@ -675,10 +667,8 @@ describe('"real life" smoke tests', function () {
     });
   });
 
-  test(
-    'If/else-if/else chains with edits early in the chain should be fully printed (GH #149)',
-    function () {
-      let template = `
+  test('If/else-if/else chains with edits early in the chain should be fully printed (GH #149)', function () {
+    let template = `
       {{#if a}}
         {{foo}}
       {{else if b}}
@@ -692,7 +682,7 @@ describe('"real life" smoke tests', function () {
       {{/if}}
     `;
 
-      let expected = `
+    let expected = `
       {{#if a}}
         {{oof}}
       {{else if b}}
@@ -706,22 +696,20 @@ describe('"real life" smoke tests', function () {
       {{/if}}
     `;
 
-      let { code } = transform(template, () => {
-        return {
-          MustacheStatement(node) {
-            if (node.path.original === 'foo') {
-              node.path.original = 'oof';
-            }
-          },
-        };
-      });
+    let { code } = transform(template, () => {
+      return {
+        MustacheStatement(node) {
+          if (node.path.original === 'foo') {
+            node.path.original = 'oof';
+          }
+        },
+      };
+    });
 
-      expect(code).toEqual(expected);
-    }
-  );
+    expect(code).toEqual(expected);
+  });
 
-  test('If/else-if/else chains with multiple edits are accurate (GH #149)', function (
-  ) {
+  test('If/else-if/else chains with multiple edits are accurate (GH #149)', function () {
     let template = `
       {{#if a}}
         {{foo}}
