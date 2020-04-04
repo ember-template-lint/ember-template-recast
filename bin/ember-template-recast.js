@@ -16,7 +16,7 @@ program
   .option(
     '-c, --cpus <count>',
     'determines the number of processes started.',
-    n => parseInt(n, 10),
+    (n) => parseInt(n, 10),
     Math.max(os.cpus().length - 1, 1)
   )
   .option('-d, --dry', 'dry run: no changes are made to files', false)

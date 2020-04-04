@@ -2,8 +2,8 @@ const { parse, print, transform } = require('..');
 const { builders } = require('@glimmer/syntax');
 const { stripIndent } = require('common-tags');
 
-QUnit.module('ember-template-recast', function() {
-  QUnit.test('basic parse + print (no modification)', function(assert) {
+QUnit.module('ember-template-recast', function () {
+  QUnit.test('basic parse + print (no modification)', function (assert) {
     let template = stripIndent`
       {{foo-bar
         baz="stuff"
@@ -13,14 +13,14 @@ QUnit.module('ember-template-recast', function() {
     assert.equal(print(ast), template);
   });
 
-  QUnit.test('basic parse + print (no modification): void elements', function(assert) {
+  QUnit.test('basic parse + print (no modification): void elements', function (assert) {
     let template = `<br><p>Hi!</p>`;
     let ast = parse(template);
 
     assert.equal(print(ast), template);
   });
 
-  QUnit.test('basic parse + print (no modification) preserves blank lines', function(assert) {
+  QUnit.test('basic parse + print (no modification) preserves blank lines', function (assert) {
     let template = stripIndent`
       {{foo-bar
         baz="stuff"
@@ -33,7 +33,7 @@ QUnit.module('ember-template-recast', function() {
     assert.equal(print(ast), template);
   });
 
-  QUnit.test('basic parse -> mutation -> print', function(assert) {
+  QUnit.test('basic parse -> mutation -> print', function (assert) {
     let template = stripIndent`
       {{foo-bar
         baz="stuff"
@@ -52,7 +52,7 @@ QUnit.module('ember-template-recast', function() {
     );
   });
 
-  QUnit.test('basic parse -> mutation -> print: preserves HTML entities', function(assert) {
+  QUnit.test('basic parse -> mutation -> print: preserves HTML entities', function (assert) {
     let template = stripIndent`<div>&nbsp;</div>`;
     let ast = parse(template);
     ast.body[0].children.push(builders.text('derp&nbsp;'));
@@ -61,10 +61,10 @@ QUnit.module('ember-template-recast', function() {
   });
 
   QUnit.module('transform', () => {
-    QUnit.test('basic traversal', function(assert) {
+    QUnit.test('basic traversal', function (assert) {
       let template = '{{foo-bar bar=foo}}';
       let paths = [];
-      transform(template, function() {
+      transform(template, function () {
         return {
           PathExpression(node) {
             paths.push(node.original);
@@ -75,11 +75,11 @@ QUnit.module('ember-template-recast', function() {
       assert.deepEqual(paths, ['foo-bar', 'foo']);
     });
 
-    QUnit.test('can handle comment append before html node case', function(assert) {
+    QUnit.test('can handle comment append before html node case', function (assert) {
       let template = '<table></table>';
       let seen = new Set();
 
-      const result = transform(template, function({ syntax }) {
+      const result = transform(template, function ({ syntax }) {
         const b = syntax.builders;
 
         return {
@@ -104,11 +104,11 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
-    QUnit.test('can handle comment append between html + newline', function(assert) {
+    QUnit.test('can handle comment append between html + newline', function (assert) {
       let template = ['\n', '<table>', '<tbody></tbody>', '</table>'].join('\n');
       let seen = new Set();
 
-      const result = transform(template, function({ syntax }) {
+      const result = transform(template, function ({ syntax }) {
         const b = syntax.builders;
 
         return {
@@ -139,11 +139,11 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
-    QUnit.test('can accept an AST', function(assert) {
+    QUnit.test('can accept an AST', function (assert) {
       let template = '{{foo-bar bar=foo}}';
       let paths = [];
       let ast = parse(template);
-      transform(ast, function() {
+      transform(ast, function () {
         return {
           PathExpression(node) {
             paths.push(node.original);
@@ -154,10 +154,10 @@ QUnit.module('ember-template-recast', function() {
       assert.deepEqual(paths, ['foo-bar', 'foo']);
     });
 
-    QUnit.test('returns code and ast', function(assert) {
+    QUnit.test('returns code and ast', function (assert) {
       let template = '{{foo-bar}}';
       let paths = [];
-      let { ast, code } = transform(template, function() {
+      let { ast, code } = transform(template, function () {
         return {
           PathExpression(node) {
             paths.push(node.original);
@@ -169,9 +169,9 @@ QUnit.module('ember-template-recast', function() {
       assert.ok(code);
     });
 
-    QUnit.test('replacement', function(assert) {
+    QUnit.test('replacement', function (assert) {
       let template = '{{foo-bar bar=foo}}';
-      let { code } = transform(template, env => {
+      let { code } = transform(template, (env) => {
         let { builders: b } = env.syntax;
         return {
           MustacheStatement() {
@@ -183,7 +183,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(code, '{{wat-wat}}');
     });
 
-    QUnit.test('removing the only hash pair on MustacheStatement', function(assert) {
+    QUnit.test('removing the only hash pair on MustacheStatement', function (assert) {
       let template = '{{foo-bar hello="world"}}';
       let { code } = transform(template, () => {
         return {
@@ -196,11 +196,11 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(code, '{{foo-bar}}');
     });
 
-    QUnit.test('pushing new item on to empty hash pair on MustacheStatement works', function(
+    QUnit.test('pushing new item on to empty hash pair on MustacheStatement works', function (
       assert
     ) {
       let template = '{{foo-bar}}{{#baz}}Hello!{{/baz}}';
-      let { code } = transform(template, env => {
+      let { code } = transform(template, (env) => {
         let { builders: b } = env.syntax;
         return {
           MustacheStatement(ast) {
@@ -213,10 +213,10 @@ QUnit.module('ember-template-recast', function() {
     });
   });
 
-  QUnit.test('Build string from escaped string', function(assert) {
+  QUnit.test('Build string from escaped string', function (assert) {
     let template = '{{foo-bar placeholder="Choose a \\"thing\\"..."}}';
 
-    let { code } = transform(template, env => ({
+    let { code } = transform(template, (env) => ({
       MustacheStatement(node) {
         let { builders: b } = env.syntax;
         node.hash.pairs.push(b.pair('p1', b.string(node.hash.pairs[0].value.original)));

@@ -2,9 +2,9 @@ const { parse, print, transform } = require('..');
 const { builders } = require('@glimmer/syntax');
 const { stripIndent } = require('common-tags');
 
-QUnit.module('ember-template-recast', function() {
-  QUnit.module('ElementNode', function() {
-    QUnit.test('creating void element', function(assert) {
+QUnit.module('ember-template-recast', function () {
+  QUnit.module('ElementNode', function () {
+    QUnit.test('creating void element', function (assert) {
       let template = ``;
 
       let ast = parse(template);
@@ -13,7 +13,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), `<img>`);
     });
 
-    QUnit.test('updating attributes on a non-self-closing void element', function(assert) {
+    QUnit.test('updating attributes on a non-self-closing void element', function (assert) {
       let template = `<img src="{{something}}">`;
 
       let ast = parse(template);
@@ -22,7 +22,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), `<img src="{{this.something}}">`);
     });
 
-    QUnit.test('changing an element to a void element does not print closing tag', function(
+    QUnit.test('changing an element to a void element does not print closing tag', function (
       assert
     ) {
       let template = `<div data-foo="{{something}}"></div>`;
@@ -33,7 +33,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), `<img data-foo="{{something}}">`);
     });
 
-    QUnit.test('updating attributes on a self-closing void element', function(assert) {
+    QUnit.test('updating attributes on a self-closing void element', function (assert) {
       let template = `<img src="{{something}}" />`;
 
       let ast = parse(template);
@@ -42,7 +42,9 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), `<img src="{{this.something}}" />`);
     });
 
-    QUnit.test('changing an attribute value from mustache to text node (GH#111)', function(assert) {
+    QUnit.test('changing an attribute value from mustache to text node (GH#111)', function (
+      assert
+    ) {
       let template = `<FooBar @thing={{1234}} @baz={{derp}} />`;
 
       let ast = parse(template);
@@ -52,7 +54,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), `<FooBar @thing="static thing 1" @baz="static thing 2" />`);
     });
 
-    QUnit.test('changing an attribute value from text node to mustache (GH #139)', function(
+    QUnit.test('changing an attribute value from text node to mustache (GH #139)', function (
       assert
     ) {
       let template = `<FooBar @foo="Hi, I'm a string!" />`;
@@ -66,28 +68,29 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), `<FooBar @foo={{my-awesome-helper "hello" "world"}} />`);
     });
 
-    QUnit.test('changing an attribute value from text node to concat statement (GH #139)', function(
-      assert
-    ) {
-      let template = `<FooBar @foo="Hi, I'm a string!" />`;
+    QUnit.test(
+      'changing an attribute value from text node to concat statement (GH #139)',
+      function (assert) {
+        let template = `<FooBar @foo="Hi, I'm a string!" />`;
 
-      let ast = parse(template);
-      ast.body[0].attributes[0].value = builders.concat([
-        builders.text('Hello '),
-        builders.mustache('my-awesome-helper', [
-          builders.string('hello'),
-          builders.string('world'),
-        ]),
-        builders.text(' world'),
-      ]);
+        let ast = parse(template);
+        ast.body[0].attributes[0].value = builders.concat([
+          builders.text('Hello '),
+          builders.mustache('my-awesome-helper', [
+            builders.string('hello'),
+            builders.string('world'),
+          ]),
+          builders.text(' world'),
+        ]);
 
-      assert.equal(
-        print(ast),
-        `<FooBar @foo="Hello {{my-awesome-helper "hello" "world"}} world" />`
-      );
-    });
+        assert.equal(
+          print(ast),
+          `<FooBar @foo="Hello {{my-awesome-helper "hello" "world"}} world" />`
+        );
+      }
+    );
 
-    QUnit.test('changing an attribute value from mustache to mustache', function(assert) {
+    QUnit.test('changing an attribute value from mustache to mustache', function (assert) {
       let template = `<FooBar @foo={{12345}} />`;
 
       let ast = parse(template);
@@ -99,7 +102,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), `<FooBar @foo={{my-awesome-helper "hello" "world"}} />`);
     });
 
-    QUnit.test('rename element tagname', function(assert) {
+    QUnit.test('rename element tagname', function (assert) {
       let template = stripIndent`
       <div data-foo='single quoted'>
         </div>`;
@@ -115,7 +118,7 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
-    QUnit.test('rename element tagname without children', function(assert) {
+    QUnit.test('rename element tagname without children', function (assert) {
       let template = stripIndent`
       <div></div>`;
 
@@ -125,7 +128,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), `<a></a>`);
     });
 
-    QUnit.test('rename self-closing element tagname', function(assert) {
+    QUnit.test('rename self-closing element tagname', function (assert) {
       let ast = parse('<Foo bar="baz"/>');
 
       ast.body[0].tag = 'Qux';
@@ -133,7 +136,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '<Qux bar="baz"/>');
     });
 
-    QUnit.test('rename self-closing element tagname with trailing whitespace', function(assert) {
+    QUnit.test('rename self-closing element tagname with trailing whitespace', function (assert) {
       let ast = parse('<Foo />');
 
       ast.body[0].tag = 'Qux';
@@ -143,7 +146,7 @@ QUnit.module('ember-template-recast', function() {
 
     QUnit.test(
       'Rename tag and convert from self-closing with attributes to block element',
-      function(assert) {
+      function (assert) {
         let ast = parse('<Foo bar="baz" />');
 
         ast.body[0].tag = 'Qux';
@@ -153,7 +156,7 @@ QUnit.module('ember-template-recast', function() {
       }
     );
 
-    QUnit.test('convert from self-closing with attributes to block element', function(assert) {
+    QUnit.test('convert from self-closing with attributes to block element', function (assert) {
       let ast = parse('<Foo bar="baz" />');
 
       ast.body[0].children = [builders.text('bay')];
@@ -163,7 +166,7 @@ QUnit.module('ember-template-recast', function() {
 
     QUnit.test(
       'convert from self-closing with specially spaced attributes to block element',
-      function(assert) {
+      function (assert) {
         let ast = parse('<Foo\n  bar="baz"\n />');
 
         ast.body[0].children = [builders.text('bay')];
@@ -172,7 +175,7 @@ QUnit.module('ember-template-recast', function() {
       }
     );
 
-    QUnit.test('Convert self-closing element with modifiers block element', function(assert) {
+    QUnit.test('Convert self-closing element with modifiers block element', function (assert) {
       let ast = parse('<Foo {{on "click" this.doSomething}} />');
 
       ast.body[0].children = [builders.text('bay')];
@@ -180,7 +183,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '<Foo {{on "click" this.doSomething}}>bay</Foo>');
     });
 
-    QUnit.test('adding attribute when none originally existed', function(assert) {
+    QUnit.test('adding attribute when none originally existed', function (assert) {
       let template = stripIndent`
       <div></div>`;
 
@@ -194,7 +197,7 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
-    QUnit.test('adding attribute to ElementNode with block params', function(assert) {
+    QUnit.test('adding attribute to ElementNode with block params', function (assert) {
       let template = `<Foo as |bar|></Foo>`;
 
       let ast = parse(template);
@@ -203,7 +206,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), `<Foo data-test="wheee" as |bar|></Foo>`);
     });
 
-    QUnit.test('adding attribute to ElementNode with block params (extra whitespace)', function(
+    QUnit.test('adding attribute to ElementNode with block params (extra whitespace)', function (
       assert
     ) {
       let template = stripIndent`<Foo as |
@@ -221,7 +224,7 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
-    QUnit.test('adding boolean attribute to ElementNode', function(assert) {
+    QUnit.test('adding boolean attribute to ElementNode', function (assert) {
       let template = stripIndent`<button></button>`;
 
       let ast = parse(template);
@@ -232,7 +235,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '<button disabled={{true}}></button>');
     });
 
-    QUnit.test('adding an attribute to existing list', function(assert) {
+    QUnit.test('adding an attribute to existing list', function (assert) {
       let template = stripIndent`
       <div
         data-foo='lol'
@@ -253,7 +256,7 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
-    QUnit.test('creating an element with complex attributes', function(assert) {
+    QUnit.test('creating an element with complex attributes', function (assert) {
       let template = '';
 
       let ast = parse(template);
@@ -279,7 +282,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), `<FooBar @thing={{hash something=bar}} />`);
     });
 
-    QUnit.test('modifying an attribute name (GH#112)', function(assert) {
+    QUnit.test('modifying an attribute name (GH#112)', function (assert) {
       let template = stripIndent`
         <div
           data-foo='some thing here'
@@ -299,7 +302,7 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
-    QUnit.test('modifying attribute after valueless attribute', function(assert) {
+    QUnit.test('modifying attribute after valueless attribute', function (assert) {
       let template = '<Foo data-foo data-derp={{hmmm}} />';
 
       let ast = parse(template);
@@ -308,7 +311,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '<Foo data-foo data-derp={{this.hmmm}} />');
     });
 
-    QUnit.test('modifying attribute after valueless attribute with special whitespace', function(
+    QUnit.test('modifying attribute after valueless attribute with special whitespace', function (
       assert
     ) {
       let template = stripIndent`
@@ -330,7 +333,7 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
-    QUnit.test('adding attribute after valueless attribute', function(assert) {
+    QUnit.test('adding attribute after valueless attribute', function (assert) {
       let template = '<Foo data-foo />';
 
       let ast = parse(template);
@@ -339,7 +342,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '<Foo data-foo data-bar="foo" />');
     });
 
-    QUnit.test('adding valueless attribute when no open parts existed', function(assert) {
+    QUnit.test('adding valueless attribute when no open parts existed', function (assert) {
       let template = '<Foo />';
 
       let ast = parse(template);
@@ -348,7 +351,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '<Foo data-bar />');
     });
 
-    QUnit.test('adding modifier when no open parts originally existed', function(assert) {
+    QUnit.test('adding modifier when no open parts originally existed', function (assert) {
       let template = stripIndent`
       <div></div>`;
 
@@ -364,7 +367,7 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
-    QUnit.test('adding modifier with existing attributes', function(assert) {
+    QUnit.test('adding modifier with existing attributes', function (assert) {
       let template = stripIndent`
       <div class="foo"></div>`;
 
@@ -381,7 +384,7 @@ QUnit.module('ember-template-recast', function() {
     });
 
     // This is specifically testing the issue described in https://github.com/glimmerjs/glimmer-vm/pull/953
-    QUnit.test('adding modifier when ...attributes is present', function(assert) {
+    QUnit.test('adding modifier when ...attributes is present', function (assert) {
       let template = stripIndent`<div data-foo="asdf" data-foo data-other="asdf"></div>`;
 
       let ast = parse(template);
@@ -395,7 +398,7 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
-    QUnit.test('removing a modifier with other attributes', function(assert) {
+    QUnit.test('removing a modifier with other attributes', function (assert) {
       let template = stripIndent`
       <div class="foo" {{on "click" this.blah}}></div>`;
 
@@ -409,7 +412,9 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
-    QUnit.test('removing a modifier with no other attributes/comments/modifiers', function(assert) {
+    QUnit.test('removing a modifier with no other attributes/comments/modifiers', function (
+      assert
+    ) {
       let template = stripIndent`
       <div {{on "click" this.blah}}></div>`;
 
@@ -423,7 +428,7 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
-    QUnit.test('adding comment when no open parts originally existed', function(assert) {
+    QUnit.test('adding comment when no open parts originally existed', function (assert) {
       let template = stripIndent`
       <div></div>`;
 
@@ -437,7 +442,7 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
-    QUnit.test('adding comment with existing attributes', function(assert) {
+    QUnit.test('adding comment with existing attributes', function (assert) {
       let template = stripIndent`
       <div class="foo"></div>`;
 
@@ -451,7 +456,7 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
-    QUnit.test('adding block param', function(assert) {
+    QUnit.test('adding block param', function (assert) {
       let template = `<MyFoo class="foo"></MyFoo>`;
 
       let ast = parse(template);
@@ -460,7 +465,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), `<MyFoo class="foo" as |blah|></MyFoo>`);
     });
 
-    QUnit.test('removing a block param', function(assert) {
+    QUnit.test('removing a block param', function (assert) {
       let template = `<MyFoo class="foo" as |bar|></MyFoo>`;
 
       let ast = parse(template);
@@ -469,7 +474,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), `<MyFoo class="foo"></MyFoo>`);
     });
 
-    QUnit.test('removing a block param preserves formatting of "open element closing"', function(
+    QUnit.test('removing a block param preserves formatting of "open element closing"', function (
       assert
     ) {
       let template = stripIndent`
@@ -490,7 +495,7 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
-    QUnit.test('interleaved attributes and modifiers are not modified when unchanged', function(
+    QUnit.test('interleaved attributes and modifiers are not modified when unchanged', function (
       assert
     ) {
       let template = `<div data-test="foo" {{on "click" this.bar}} data-blah="derp"></div>`;
@@ -504,7 +509,7 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
-    QUnit.test('adding children to element with children', function(assert) {
+    QUnit.test('adding children to element with children', function (assert) {
       let template = stripIndent`
         <ul>
           <li></li>
@@ -530,7 +535,7 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
-    QUnit.test('adding children to an empty element', function(assert) {
+    QUnit.test('adding children to an empty element', function (assert) {
       let template = `<div></div>`;
 
       let ast = parse(template);
@@ -539,7 +544,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '<div>some text</div>');
     });
 
-    QUnit.test('adding children to a self closing element', function(assert) {
+    QUnit.test('adding children to a self closing element', function (assert) {
       let template = `<Foo />`;
 
       let ast = parse(template);
@@ -548,7 +553,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '<Foo>some text</Foo>');
     });
 
-    QUnit.test('moving a child to another ElementNode', function(assert) {
+    QUnit.test('moving a child to another ElementNode', function (assert) {
       let template = stripIndent`
         <Foo>{{
           special-formatting-here
@@ -572,8 +577,8 @@ QUnit.module('ember-template-recast', function() {
     });
   });
 
-  QUnit.module('MustacheStatement', function() {
-    QUnit.test('path mutations retain custom whitespace formatting', function(assert) {
+  QUnit.module('MustacheStatement', function () {
+    QUnit.test('path mutations retain custom whitespace formatting', function (assert) {
       let template = `{{ foo }}`;
 
       let ast = parse(template);
@@ -582,7 +587,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '{{ bar }}');
     });
 
-    QUnit.test('updating from this.foo to @foo via path.original mutation', function(assert) {
+    QUnit.test('updating from this.foo to @foo via path.original mutation', function (assert) {
       let template = `{{this.foo}}`;
 
       let ast = parse(template);
@@ -591,7 +596,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '{{@foo}}');
     });
 
-    QUnit.test('updating from this.foo to @foo via path replacement', function(assert) {
+    QUnit.test('updating from this.foo to @foo via path replacement', function (assert) {
       let template = `{{this.foo}}`;
 
       let ast = parse(template);
@@ -600,7 +605,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '{{@foo}}');
     });
 
-    QUnit.test('updating path via path replacement retains custom whitespace', function(assert) {
+    QUnit.test('updating path via path replacement retains custom whitespace', function (assert) {
       let template = `{{\n@foo\n}}`;
 
       let ast = parse(template);
@@ -609,7 +614,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '{{\nthis.foo\n}}');
     });
 
-    QUnit.test('rename non-block component', function(assert) {
+    QUnit.test('rename non-block component', function (assert) {
       let template = stripIndent`
       {{foo-bar
         baz="stuff"
@@ -629,14 +634,14 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
-    QUnit.test('MustacheStatements retain whitespace when multiline replacements occur', function(
+    QUnit.test('MustacheStatements retain whitespace when multiline replacements occur', function (
       assert
     ) {
       let template = stripIndent`
         <p></p>
         {{ other-stuff }}
       `;
-      let { code } = transform(template, env => {
+      let { code } = transform(template, (env) => {
         let { builders: b } = env.syntax;
 
         return {
@@ -649,7 +654,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(code, 'xy\n{{ other-stuff }}');
     });
 
-    QUnit.test('can add param', function(assert) {
+    QUnit.test('can add param', function (assert) {
       let template = stripIndent`
         {{foo-bar
           baz=(stuff
@@ -670,7 +675,7 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
-    QUnit.test('can remove param', function(assert) {
+    QUnit.test('can remove param', function (assert) {
       let template = stripIndent`
         {{foo-bar
           hhaahahaha
@@ -691,7 +696,7 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
-    QUnit.test('replacing empty hash pair on MustacheStatement works', function(assert) {
+    QUnit.test('replacing empty hash pair on MustacheStatement works', function (assert) {
       let template = '{{foo-bar}}';
 
       let ast = parse(template);
@@ -700,7 +705,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), stripIndent`{{foo-bar hello="world"}}`);
     });
 
-    QUnit.test('infers indentation of hash when multiple HashPairs existed', function(assert) {
+    QUnit.test('infers indentation of hash when multiple HashPairs existed', function (assert) {
       let template = stripIndent`
         {{foo-bar
           baz="stuff"
@@ -720,7 +725,7 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
-    QUnit.test('infers indentation of hash when no existing hash existed but params do', function(
+    QUnit.test('infers indentation of hash when no existing hash existed but params do', function (
       assert
     ) {
       let template = stripIndent`
@@ -742,7 +747,7 @@ QUnit.module('ember-template-recast', function() {
 
     QUnit.test(
       'infers indentation of new HashPairs when existing hash with single entry (but no params)',
-      function(assert) {
+      function (assert) {
         let template = stripIndent`
         {{foo-bar
           stuff=here
@@ -761,7 +766,7 @@ QUnit.module('ember-template-recast', function() {
       }
     );
 
-    QUnit.test('can add literal hash pair values', function(assert) {
+    QUnit.test('can add literal hash pair values', function (assert) {
       let template = stripIndent`
         {{foo-bar
           first=thing
@@ -789,8 +794,8 @@ QUnit.module('ember-template-recast', function() {
     });
   });
 
-  QUnit.module('SubExpression', function() {
-    QUnit.test('rename path', function(assert) {
+  QUnit.module('SubExpression', function () {
+    QUnit.test('rename path', function (assert) {
       let template = stripIndent`
         {{foo-bar
           baz=(stuff
@@ -810,7 +815,7 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
-    QUnit.test('can add param', function(assert) {
+    QUnit.test('can add param', function (assert) {
       let template = stripIndent`
         {{foo-bar
           baz=(stuff
@@ -831,7 +836,7 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
-    QUnit.test('can remove param', function(assert) {
+    QUnit.test('can remove param', function (assert) {
       let template = stripIndent`
         {{foo-bar
           baz=(stuff
@@ -852,7 +857,7 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
-    QUnit.test('replacing empty hash pair', function(assert) {
+    QUnit.test('replacing empty hash pair', function (assert) {
       let template = stripIndent`
         {{foo-bar
           baz=(stuff)
@@ -867,8 +872,8 @@ QUnit.module('ember-template-recast', function() {
     });
   });
 
-  QUnit.module('BlockStatement', function() {
-    QUnit.test('rename block component', function(assert) {
+  QUnit.module('BlockStatement', function () {
+    QUnit.test('rename block component', function (assert) {
       let template = stripIndent`
       {{#foo-bar
         baz="stuff"
@@ -892,7 +897,7 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
-    QUnit.test('rename block component from longer to shorter name', function(assert) {
+    QUnit.test('rename block component from longer to shorter name', function (assert) {
       let template = stripIndent`
       {{#this-is-a-long-name
         hello="world"
@@ -916,7 +921,7 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
-    QUnit.test('replacing a previously empty hash', function(assert) {
+    QUnit.test('replacing a previously empty hash', function (assert) {
       let template = `{{#foo-bar}}Hi there!{{/foo-bar}}`;
 
       let ast = parse(template);
@@ -925,7 +930,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '{{#foo-bar hello="world"}}Hi there!{{/foo-bar}}');
     });
 
-    QUnit.test('adding multiple HashPair to previously empty hash', function(assert) {
+    QUnit.test('adding multiple HashPair to previously empty hash', function (assert) {
       let template = '{{#foo-bar}}Hi there!{{/foo-bar}}{{baz}}';
 
       let ast = parse(template);
@@ -935,7 +940,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '{{#foo-bar hello="world" foo="bar"}}Hi there!{{/foo-bar}}{{baz}}');
     });
 
-    QUnit.test('replacing empty hash w/ block params works', function(assert) {
+    QUnit.test('replacing empty hash w/ block params works', function (assert) {
       let template = `{{#foo-bar as |a b c|}}Hi there!{{/foo-bar}}`;
 
       let ast = parse(template);
@@ -944,7 +949,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '{{#foo-bar hello="world" as |a b c|}}Hi there!{{/foo-bar}}');
     });
 
-    QUnit.test('adding new HashPair to an empty hash w/ block params works', function(assert) {
+    QUnit.test('adding new HashPair to an empty hash w/ block params works', function (assert) {
       let template = `{{#foo-bar as |a b c|}}Hi there!{{/foo-bar}}`;
 
       let ast = parse(template);
@@ -953,7 +958,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '{{#foo-bar hello="world" as |a b c|}}Hi there!{{/foo-bar}}');
     });
 
-    QUnit.test('changing a HashPair key with a StringLiteral value (GH#112)', function(assert) {
+    QUnit.test('changing a HashPair key with a StringLiteral value (GH#112)', function (assert) {
       let template = `{{#foo-bar foo="some thing with a space"}}Hi there!{{/foo-bar}}`;
 
       let ast = parse(template);
@@ -962,7 +967,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '{{#foo-bar bar="some thing with a space"}}Hi there!{{/foo-bar}}');
     });
 
-    QUnit.test('changing a HashPair key with a SubExpression value (GH#112)', function(assert) {
+    QUnit.test('changing a HashPair key with a SubExpression value (GH#112)', function (assert) {
       let template = `{{#foo-bar foo=(helper-here this.arg1 this.arg2)}}Hi there!{{/foo-bar}}`;
 
       let ast = parse(template);
@@ -974,7 +979,7 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
-    QUnit.test('changing a HashPair value from StringLiteral to SubExpression', function(assert) {
+    QUnit.test('changing a HashPair value from StringLiteral to SubExpression', function (assert) {
       let template = `{{#foo-bar foo="bar!"}}Hi there!{{/foo-bar}}`;
 
       let ast = parse(template);
@@ -986,7 +991,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '{{#foo-bar foo=(concat "hello" "world")}}Hi there!{{/foo-bar}}');
     });
 
-    QUnit.test('changing a HashPair value from SubExpression to StringLiteral', function(assert) {
+    QUnit.test('changing a HashPair value from SubExpression to StringLiteral', function (assert) {
       let template = `{{#foo-bar foo=(concat "hello" "world")}}Hi there!{{/foo-bar}}`;
 
       let ast = parse(template);
@@ -995,7 +1000,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '{{#foo-bar foo="hello world!"}}Hi there!{{/foo-bar}}');
     });
 
-    QUnit.test('adding param with no params or hash', function(assert) {
+    QUnit.test('adding param with no params or hash', function (assert) {
       let template = `{{#foo-bar}}Hi there!{{/foo-bar}}`;
 
       let ast = parse(template);
@@ -1004,7 +1009,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '{{#foo-bar this.foo}}Hi there!{{/foo-bar}}');
     });
 
-    QUnit.test('adding param with empty program', function(assert) {
+    QUnit.test('adding param with empty program', function (assert) {
       let template = `{{#foo-bar}}{{/foo-bar}}`;
 
       let ast = parse(template);
@@ -1013,7 +1018,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '{{#foo-bar this.foo}}{{/foo-bar}}');
     });
 
-    QUnit.test('adding param with existing params', function(assert) {
+    QUnit.test('adding param with existing params', function (assert) {
       let template = `{{#foo-bar this.first}}Hi there!{{/foo-bar}}`;
 
       let ast = parse(template);
@@ -1024,7 +1029,7 @@ QUnit.module('ember-template-recast', function() {
 
     QUnit.test(
       'adding param with existing params infers indentation from existing params',
-      function(assert) {
+      function (assert) {
         let template = `{{#foo-bar \n   \nthis.first}}Hi there!{{/foo-bar}}`;
 
         let ast = parse(template);
@@ -1037,7 +1042,7 @@ QUnit.module('ember-template-recast', function() {
       }
     );
 
-    QUnit.test('adding child to end of program', function(assert) {
+    QUnit.test('adding child to end of program', function (assert) {
       let template = `{{#foo-bar}}Hello{{/foo-bar}}`;
 
       let ast = parse(template);
@@ -1046,7 +1051,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '{{#foo-bar}}Hello world!{{/foo-bar}}');
     });
 
-    QUnit.test('adding child to beginning of program', function(assert) {
+    QUnit.test('adding child to beginning of program', function (assert) {
       let template = `{{#foo-bar}}Hello{{/foo-bar}}`;
 
       let ast = parse(template);
@@ -1055,7 +1060,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '{{#foo-bar}}ZOMG! Hello{{/foo-bar}}');
     });
 
-    QUnit.test('adding child to end of inverse', function(assert) {
+    QUnit.test('adding child to end of inverse', function (assert) {
       let template = `{{#foo-bar}}{{else}}Hello{{/foo-bar}}`;
 
       let ast = parse(template);
@@ -1064,7 +1069,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '{{#foo-bar}}{{else}}Hello world!{{/foo-bar}}');
     });
 
-    QUnit.test('adding child to beginning of inverse', function(assert) {
+    QUnit.test('adding child to beginning of inverse', function (assert) {
       let template = `{{#foo-bar}}{{else}}Hello{{/foo-bar}}`;
 
       let ast = parse(template);
@@ -1075,7 +1080,7 @@ QUnit.module('ember-template-recast', function() {
 
     QUnit.test(
       'adding child to end of inverse preserves whitespace and whitespace control when program is also present',
-      function(assert) {
+      function (assert) {
         let template = `{{#foo-bar}}Goodbye\n  {{~ else ~}} Hello{{/foo-bar}}`;
 
         let ast = parse(template);
@@ -1087,7 +1092,7 @@ QUnit.module('ember-template-recast', function() {
 
     QUnit.test(
       'adding child to end of inverse preserves whitespace and whitespace control',
-      function(assert) {
+      function (assert) {
         let template = `{{#foo-bar}}{{~ else ~}}Hello{{/foo-bar}}`;
 
         let ast = parse(template);
@@ -1097,7 +1102,7 @@ QUnit.module('ember-template-recast', function() {
       }
     );
 
-    QUnit.test('add child in an {{else if foo}} chain', function(assert) {
+    QUnit.test('add child in an {{else if foo}} chain', function (assert) {
       let template = `{{#if foo}}{{else if baz}}Hello{{/if}}`;
 
       let ast = parse(template);
@@ -1106,7 +1111,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '{{#if foo}}{{else if baz}}Hello world!{{/if}}');
     });
 
-    QUnit.test('adding an inverse', function(assert) {
+    QUnit.test('adding an inverse', function (assert) {
       let template = `{{#foo-bar}}{{/foo-bar}}`;
 
       let ast = parse(template);
@@ -1115,7 +1120,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '{{#foo-bar}}{{else}}ZOMG!{{/foo-bar}}');
     });
 
-    QUnit.test('removing an inverse', function(assert) {
+    QUnit.test('removing an inverse', function (assert) {
       let template = `{{#foo-bar}}Goodbye{{else}}Hello{{/foo-bar}}`;
 
       let ast = parse(template);
@@ -1124,7 +1129,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '{{#foo-bar}}Goodbye{{/foo-bar}}');
     });
 
-    QUnit.test('annotating an "else if" node', function(assert) {
+    QUnit.test('annotating an "else if" node', function (assert) {
       let template = '{{#if foo}}{{else if bar}}{{else}}{{/if}}';
 
       let ast = parse(template);
@@ -1133,7 +1138,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '{{#if foo}}{{else if bar}}{{else}}{{/if}}');
     });
 
-    QUnit.test('add block param (when none existed)', function(assert) {
+    QUnit.test('add block param (when none existed)', function (assert) {
       let template = `{{#foo-bar}}{{/foo-bar}}`;
 
       let ast = parse(template);
@@ -1142,7 +1147,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '{{#foo-bar as |foo|}}{{/foo-bar}}');
     });
 
-    QUnit.test('remove only block param', function(assert) {
+    QUnit.test('remove only block param', function (assert) {
       let template = `{{#foo-bar as |a|}}{{/foo-bar}}`;
 
       let ast = parse(template);
@@ -1151,7 +1156,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '{{#foo-bar}}{{/foo-bar}}');
     });
 
-    QUnit.test('remove one block param of many', function(assert) {
+    QUnit.test('remove one block param of many', function (assert) {
       let template = `{{#foo-bar as |a b|}}{{/foo-bar}}`;
 
       let ast = parse(template);
@@ -1160,7 +1165,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '{{#foo-bar as |a|}}{{/foo-bar}}');
     });
 
-    QUnit.test('remove one block param of many preserves custom whitespace', function(assert) {
+    QUnit.test('remove one block param of many preserves custom whitespace', function (assert) {
       let template = stripIndent`
         {{#foo-bar
           as |a b|
@@ -1182,7 +1187,7 @@ QUnit.module('ember-template-recast', function() {
       );
     });
 
-    QUnit.test('remove only block param preserves custom whitespace', function(assert) {
+    QUnit.test('remove only block param preserves custom whitespace', function (assert) {
       let template = stripIndent`
         {{#foo-bar
           some=thing
@@ -1206,8 +1211,8 @@ QUnit.module('ember-template-recast', function() {
     });
   });
 
-  QUnit.module('AttrNode', function() {
-    QUnit.test('updating value', function(assert) {
+  QUnit.module('AttrNode', function () {
+    QUnit.test('updating value', function (assert) {
       let template = '<Foo bar={{foo}} />';
 
       let ast = parse(template);
@@ -1216,7 +1221,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '<Foo bar={{bar}} />');
     });
 
-    QUnit.test('updating concat statement value', function(assert) {
+    QUnit.test('updating concat statement value', function (assert) {
       let template = '<Foo class="{{foo}} static {{bar}}" />';
 
       let ast = parse(template);
@@ -1225,7 +1230,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '<Foo class="{{foo}} static {{bar}} other-static" />');
     });
 
-    QUnit.test('updating value from non-quotable to TextNode (GH#111)', function(assert) {
+    QUnit.test('updating value from non-quotable to TextNode (GH#111)', function (assert) {
       let template = '<Foo bar={{foo}} />';
 
       let ast = parse(template);
@@ -1234,7 +1239,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '<Foo bar="hello!" />');
     });
 
-    QUnit.test('updating value from non-quotable to ConcatStatement (GH#111)', function(assert) {
+    QUnit.test('updating value from non-quotable to ConcatStatement (GH#111)', function (assert) {
       let template = '<Foo bar={{foo}} />';
 
       let ast = parse(template);
@@ -1249,7 +1254,7 @@ QUnit.module('ember-template-recast', function() {
 
     QUnit.test(
       'can determine if an AttrNode was valueless (required by ember-template-lint)',
-      function(assert) {
+      function (assert) {
         assert.strictEqual(
           parse(`<Foo bar={{foo}} />`).body[0].attributes[0].isValueless,
           false,
@@ -1290,7 +1295,7 @@ QUnit.module('ember-template-recast', function() {
 
     QUnit.test(
       'can determine type of quotes used from AST (required by ember-template-lint)',
-      function(assert) {
+      function (assert) {
         assert.strictEqual(
           parse(`<Foo bar={{foo}} />`).body[0].attributes[0].quoteType,
           null,
@@ -1329,7 +1334,7 @@ QUnit.module('ember-template-recast', function() {
       }
     );
 
-    QUnit.test('renaming valueless attribute', function(assert) {
+    QUnit.test('renaming valueless attribute', function (assert) {
       let template = '<Foo data-bar />';
 
       let ast = parse(template);
@@ -1338,7 +1343,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '<Foo data-foo />');
     });
 
-    QUnit.test('mutations retain custom whitespace formatting', function(assert) {
+    QUnit.test('mutations retain custom whitespace formatting', function (assert) {
       let template = stripIndent`
         <Foo 
           bar = {{ foo }} />
@@ -1350,7 +1355,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '<Foo \n  bar = {{ bar }} />');
     });
 
-    QUnit.test('quotes are preserved when updated a TextNode value (double quote)', function(
+    QUnit.test('quotes are preserved when updated a TextNode value (double quote)', function (
       assert
     ) {
       let template = `<div class="lol"></div>`;
@@ -1361,7 +1366,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '<div class="hahah"></div>');
     });
 
-    QUnit.test('quotes are preserved when updated a TextNode value (single quote)', function(
+    QUnit.test('quotes are preserved when updated a TextNode value (single quote)', function (
       assert
     ) {
       let template = `<div class='lol'></div>`;
@@ -1372,7 +1377,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), `<div class='hahah'></div>`);
     });
 
-    QUnit.test('can update a quoteless attribute value', function(assert) {
+    QUnit.test('can update a quoteless attribute value', function (assert) {
       let template = `<div class=wat></div>`;
 
       let ast = parse(template);
@@ -1381,7 +1386,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '<div class=zomgyasss></div>');
     });
 
-    QUnit.test('quotes are preserved when updating a ConcatStatement value', function(assert) {
+    QUnit.test('quotes are preserved when updating a ConcatStatement value', function (assert) {
       let template = `<div class="lol {{foo}}"></div>`;
 
       let ast = parse(template);
@@ -1391,8 +1396,8 @@ QUnit.module('ember-template-recast', function() {
     });
   });
 
-  QUnit.module('HashPair', function() {
-    QUnit.test('mutations', function(assert) {
+  QUnit.module('HashPair', function () {
+    QUnit.test('mutations', function (assert) {
       let template = '{{foo-bar bar=foo}}';
 
       let ast = parse(template);
@@ -1401,7 +1406,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '{{foo-bar bar=bar}}');
     });
 
-    QUnit.test('mutations retain formatting', function(assert) {
+    QUnit.test('mutations retain formatting', function (assert) {
       let template = '{{foo-bar   bar= foo}}';
 
       let ast = parse(template);
@@ -1411,7 +1416,7 @@ QUnit.module('ember-template-recast', function() {
     });
   });
 
-  QUnit.test('can remove during traversal by returning `null`', function(assert) {
+  QUnit.test('can remove during traversal by returning `null`', function (assert) {
     let template = stripIndent`
     <p>here is some multiline string</p>
     {{ other-stuff }}
@@ -1427,14 +1432,14 @@ QUnit.module('ember-template-recast', function() {
     assert.equal(code, '\n{{ other-stuff }}');
   });
 
-  QUnit.test('can replace with many items during traversal by returning an array', function(
+  QUnit.test('can replace with many items during traversal by returning an array', function (
     assert
   ) {
     let template = stripIndent`
     <p>here is some multiline string</p>
     {{other-stuff}}
     `;
-    let { code } = transform(template, env => {
+    let { code } = transform(template, (env) => {
       let { builders: b } = env.syntax;
 
       return {
@@ -1447,8 +1452,8 @@ QUnit.module('ember-template-recast', function() {
     assert.equal(code, 'hello world\n{{other-stuff}}');
   });
 
-  QUnit.module('MustacheCommentStatement', function() {
-    QUnit.test('can be updated', function(assert) {
+  QUnit.module('MustacheCommentStatement', function () {
+    QUnit.test('can be updated', function (assert) {
       let template = `<div {{!-- something here --}}></div>`;
 
       let ast = parse(template);
@@ -1457,7 +1462,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), `<div {{!-- otherthing --}}></div>`);
     });
 
-    QUnit.test('comments without `--` are preserved', function(assert) {
+    QUnit.test('comments without `--` are preserved', function (assert) {
       let template = `<div {{! something here }}></div>`;
 
       let ast = parse(template);
@@ -1467,8 +1472,8 @@ QUnit.module('ember-template-recast', function() {
     });
   });
 
-  QUnit.module('ElementModifierStatement', function() {
-    QUnit.test('can be updated', function(assert) {
+  QUnit.module('ElementModifierStatement', function () {
+    QUnit.test('can be updated', function (assert) {
       let template = `<div {{thing 'foo'}}></div>`;
 
       let ast = parse(template);
@@ -1478,8 +1483,8 @@ QUnit.module('ember-template-recast', function() {
     });
   });
 
-  QUnit.module('CommentStatement', function() {
-    QUnit.test('can be updated', function(assert) {
+  QUnit.module('CommentStatement', function () {
+    QUnit.test('can be updated', function (assert) {
       let template = `<!-- something -->`;
 
       let ast = parse(template);
@@ -1489,8 +1494,8 @@ QUnit.module('ember-template-recast', function() {
     });
   });
 
-  QUnit.module('ConcatStatement', function() {
-    QUnit.test('can add parts', function(assert) {
+  QUnit.module('ConcatStatement', function () {
+    QUnit.test('can add parts', function (assert) {
       let template = `<div class="foo {{bar}}"></div>`;
 
       let ast = parse(template);
@@ -1499,7 +1504,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), `<div class="foo {{bar}} baz"></div>`);
     });
 
-    QUnit.test('preserves quote style', function(assert) {
+    QUnit.test('preserves quote style', function (assert) {
       let template = `<div class='foo {{bar}}'></div>`;
 
       let ast = parse(template);
@@ -1508,7 +1513,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), `<div class='foo {{bar}} baz'></div>`);
     });
 
-    QUnit.test('updating parts preserves custom whitespace', function(assert) {
+    QUnit.test('updating parts preserves custom whitespace', function (assert) {
       let template = `<div class="foo {{\nbar\n}}"></div>`;
 
       let ast = parse(template);
@@ -1518,8 +1523,8 @@ QUnit.module('ember-template-recast', function() {
     });
   });
 
-  QUnit.module('StringLiteral', function() {
-    QUnit.test('can be updated', function(assert) {
+  QUnit.module('StringLiteral', function () {
+    QUnit.test('can be updated', function (assert) {
       let template = `{{foo "blah"}}`;
 
       let ast = parse(template);
@@ -1529,8 +1534,8 @@ QUnit.module('ember-template-recast', function() {
     });
   });
 
-  QUnit.module('NumberLiteral', function() {
-    QUnit.test('can be updated', function(assert) {
+  QUnit.module('NumberLiteral', function () {
+    QUnit.test('can be updated', function (assert) {
       let template = `{{foo 42}}`;
 
       let ast = parse(template);
@@ -1540,8 +1545,8 @@ QUnit.module('ember-template-recast', function() {
     });
   });
 
-  QUnit.module('BooleanLiteral', function() {
-    QUnit.test('can be updated in MustacheStatement .path position', function(assert) {
+  QUnit.module('BooleanLiteral', function () {
+    QUnit.test('can be updated in MustacheStatement .path position', function (assert) {
       let template = `{{true}}`;
 
       let ast = parse(template);
@@ -1550,7 +1555,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), `{{false}}`);
     });
 
-    QUnit.test('can be updated in MustacheStatement .hash position', function(assert) {
+    QUnit.test('can be updated in MustacheStatement .hash position', function (assert) {
       let template = `{{foo thing=true}}`;
 
       let ast = parse(template);
@@ -1560,8 +1565,8 @@ QUnit.module('ember-template-recast', function() {
     });
   });
 
-  QUnit.module('TextNode', function() {
-    QUnit.test('can be updated', function(assert) {
+  QUnit.module('TextNode', function () {
+    QUnit.test('can be updated', function (assert) {
       let template = `Foo`;
 
       let ast = parse(template);
@@ -1570,7 +1575,7 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), 'Bar');
     });
 
-    QUnit.test('can be updated as value of AttrNode', function(assert) {
+    QUnit.test('can be updated as value of AttrNode', function (assert) {
       let template = `<div class="lol"></div>`;
 
       let ast = parse(template);
@@ -1581,7 +1586,7 @@ QUnit.module('ember-template-recast', function() {
 
     QUnit.test(
       'an AttrNode values quotes are removed when inserted in alternate positions (e.g. content)',
-      function(assert) {
+      function (assert) {
         let template = `<div class="lol"></div>`;
 
         let ast = parse(template);
