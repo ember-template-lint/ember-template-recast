@@ -806,4 +806,22 @@ describe('"real life" smoke tests', function () {
 
     expect(code).toEqual('<FooBar @query={{hash foo="baz"}} />');
   });
+
+  test('can replace whole template (aka what a prettier autofixer would want to do)', function () {
+    let template = `Foo baz {{haha}} derp`;
+
+    let { code } = transform(template, (env) => {
+      return {
+        Program: {
+          exit(node) {
+            let replacement = `ZOMG other things here`;
+
+            node.body = env.syntax.parse(replacement).body;
+          },
+        },
+      };
+    });
+
+    expect(code).toEqual('ZOMG other things here');
+  });
 });
