@@ -711,6 +711,27 @@ QUnit.module('"real life" smoke tests', function () {
       `
       );
     });
+
+    QUnit.test('preserves simple attribute indentation', function(assert) {
+      let template = stripIndent`
+        {{foo-bar 
+          goes=here
+          and=here
+        }}
+      `;
+
+      let { code } = transform(template, codemod);
+
+      assert.equal(
+        code,
+        stripIndent`
+        <FooBar 
+          @goes={{here}}
+          @and={{here}}
+        />
+      `
+      );
+    });
   });
 
   QUnit.test(
