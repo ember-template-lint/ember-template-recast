@@ -3,7 +3,7 @@ const { stripIndent } = require('common-tags');
 
 describe('"real life" smoke tests', function () {
   describe('line endings', function () {
-    test('preserves mixed line endings', function (assert) {
+    test('preserves mixed line endings', function () {
       let template = `{{foo}}\r\n{{bar}}\n{{qux}}\r\n`;
 
       let expected = `{{oof}}\r\n{{rab}}\n{{xuq}}\r\n`;
@@ -18,7 +18,7 @@ describe('"real life" smoke tests', function () {
 
       expect(code).toEqual(expected);
     });
-    test('preserves \\r\\n line endings', function (assert) {
+    test('preserves \\r\\n line endings', function () {
       let template = `{{foo}}\r\n{{bar}}\r\n`;
 
       let expected = `{{oof}}\r\n{{rab}}\r\n`;
@@ -34,7 +34,7 @@ describe('"real life" smoke tests', function () {
       expect(code).toEqual(expected);
     });
 
-    test('preserves \\n line endings', function (assert) {
+    test('preserves \\n line endings', function () {
       let template = `{{foo}}\n{{bar}}\n`;
 
       let expected = `{{oof}}\n{{rab}}\n`;
@@ -52,7 +52,7 @@ describe('"real life" smoke tests', function () {
   });
 
   describe('nested else conditionals GH#126', function () {
-    test('without mutation', function (assert) {
+    test('without mutation', function () {
       let template = `
         {{#if a}}
           {{foo}}
@@ -73,7 +73,6 @@ describe('"real life" smoke tests', function () {
     });
 
     test('with mutation inside component invocation with `else let` branches', function (
-      assert
     ) {
       let template = `
         {{#foo-bar}}
@@ -107,7 +106,6 @@ describe('"real life" smoke tests', function () {
     });
 
     test('with mutation inside component invocation with `else if` branches', function (
-      assert
     ) {
       let template = `
         {{#foo-bar}}
@@ -144,7 +142,7 @@ describe('"real life" smoke tests', function () {
       expect(code).toEqual(expected);
     });
 
-    test('with mutation inside `if`/`else if` branches', function (assert) {
+    test('with mutation inside `if`/`else if` branches', function () {
       let template = `
         {{#if a}}
           {{foo}}
@@ -182,7 +180,7 @@ describe('"real life" smoke tests', function () {
   });
 
   describe('hash pair mutation order should not matter GH#86', function () {
-    test('change, add, remove', function (assert) {
+    test('change, add, remove', function () {
       let template = stripIndent`
         {{foo-bar-baz
           unchanged="unchanged"
@@ -216,7 +214,7 @@ describe('"real life" smoke tests', function () {
       `);
     });
 
-    test('remove, change, add', function (assert) {
+    test('remove, change, add', function () {
       let template = stripIndent`
         {{foo-bar-baz
           unchanged="unchanged"
@@ -252,7 +250,7 @@ describe('"real life" smoke tests', function () {
   });
 
   describe('whitespace and removed hash pairs', function () {
-    test('Multi-line removed hash pair causes line removal', function (assert) {
+    test('Multi-line removed hash pair causes line removal', function () {
       let template = stripIndent`
         {{#foo-bar
           prop="abc"
@@ -279,7 +277,7 @@ describe('"real life" smoke tests', function () {
         {{/foo-bar}}`);
     });
 
-    test('whitespace is preserved when mutating a positional param', function (assert) {
+    test('whitespace is preserved when mutating a positional param', function () {
       let template = stripIndent`
         {{some-helper positional}}
         {{#block positional}}
@@ -308,7 +306,6 @@ describe('"real life" smoke tests', function () {
     });
 
     test('Same-line removed hash pair from middle collapses excess whitespace', function (
-      assert
     ) {
       let template = stripIndent`
         {{#hello-world}}
@@ -332,7 +329,7 @@ describe('"real life" smoke tests', function () {
         {{/hello-world}}`);
     });
 
-    test('Whitespace properly collapsed when the removed prop is last', function (assert) {
+    test('Whitespace properly collapsed when the removed prop is last', function () {
       let template = stripIndent`
         {{#hello-world}}
           {{#foo-bar prop="abc" yetAnotherProp="xyz" anotherProp=123}}
@@ -356,7 +353,7 @@ describe('"real life" smoke tests', function () {
 
     test(
       'Whitespace properly collapsed when the removed prop is last and the contents of the tag are spaced',
-      function (assert) {
+      function () {
         let template = stripIndent`
           {{#hello-world}}
             {{ foo-bar prop="abc" yetAnotherProp="xyz" anotherProp=123 }}
@@ -378,7 +375,6 @@ describe('"real life" smoke tests', function () {
     );
 
     test('Whitespace is left alone for replacements with whitespace on both sides', function (
-      assert
     ) {
       let template = stripIndent`
           {{#hello-world foo="foo" bar="bar" as |yieldedProp|}}
@@ -401,9 +397,11 @@ describe('"real life" smoke tests', function () {
     });
   });
 
-  describe('multi-line', function (hooks) {
+  describe('multi-line', function () {
     let i = 0;
-    hooks.beforeEach(() => (i = 0));
+
+    beforeEach(() => (i = 0));
+
     function funkyIf(b) {
       return b.block(
         'if',
@@ -413,7 +411,7 @@ describe('"real life" smoke tests', function () {
       );
     }
 
-    test('supports multi-line replacements', function (assert) {
+    test('supports multi-line replacements', function () {
       let template = stripIndent`
         {{bar}}
 
@@ -441,7 +439,7 @@ describe('"real life" smoke tests', function () {
       `);
     });
 
-    test('`if` branch containing whitespace controls', function (assert) {
+    test('`if` branch containing whitespace controls', function () {
       let template = `
         {{#if foo~}}
           {{foo}}
@@ -465,7 +463,7 @@ describe('"real life" smoke tests', function () {
       expect(code).toEqual(expected);
     });
 
-    test('collapsing lines (full line replacment)', function (assert) {
+    test('collapsing lines (full line replacment)', function () {
       let template = stripIndent`
         here
         is
@@ -486,7 +484,7 @@ describe('"real life" smoke tests', function () {
       expect(code).toEqual('here is a single line string');
     });
 
-    test('collapsing lines when start line has non-replaced content', function (assert) {
+    test('collapsing lines when start line has non-replaced content', function () {
       let template = stripIndent`
         <div
            data-foo={{baz}}></div>here
@@ -507,7 +505,7 @@ describe('"real life" smoke tests', function () {
       expect(code).toEqual('<div\n   data-foo={{baz}}></div>here is a single line string');
     });
 
-    test('collapsing lines when end line has non-replaced content', function (assert) {
+    test('collapsing lines when end line has non-replaced content', function () {
       let template = stripIndent`
         here
         is
@@ -530,7 +528,6 @@ describe('"real life" smoke tests', function () {
     });
 
     test('collapsing lines when start and end lines have non-replaced content', function (
-      assert
     ) {
       let template = stripIndent`{{ foo }}
         here
@@ -551,7 +548,7 @@ describe('"real life" smoke tests', function () {
       expect(code).toEqual('{{ foo }}here is a single line string{{ bar }}');
     });
 
-    test('Can handle multi-line column expansion', function (assert) {
+    test('Can handle multi-line column expansion', function () {
       let template = `
         <div data-foo="bar"></div>here
         is
@@ -574,7 +571,7 @@ describe('"real life" smoke tests', function () {
       );
     });
 
-    test('supports multi-line replacements with interleaving', function (assert) {
+    test('supports multi-line replacements with interleaving', function () {
       let template = stripIndent`
         <br>
         {{bar}}
@@ -649,7 +646,7 @@ describe('"real life" smoke tests', function () {
       };
     }
 
-    test('works for simple mustache', function (assert) {
+    test('works for simple mustache', function () {
       let template = stripIndent`
         {{foo-bar baz=qux}}
       `;
@@ -659,7 +656,7 @@ describe('"real life" smoke tests', function () {
       expect(code).toEqual(`<FooBar @baz={{qux}} />`);
     });
 
-    test('preserves nested invocation whitespace', function (assert) {
+    test('preserves nested invocation whitespace', function () {
       let template = stripIndent`
         {{foo-bar baz=(something
           goes=here
@@ -680,7 +677,7 @@ describe('"real life" smoke tests', function () {
 
   test(
     'If/else-if/else chains with edits early in the chain should be fully printed (GH #149)',
-    function (assert) {
+    function () {
       let template = `
       {{#if a}}
         {{foo}}
@@ -724,7 +721,6 @@ describe('"real life" smoke tests', function () {
   );
 
   test('If/else-if/else chains with multiple edits are accurate (GH #149)', function (
-    assert
   ) {
     let template = `
       {{#if a}}
@@ -780,7 +776,7 @@ describe('"real life" smoke tests', function () {
     expect(code).toEqual(expected);
   });
 
-  test('mustache param slicing (GH #149)', function (assert) {
+  test('mustache param slicing (GH #149)', function () {
     let template = `
       <SomeComponent
         class=""
@@ -800,7 +796,7 @@ describe('"real life" smoke tests', function () {
     expect(code).toEqual(expected);
   });
 
-  test('reusing existing hash preserves spacing', function (assert) {
+  test('reusing existing hash preserves spacing', function () {
     let template = '{{foo-bar (query-params foo="baz")}}';
 
     let { code } = transform(template, (env) => {

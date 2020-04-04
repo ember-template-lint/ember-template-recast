@@ -8,31 +8,43 @@ function run(args, cwd) {
   return execa(require.resolve('../bin/ember-template-recast'), args, { cwd });
 }
 
-describe('ember-template-recast executable', function ({ beforeEach, afterEach }) {
-  beforeEach(function () {
-    return createTempDir().then((fixture) => {
-      this.fixture = fixture;
+const transform = `
+module.exports = function ({ source }, { parse, visit }) {
+  const ast = parse(source);
 
-      this.fixture.write({
+  return visit(ast, (env) => {
+    let { builders: b } = env.syntax;
+
+    return {
+      MustacheStatement() {
+        return b.mustache(b.path('wat-wat'));
+      },
+    };
+  });
+};
+`;
+
+describe('ember-template-recast executable', function () {
+  let fixture, input;
+
+  beforeEach(function () {
+    return createTempDir().then((_fixture) => {
+      fixture = _fixture;
+
+      fixture.write({
         files: {
           'a.hbs': '{{hello-world}}',
           'b.handlebars': '{{more-mustache foo=bar}}',
           'unchanged.hbs': `nothing to do`,
         },
-        'transform.js': readFileSync(join(__dirname, 'fixtures', 'wat-wat.js'), 'utf8'),
+        'transform.js': transform,
       });
     });
   });
 
-  afterEach(function () {
-    if (this.input) {
-      return this.input.dispose();
-    }
-  });
-
-  test('updating files', function (assert) {
-    return run(['files', '-c', '1'], this.fixture.path()).then(({ stdout }) => {
-      const out = this.fixture.read();
+  test('updating files', function () {
+    return run(['files', '-c', '1'], fixture.path()).then(({ stdout }) => {
+      const out = fixture.read();
 
       expect(stdout).toEqual(`Processing 3 files…
 Spawning 1 worker…
@@ -47,9 +59,9 @@ Unchanged: 1`);
     });
   });
 
-  test('dry run', function (assert) {
-    return run(['files', '-c', '1', '-d'], this.fixture.path()).then(({ stdout }) => {
-      const out = this.fixture.read();
+  test('dry run', function () {
+    return run(['files', '-c', '1', '-d'], fixture.path()).then(({ stdout }) => {
+      const out = fixture.read();
 
       expect(stdout).toEqual(`Processing 3 files…
 Spawning 1 worker…
@@ -64,26 +76,26 @@ Unchanged: 1`);
     });
   });
 
-  test('with a bad transform', function (assert) {
-    this.fixture.write({
+  test('with a bad transform', function () {
+    fixture.write({
       'bad-transform.js': 'module.exports = syntax error',
     });
 
-    return run(['files', '-t', 'bad-transform.js'], this.fixture.path()).then(({ stdout }) => {
+    return run(['files', '-t', 'bad-transform.js'], fixture.path()).then(({ stdout }) => {
       expect(stdout.includes('Error: Unexpected identifier')).toBeTruthy();
-      expect(stdout.includes(join(this.fixture.path(), 'bad-transform.js'))).toBeTruthy();
+      expect(stdout.includes(join(fixture.path(), 'bad-transform.js'))).toBeTruthy();
     });
   });
 
-  test('with a bad template', function (assert) {
-    this.fixture.write({
+  test('with a bad template', function () {
+    fixture.write({
       files: {
         'bad-template.hbs': `{{ not { valid (mustache) }`,
       },
     });
 
-    return run(['files', '-c', '1'], this.fixture.path()).then(({ stdout }) => {
-      const out = this.fixture.read();
+    return run(['files', '-c', '1'], fixture.path()).then(({ stdout }) => {
+      const out = fixture.read();
 
       expect(stdout.includes(
         `Processing 4 files…
@@ -93,12 +105,9 @@ Unchanged: 1
 Errored:   1`
       )).toBeTruthy();
 
-      let badFilePath = slash(join(this.fixture.path(), 'files/bad-template.hbs'));
+      let badFilePath = slash(join(fixture.path(), 'files/bad-template.hbs'));
 
-      assert.pushResult({
-        result: stdout.includes(badFilePath),
-        message: `Expected output to include full path to the invalid template (${badFilePath}): \n\n${stdout}`,
-      });
+      expect(stdout).toEqual(expect.stringContaining(badFilePath));
 
       expect(stdout.includes('Error: Parse error on line 1:')).toBeTruthy();
 
@@ -111,22 +120,22 @@ Errored:   1`
     });
   });
 
-  test('concurrency', function (assert) {
+  test('concurrency', function () {
     const files = Array(300)
       .fill(1)
       .reduce((acc, _, i) => Object.assign(acc, { [`file${i}.hbs`]: '{{hello-world}}' }), {});
 
-    this.fixture.write({
+    fixture.write({
       'many-files': files,
     });
 
-    return run(['many-files', '-c', '4'], this.fixture.path()).then(({ stdout }) => {
+    return run(['many-files', '-c', '4'], fixture.path()).then(({ stdout }) => {
       expect(stdout).toEqual(`Processing 300 files…
 Spawning 4 workers…
 Ok:        300
 Unchanged: 0`);
 
-      const files = this.fixture.read();
+      const files = fixture.read();
       expect(files['many-files']['file199.hbs']).toEqual('{{wat-wat}}');
     });
   });
