@@ -1,3 +1,15 @@
+## v4.1.2 (2020-04-04)
+
+#### :bug: Bug Fix
+* [#251](https://github.com/ember-template-lint/ember-template-recast/pull/251) Fix issue when swapping ElementNode from self closing with attributes to block. ([@rwjblue](https://github.com/rwjblue))
+
+#### :house: Internal
+* [#252](https://github.com/ember-template-lint/ember-template-recast/pull/252) Make CI job names easier to read. ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 2
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+- [@dependabot-preview[bot]](https://github.com/apps/dependabot-preview)
+
 ## v4.1.1 (2020-02-27)
 
 #### :bug: Bug Fix
