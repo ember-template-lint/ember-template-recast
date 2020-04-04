@@ -10,14 +10,14 @@ describe('ember-template-recast', function () {
       }}`;
     let ast = parse(template);
 
-    assert.equal(print(ast), template);
+    expect(print(ast)).toEqual(template);
   });
 
   test('basic parse + print (no modification): void elements', function (assert) {
     let template = `<br><p>Hi!</p>`;
     let ast = parse(template);
 
-    assert.equal(print(ast), template);
+    expect(print(ast)).toEqual(template);
   });
 
   test('basic parse + print (no modification) preserves blank lines', function (assert) {
@@ -30,7 +30,7 @@ describe('ember-template-recast', function () {
 `;
     let ast = parse(template);
 
-    assert.equal(print(ast), template);
+    expect(print(ast)).toEqual(template);
   });
 
   test('basic parse -> mutation -> print', function (assert) {
@@ -42,14 +42,11 @@ describe('ember-template-recast', function () {
     let ast = parse(template);
     ast.body[0].hash.pairs[0].key = 'derp';
 
-    assert.equal(
-      print(ast),
-      stripIndent`
-        {{foo-bar
-          derp="stuff"
-          other='single quote'
-        }}`
-    );
+    expect(print(ast)).toEqual(stripIndent`
+      {{foo-bar
+        derp="stuff"
+        other='single quote'
+      }}`);
   });
 
   test('basic parse -> mutation -> print: preserves HTML entities', function (assert) {
@@ -57,7 +54,7 @@ describe('ember-template-recast', function () {
     let ast = parse(template);
     ast.body[0].children.push(builders.text('derp&nbsp;'));
 
-    assert.equal(print(ast), stripIndent`<div>&nbsp;derp&nbsp;</div>`);
+    expect(print(ast)).toEqual(stripIndent`<div>&nbsp;derp&nbsp;</div>`);
   });
 
   describe('transform', () => {
@@ -72,7 +69,7 @@ describe('ember-template-recast', function () {
         };
       });
 
-      assert.deepEqual(paths, ['foo-bar', 'foo']);
+      expect(paths).toEqual(['foo-bar', 'foo']);
     });
 
     test('can handle comment append before html node case', function (assert) {
@@ -98,8 +95,7 @@ describe('ember-template-recast', function () {
         };
       });
 
-      assert.deepEqual(
-        result.code,
+      expect(result.code).toEqual(
         ['{{!-- template-lint-disable no-table-tag --}}', '<table></table>'].join('\n')
       );
     });
@@ -127,16 +123,13 @@ describe('ember-template-recast', function () {
         };
       });
 
-      assert.deepEqual(
-        result.code,
-        [
-          '\n',
-          '{{!-- template-lint-disable no-table-tag --}}',
-          '<table>',
-          '<tbody></tbody>',
-          '</table>',
-        ].join('\n')
-      );
+      expect(result.code).toEqual([
+        '\n',
+        '{{!-- template-lint-disable no-table-tag --}}',
+        '<table>',
+        '<tbody></tbody>',
+        '</table>',
+      ].join('\n'));
     });
 
     test('can accept an AST', function (assert) {
@@ -151,7 +144,7 @@ describe('ember-template-recast', function () {
         };
       });
 
-      assert.deepEqual(paths, ['foo-bar', 'foo']);
+      expect(paths).toEqual(['foo-bar', 'foo']);
     });
 
     test('returns code and ast', function (assert) {
@@ -165,8 +158,8 @@ describe('ember-template-recast', function () {
         };
       });
 
-      assert.ok(ast);
-      assert.ok(code);
+      expect(ast).toBeTruthy();
+      expect(code).toBeTruthy();
     });
 
     test('replacement', function (assert) {
@@ -180,7 +173,7 @@ describe('ember-template-recast', function () {
         };
       });
 
-      assert.equal(code, '{{wat-wat}}');
+      expect(code).toEqual('{{wat-wat}}');
     });
 
     test('removing the only hash pair on MustacheStatement', function (assert) {
@@ -193,7 +186,7 @@ describe('ember-template-recast', function () {
         };
       });
 
-      assert.equal(code, '{{foo-bar}}');
+      expect(code).toEqual('{{foo-bar}}');
     });
 
     test('pushing new item on to empty hash pair on MustacheStatement works', function (
@@ -209,7 +202,7 @@ describe('ember-template-recast', function () {
         };
       });
 
-      assert.equal(code, '{{foo-bar hello="world"}}{{#baz}}Hello!{{/baz}}');
+      expect(code).toEqual('{{foo-bar hello="world"}}{{#baz}}Hello!{{/baz}}');
     });
   });
 
@@ -223,8 +216,7 @@ describe('ember-template-recast', function () {
       },
     }));
 
-    assert.equal(
-      code,
+    expect(code).toEqual(
       '{{foo-bar placeholder="Choose a \\"thing\\"..." p1="Choose a \\"thing\\"..."}}'
     );
   });

@@ -16,7 +16,7 @@ describe('"real life" smoke tests', function () {
         };
       });
 
-      assert.equal(code, expected);
+      expect(code).toEqual(expected);
     });
     test('preserves \\r\\n line endings', function (assert) {
       let template = `{{foo}}\r\n{{bar}}\r\n`;
@@ -31,7 +31,7 @@ describe('"real life" smoke tests', function () {
         };
       });
 
-      assert.equal(code, expected);
+      expect(code).toEqual(expected);
     });
 
     test('preserves \\n line endings', function (assert) {
@@ -47,7 +47,7 @@ describe('"real life" smoke tests', function () {
         };
       });
 
-      assert.equal(code, expected);
+      expect(code).toEqual(expected);
     });
   });
 
@@ -69,7 +69,7 @@ describe('"real life" smoke tests', function () {
         return {};
       });
 
-      assert.equal(code, template);
+      expect(code).toEqual(template);
     });
 
     test('with mutation inside component invocation with `else let` branches', function (
@@ -103,7 +103,7 @@ describe('"real life" smoke tests', function () {
         };
       });
 
-      assert.equal(code, expected);
+      expect(code).toEqual(expected);
     });
 
     test('with mutation inside component invocation with `else if` branches', function (
@@ -141,7 +141,7 @@ describe('"real life" smoke tests', function () {
         };
       });
 
-      assert.equal(code, expected);
+      expect(code).toEqual(expected);
     });
 
     test('with mutation inside `if`/`else if` branches', function (assert) {
@@ -177,7 +177,7 @@ describe('"real life" smoke tests', function () {
         };
       });
 
-      assert.equal(code, expected);
+      expect(code).toEqual(expected);
     });
   });
 
@@ -207,16 +207,13 @@ describe('"real life" smoke tests', function () {
         };
       });
 
-      assert.equal(
-        code,
-        stripIndent`
-          {{foo-bar-baz
-            unchanged="unchanged"
-            foo="baaaaar"
-            somethingnew=123
-          }}
-        `
-      );
+      expect(code).toEqual(stripIndent`
+        {{foo-bar-baz
+          unchanged="unchanged"
+          foo="baaaaar"
+          somethingnew=123
+        }}
+      `);
     });
 
     test('remove, change, add', function (assert) {
@@ -244,16 +241,13 @@ describe('"real life" smoke tests', function () {
         };
       });
 
-      assert.equal(
-        code,
-        stripIndent`
-          {{foo-bar-baz
-            unchanged="unchanged"
-            foo="baaaaar"
-            somethingnew=123
-          }}
-        `
-      );
+      expect(code).toEqual(stripIndent`
+        {{foo-bar-baz
+          unchanged="unchanged"
+          foo="baaaaar"
+          somethingnew=123
+        }}
+      `);
     });
   });
 
@@ -276,16 +270,13 @@ describe('"real life" smoke tests', function () {
         };
       });
 
-      assert.equal(
-        code,
-        stripIndent`
-          {{#foo-bar
-            prop="abc"
-            yetAnotherProp="xyz"
-          }}
-            Hello!
-          {{/foo-bar}}`
-      );
+      expect(code).toEqual(stripIndent`
+        {{#foo-bar
+          prop="abc"
+          yetAnotherProp="xyz"
+        }}
+          Hello!
+        {{/foo-bar}}`);
     });
 
     test('whitespace is preserved when mutating a positional param', function (assert) {
@@ -308,15 +299,12 @@ describe('"real life" smoke tests', function () {
           },
         };
       });
-      assert.equal(
-        code,
-        stripIndent`
-          {{some-helper this.positional}}
-          {{#block this.positional}}
-            empty
-          {{/block}}
-        `
-      );
+      expect(code).toEqual(stripIndent`
+        {{some-helper this.positional}}
+        {{#block this.positional}}
+          empty
+        {{/block}}
+      `);
     });
 
     test('Same-line removed hash pair from middle collapses excess whitespace', function (
@@ -336,15 +324,12 @@ describe('"real life" smoke tests', function () {
         };
       });
 
-      assert.equal(
-        code,
-        stripIndent`
-          {{#hello-world}}
-            {{#foo-bar prop="abc"  yetAnotherProp="xyz"}}
-              Hello!
-            {{/foo-bar}}
-          {{/hello-world}}`
-      );
+      expect(code).toEqual(stripIndent`
+        {{#hello-world}}
+          {{#foo-bar prop="abc"  yetAnotherProp="xyz"}}
+            Hello!
+          {{/foo-bar}}
+        {{/hello-world}}`);
     });
 
     test('Whitespace properly collapsed when the removed prop is last', function (assert) {
@@ -361,15 +346,12 @@ describe('"real life" smoke tests', function () {
           },
         };
       });
-      assert.equal(
-        code,
-        stripIndent`
-          {{#hello-world}}
-            {{#foo-bar prop="abc" yetAnotherProp="xyz"}}
-              Hello!
-            {{/foo-bar}}
-          {{/hello-world}}`
-      );
+      expect(code).toEqual(stripIndent`
+        {{#hello-world}}
+          {{#foo-bar prop="abc" yetAnotherProp="xyz"}}
+            Hello!
+          {{/foo-bar}}
+        {{/hello-world}}`);
     });
 
     test(
@@ -388,13 +370,10 @@ describe('"real life" smoke tests', function () {
           };
         });
 
-        assert.equal(
-          code,
-          stripIndent`
-            {{#hello-world}}
-              {{ foo-bar prop="abc" yetAnotherProp="xyz" }}
-            {{/hello-world}}`
-        );
+        expect(code).toEqual(stripIndent`
+          {{#hello-world}}
+            {{ foo-bar prop="abc" yetAnotherProp="xyz" }}
+          {{/hello-world}}`);
       }
     );
 
@@ -415,14 +394,10 @@ describe('"real life" smoke tests', function () {
           },
         };
       });
-      assert.equal(
-        code,
-        stripIndent`
-            {{#hello-world foo="foo" bar="bar" somethingNew="Hello world!" as |yieldedProp|}}
-              {{yieldedProp.something-something}}
-            {{/hello-world}}`,
-        'Code is updated with new hash, and whitespace on both sides is preserved'
-      );
+      expect(code).toEqual(stripIndent`
+          {{#hello-world foo="foo" bar="bar" somethingNew="Hello world!" as |yieldedProp|}}
+            {{yieldedProp.something-something}}
+          {{/hello-world}}`);
     });
   });
 
@@ -453,20 +428,17 @@ describe('"real life" smoke tests', function () {
         };
       });
 
-      assert.equal(
-        code,
-        stripIndent`
-          {{#if (a)}}
-            {{0}}
+      expect(code).toEqual(stripIndent`
+        {{#if (a)}}
+          {{0}}
 
-          {{/if}}
+        {{/if}}
 
-          {{#if (a)}}
-            {{1}}
+        {{#if (a)}}
+          {{1}}
 
-          {{/if}}
-        `
-      );
+        {{/if}}
+      `);
     });
 
     test('`if` branch containing whitespace controls', function (assert) {
@@ -490,7 +462,7 @@ describe('"real life" smoke tests', function () {
         };
       });
 
-      assert.equal(code, expected);
+      expect(code).toEqual(expected);
     });
 
     test('collapsing lines (full line replacment)', function (assert) {
@@ -511,7 +483,7 @@ describe('"real life" smoke tests', function () {
         };
       });
 
-      assert.equal(code, 'here is a single line string');
+      expect(code).toEqual('here is a single line string');
     });
 
     test('collapsing lines when start line has non-replaced content', function (assert) {
@@ -532,7 +504,7 @@ describe('"real life" smoke tests', function () {
         };
       });
 
-      assert.equal(code, '<div\n   data-foo={{baz}}></div>here is a single line string');
+      expect(code).toEqual('<div\n   data-foo={{baz}}></div>here is a single line string');
     });
 
     test('collapsing lines when end line has non-replaced content', function (assert) {
@@ -554,7 +526,7 @@ describe('"real life" smoke tests', function () {
         };
       });
 
-      assert.equal(code, 'here is a single line string<div\ndata-foo={{bar}}></div>');
+      expect(code).toEqual('here is a single line string<div\ndata-foo={{bar}}></div>');
     });
 
     test('collapsing lines when start and end lines have non-replaced content', function (
@@ -576,7 +548,7 @@ describe('"real life" smoke tests', function () {
         };
       });
 
-      assert.equal(code, '{{ foo }}here is a single line string{{ bar }}');
+      expect(code).toEqual('{{ foo }}here is a single line string{{ bar }}');
     });
 
     test('Can handle multi-line column expansion', function (assert) {
@@ -597,8 +569,7 @@ describe('"real life" smoke tests', function () {
         };
       });
 
-      assert.equal(
-        code,
+      expect(code).toEqual(
         `${Array(10).join('x')}<div data-foo="${Array(10).join('x')}"></div>${Array(10).join('x')}`
       );
     });
@@ -620,22 +591,19 @@ describe('"real life" smoke tests', function () {
         };
       });
 
-      assert.equal(
-        code,
-        stripIndent`
-          <br>
-          {{#if (a)}}
-            {{0}}
+      expect(code).toEqual(stripIndent`
+        <br>
+        {{#if (a)}}
+          {{0}}
 
-          {{/if}}
-          <div></div>
-          {{#if (a)}}
-            {{1}}
+        {{/if}}
+        <div></div>
+        {{#if (a)}}
+          {{1}}
 
-          {{/if}}
-          <hr>
-        `
-      );
+        {{/if}}
+        <hr>
+      `);
     });
   });
 
@@ -688,7 +656,7 @@ describe('"real life" smoke tests', function () {
 
       let { code } = transform(template, codemod);
 
-      assert.equal(code, `<FooBar @baz={{qux}} />`);
+      expect(code).toEqual(`<FooBar @baz={{qux}} />`);
     });
 
     test('preserves nested invocation whitespace', function (assert) {
@@ -701,15 +669,12 @@ describe('"real life" smoke tests', function () {
 
       let { code } = transform(template, codemod);
 
-      assert.equal(
-        code,
-        stripIndent`
-        <FooBar @baz={{something
-          goes=here
-          and=here
-        }} />
-      `
-      );
+      expect(code).toEqual(stripIndent`
+      <FooBar @baz={{something
+        goes=here
+        and=here
+      }} />
+    `);
     });
   });
 
@@ -754,7 +719,7 @@ describe('"real life" smoke tests', function () {
         };
       });
 
-      assert.equal(code, expected);
+      expect(code).toEqual(expected);
     }
   );
 
@@ -812,7 +777,7 @@ describe('"real life" smoke tests', function () {
       };
     });
 
-    assert.equal(code, expected);
+    expect(code).toEqual(expected);
   });
 
   test('mustache param slicing (GH #149)', function (assert) {
@@ -832,7 +797,7 @@ describe('"real life" smoke tests', function () {
       },
     }));
 
-    assert.equal(code, expected);
+    expect(code).toEqual(expected);
   });
 
   test('reusing existing hash preserves spacing', function (assert) {
@@ -855,6 +820,6 @@ describe('"real life" smoke tests', function () {
       };
     });
 
-    assert.equal(code, '<FooBar @query={{hash foo="baz"}} />');
+    expect(code).toEqual('<FooBar @query={{hash foo="baz"}} />');
   });
 });

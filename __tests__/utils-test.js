@@ -9,10 +9,7 @@ describe('utils', function () {
 
       let actual = [a, b].sort(sortByLoc);
 
-      assert.deepEqual(
-        actual.map((i) => i.key),
-        ['b', 'a']
-      );
+      expect(actual.map((i) => i.key)).toEqual(['b', 'a']);
     });
 
     test('sorts nodes by their line numbers', function (assert) {
@@ -22,10 +19,7 @@ describe('utils', function () {
 
       let actual = [b, a, c].sort(sortByLoc);
 
-      assert.deepEqual(
-        actual.map((i) => i.key),
-        ['a', 'c', 'b']
-      );
+      expect(actual.map((i) => i.key)).toEqual(['a', 'c', 'b']);
     });
 
     test('when start line matches, sorts by starting column', function (assert) {
@@ -35,10 +29,7 @@ describe('utils', function () {
 
       let actual = [b, a, c].sort(sortByLoc);
 
-      assert.deepEqual(
-        actual.map((i) => i.key),
-        ['a', 'c', 'b']
-      );
+      expect(actual.map((i) => i.key)).toEqual(['a', 'c', 'b']);
     });
   });
 });

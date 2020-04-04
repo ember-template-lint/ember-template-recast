@@ -34,15 +34,12 @@ describe('ember-template-recast executable', function ({ beforeEach, afterEach }
     return run(['files', '-c', '1'], this.fixture.path()).then(({ stdout }) => {
       const out = this.fixture.read();
 
-      assert.equal(
-        stdout,
-        `Processing 3 files…
+      expect(stdout).toEqual(`Processing 3 files…
 Spawning 1 worker…
 Ok:        2
-Unchanged: 1`
-      );
+Unchanged: 1`);
 
-      assert.deepEqual(out.files, {
+      expect(out.files).toEqual({
         'a.hbs': '{{wat-wat}}',
         'b.handlebars': '{{wat-wat}}',
         'unchanged.hbs': 'nothing to do',
@@ -54,15 +51,12 @@ Unchanged: 1`
     return run(['files', '-c', '1', '-d'], this.fixture.path()).then(({ stdout }) => {
       const out = this.fixture.read();
 
-      assert.equal(
-        stdout,
-        `Processing 3 files…
+      expect(stdout).toEqual(`Processing 3 files…
 Spawning 1 worker…
 Ok:        2
-Unchanged: 1`
-      );
+Unchanged: 1`);
 
-      assert.deepEqual(out.files, {
+      expect(out.files).toEqual({
         'a.hbs': '{{hello-world}}',
         'b.handlebars': '{{more-mustache foo=bar}}',
         'unchanged.hbs': `nothing to do`,
@@ -76,11 +70,8 @@ Unchanged: 1`
     });
 
     return run(['files', '-t', 'bad-transform.js'], this.fixture.path()).then(({ stdout }) => {
-      assert.ok(stdout.includes('Error: Unexpected identifier'), 'Output includes error message');
-      assert.ok(
-        stdout.includes(join(this.fixture.path(), 'bad-transform.js')),
-        'Output includes full path to transform'
-      );
+      expect(stdout.includes('Error: Unexpected identifier')).toBeTruthy();
+      expect(stdout.includes(join(this.fixture.path(), 'bad-transform.js'))).toBeTruthy();
     });
   });
 
@@ -94,16 +85,13 @@ Unchanged: 1`
     return run(['files', '-c', '1'], this.fixture.path()).then(({ stdout }) => {
       const out = this.fixture.read();
 
-      assert.ok(
-        stdout.includes(
-          `Processing 4 files…
+      expect(stdout.includes(
+        `Processing 4 files…
 Spawning 1 worker…
 Ok:        2
 Unchanged: 1
 Errored:   1`
-        ),
-        'Status message includes error count'
-      );
+      )).toBeTruthy();
 
       let badFilePath = slash(join(this.fixture.path(), 'files/bad-template.hbs'));
 
@@ -112,12 +100,9 @@ Errored:   1`
         message: `Expected output to include full path to the invalid template (${badFilePath}): \n\n${stdout}`,
       });
 
-      assert.ok(
-        stdout.includes('Error: Parse error on line 1:'),
-        'Output includes error stacktrace'
-      );
+      expect(stdout.includes('Error: Parse error on line 1:')).toBeTruthy();
 
-      assert.deepEqual(out.files, {
+      expect(out.files).toEqual({
         'a.hbs': '{{wat-wat}}',
         'b.handlebars': '{{wat-wat}}',
         'unchanged.hbs': `nothing to do`,
@@ -136,16 +121,13 @@ Errored:   1`
     });
 
     return run(['many-files', '-c', '4'], this.fixture.path()).then(({ stdout }) => {
-      assert.equal(
-        stdout,
-        `Processing 300 files…
+      expect(stdout).toEqual(`Processing 300 files…
 Spawning 4 workers…
 Ok:        300
-Unchanged: 0`
-      );
+Unchanged: 0`);
 
       const files = this.fixture.read();
-      assert.equal(files['many-files']['file199.hbs'], '{{wat-wat}}');
+      expect(files['many-files']['file199.hbs']).toEqual('{{wat-wat}}');
     });
   });
 });
