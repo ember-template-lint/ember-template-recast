@@ -24,14 +24,14 @@ function run(transformPath, filePath, options) {
   const plugin = typeof module.default === 'function' ? module.default : module;
 
   return readFile(filePath)
-    .then(contents => applyTransform(plugin, filePath, contents))
-    .then(output => writeFile(filePath, output, options))
-    .then(output => ({
+    .then((contents) => applyTransform(plugin, filePath, contents))
+    .then((output) => writeFile(filePath, output, options))
+    .then((output) => ({
       type: 'update',
       file: filePath,
       status: output.skipped ? 'skipped' : output.changed ? 'ok' : 'nochange',
     }))
-    .catch(err => ({
+    .catch((err) => ({
       type: 'error',
       file: filePath,
       error: err.stack,
@@ -93,7 +93,7 @@ function writeFile(filePath, output, options) {
   }
 
   return new Promise((resolve, reject) => {
-    fs.writeFile(filePath, source, 'utf8', err => {
+    fs.writeFile(filePath, source, 'utf8', (err) => {
       err ? reject(err) : resolve(output);
     });
   });

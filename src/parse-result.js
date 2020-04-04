@@ -279,7 +279,7 @@ module.exports = class ParseResult {
         }
 
         nodeInfo.hashSource = ast.hash.pairs
-          .map(pair => {
+          .map((pair) => {
             return this.print(pair);
           })
           .join(joinWith);
@@ -312,7 +312,7 @@ module.exports = class ParseResult {
         // values, reset to `' '`
         joinWith = ' ';
       }
-      nodeInfo.paramsSource = ast.params.map(param => this.print(param)).join(joinWith);
+      nodeInfo.paramsSource = ast.params.map((param) => this.print(param)).join(joinWith);
 
       if (nodeInfo.hadParams && ast.params.length === 0) {
         nodeInfo.postPathWhitespace = '';
@@ -335,7 +335,7 @@ module.exports = class ParseResult {
       return _print(_ast, {
         entityEncoding: 'raw',
 
-        override: ast => {
+        override: (ast) => {
           if (this.nodeInfo.has(ast)) {
             return this.print(ast);
           }
@@ -368,7 +368,7 @@ module.exports = class ParseResult {
           let bodySource = nodeInfo.source;
 
           if (dirtyFields.has('body')) {
-            bodySource = ast.body.map(node => this.print(node)).join('');
+            bodySource = ast.body.map((node) => this.print(node)).join('');
 
             dirtyFields.delete('body');
           }
@@ -421,7 +421,7 @@ module.exports = class ParseResult {
           }
 
           let openPartsSource = originalOpenParts
-            .map(part => this.sourceForLoc(part.loc))
+            .map((part) => this.sourceForLoc(part.loc))
             .join(joinOpenPartsWith);
 
           let postPartsWhitespace = '';
@@ -491,7 +491,7 @@ module.exports = class ParseResult {
           }
 
           if (dirtyFields.has('children')) {
-            childrenSource = ast.children.map(child => this.print(child)).join('');
+            childrenSource = ast.children.map((child) => this.print(child)).join('');
 
             if (selfClosing) {
               closeOpen = `>`;
@@ -517,7 +517,7 @@ module.exports = class ParseResult {
           ) {
             let openParts = [].concat(ast.attributes, ast.modifiers, ast.comments).sort(sortByLoc);
 
-            openPartsSource = openParts.map(part => this.print(part)).join(joinOpenPartsWith);
+            openPartsSource = openParts.map((part) => this.print(part)).join(joinOpenPartsWith);
 
             if (originalOpenParts.length === 0) {
               postTagWhitespace = ' ';
@@ -635,7 +635,7 @@ module.exports = class ParseResult {
           });
 
           if (dirtyFields.has('parts')) {
-            partsSource = ast.parts.map(part => this.print(part)).join('');
+            partsSource = ast.parts.map((part) => this.print(part)).join('');
 
             dirtyFields.delete('parts');
           }
@@ -802,7 +802,7 @@ module.exports = class ParseResult {
             }
 
             if (programDirtyFields.has('body')) {
-              programSource = ast.program.body.map(child => this.print(child)).join('');
+              programSource = ast.program.body.map((child) => this.print(child)).join('');
 
               programDirtyFields.delete('body');
             }
@@ -827,7 +827,7 @@ module.exports = class ParseResult {
                 inverseBody.wasChained = true;
                 inverseSource = this.print(inverseBody);
               } else {
-                inverseSource = ast.inverse.body.map(child => this.print(child)).join('');
+                inverseSource = ast.inverse.body.map((child) => this.print(child)).join('');
               }
 
               if (!hadInverse) {

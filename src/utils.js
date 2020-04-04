@@ -70,7 +70,7 @@ function sortByLoc(a, b) {
 
 function compact(array) {
   const newArray = [];
-  array.forEach(a => {
+  array.forEach((a) => {
     if (typeof a !== 'undefined' && a !== null && a !== '') {
       newArray.push(a);
     }

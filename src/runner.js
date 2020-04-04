@@ -160,10 +160,10 @@ function downloadFile(url) {
 
     let contents = '';
     transport
-      .get(url, res =>
-        res.on('data', data => (contents += data.toString())).on('end', () => resolve(contents))
+      .get(url, (res) =>
+        res.on('data', (data) => (contents += data.toString())).on('end', () => resolve(contents))
       )
-      .on('error', err => reject(err));
+      .on('error', (err) => reject(err));
   });
 }
 
@@ -214,7 +214,7 @@ async function spawnWorkers(transformPath, files, { cpus, dry }, stats, logger) 
   const pool = workerpool.pool(require.resolve('./worker.js'), { maxWorkers: cpus });
 
   let i = 0;
-  const worker = queue.async.asyncify(async file => {
+  const worker = queue.async.asyncify(async (file) => {
     const message = await pool.exec('run', [transformPath, file, { dry }]);
 
     stats.update(message);
