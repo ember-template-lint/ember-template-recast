@@ -29,13 +29,13 @@ jobs:
       run: yarn lint:js
 
   test:
-    name: Tests
-    runs-on: ${{ matrix.os }}
+    name: "Node ${{ matrix.node }}: ${{ matrix.os }}"
+    runs-on: "${{ matrix.os }}-latest"
 
     strategy:
       matrix:
         node: ['10', '12', '13']
-        os: [ubuntu-latest, windows-latest, macOS-latest]
+        os: [ubuntu, windows, macOS]
 
     steps:
     - uses: actions/checkout@v1
