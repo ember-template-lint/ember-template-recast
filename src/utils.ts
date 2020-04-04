@@ -1,18 +1,20 @@
 const reLines = /(.*?(?:\r\n?|\n|$))/gm;
 
-function sourceForLoc(source, loc) {
-  let sourceLines = Array.isArray(source) ? source : getLines(source);
+import type { AST } from '@glimmer/syntax';
 
+export function sourceForLoc(source: string | string[], loc?: AST.SourceLocation): string {
   if (!loc) {
-    return;
+    return '';
   }
 
-  let firstLine = loc.start.line - 1;
-  let lastLine = loc.end.line - 1;
+  let sourceLines = Array.isArray(source) ? source : getLines(source);
+
+  const firstLine = loc.start.line - 1;
+  const lastLine = loc.end.line - 1;
   let currentLine = firstLine - 1;
-  let firstColumn = loc.start.column;
-  let lastColumn = loc.end.column;
-  let string = [];
+  const firstColumn = loc.start.column;
+  const lastColumn = loc.end.column;
+  const string = [];
   let line;
 
   while (currentLine < lastLine) {
@@ -38,7 +40,7 @@ function sourceForLoc(source, loc) {
   return string.join('');
 }
 
-function isSynthetic(node) {
+export function isSynthetic(node: AST.Node): boolean {
   if (node && node.loc) {
     return node.loc.source === '(synthetic)';
   }
@@ -46,7 +48,7 @@ function isSynthetic(node) {
   return false;
 }
 
-function sortByLoc(a, b) {
+export function sortByLoc(a: AST.Node, b: AST.Node): -1 | 0 | 1 {
   // be conservative about the location where a new node is inserted
   if (isSynthetic(a) || isSynthetic(b)) {
     return 0;
@@ -67,8 +69,8 @@ function sortByLoc(a, b) {
   return 1;
 }
 
-function compact(array) {
-  const newArray = [];
+export function compact(array: unknown[]): unknown[] {
+  const newArray: unknown[] = [];
   array.forEach((a) => {
     if (typeof a !== 'undefined' && a !== null && a !== '') {
       newArray.push(a);
@@ -77,20 +79,16 @@ function compact(array) {
   return newArray;
 }
 
-function compactJoin(array, delimeter = '') {
+export function compactJoin(array: unknown[], delimeter = ''): string {
   return compact(array).join(delimeter);
 }
 
-function getLines(source) {
+export function getLines(source: string): string[] {
   let result = source.match(reLines);
+
+  if (!result) {
+    throw new Error('could not parse source');
+  }
 
   return result.slice(0, -1);
 }
-
-module.exports = {
-  sortByLoc,
-  compact,
-  compactJoin,
-  sourceForLoc,
-  getLines,
-};

@@ -1,6 +1,7 @@
-const { parse, sourceForLoc, transform } = require('..');
-const { sortByLoc } = require('../src/utils');
-const { stripIndent } = require('common-tags');
+import { parse, sourceForLoc, transform, builders, TransformPluginEnv } from '.';
+import { sortByLoc } from './utils';
+import type { AST, NodeVisitor } from '@glimmer/syntax';
+import { stripIndent } from 'common-tags';
 
 describe('"real life" smoke tests', function () {
   describe('line endings', function () {
@@ -12,7 +13,8 @@ describe('"real life" smoke tests', function () {
       let { code } = transform(template, () => {
         return {
           MustacheStatement(node) {
-            node.path.original = node.path.original.split('').reverse().join('');
+            let path = node.path as AST.PathExpression;
+            path.original = path.original.split('').reverse().join('');
           },
         };
       });
@@ -27,7 +29,9 @@ describe('"real life" smoke tests', function () {
       let { code } = transform(template, () => {
         return {
           MustacheStatement(node) {
-            node.path.original = node.path.original.split('').reverse().join('');
+            let path = node.path as AST.PathExpression;
+
+            path.original = path.original.split('').reverse().join('');
           },
         };
       });
@@ -43,7 +47,9 @@ describe('"real life" smoke tests', function () {
       let { code } = transform(template, () => {
         return {
           MustacheStatement(node) {
-            node.path.original = node.path.original.split('').reverse().join('');
+            let path = node.path as AST.PathExpression;
+
+            path.original = path.original.split('').reverse().join('');
           },
         };
       });
@@ -97,7 +103,8 @@ describe('"real life" smoke tests', function () {
       let { code } = transform(template, () => {
         return {
           MustacheStatement(node) {
-            node.path.original = node.path.original.split('').reverse().join('');
+            let path = node.path as AST.PathExpression;
+            path.original = path.original.split('').reverse().join('');
           },
         };
       });
@@ -133,7 +140,8 @@ describe('"real life" smoke tests', function () {
       let { code } = transform(template, () => {
         return {
           MustacheStatement(node) {
-            node.path.original = node.path.original.split('').reverse().join('');
+            let path = node.path as AST.PathExpression;
+            path.original = path.original.split('').reverse().join('');
           },
         };
       });
@@ -169,7 +177,9 @@ describe('"real life" smoke tests', function () {
       let { code } = transform(template, () => {
         return {
           MustacheStatement(node) {
-            node.path.original = node.path.original.split('').reverse().join('');
+            let path = node.path as AST.PathExpression;
+
+            path.original = path.original.split('').reverse().join('');
           },
         };
       });
@@ -396,7 +406,7 @@ describe('"real life" smoke tests', function () {
 
     beforeEach(() => (i = 0));
 
-    function funkyIf(b) {
+    function funkyIf(b: typeof builders) {
       return b.block(
         'if',
         [b.sexpr(b.path('a'))],
@@ -449,7 +459,9 @@ describe('"real life" smoke tests', function () {
       let { code } = transform(template, () => {
         return {
           MustacheStatement(node) {
-            node.path.original = node.path.original.split('').reverse().join('');
+            let path = node.path as AST.PathExpression;
+
+            path.original = path.original.split('').reverse().join('');
           },
         };
       });
@@ -598,18 +610,19 @@ describe('"real life" smoke tests', function () {
   });
 
   describe('angle-bracket-codemod mockup', function () {
-    function isComponent(node) {
-      return ['foo-bar'].includes(node.path.original);
+    function isComponent(node: AST.MustacheStatement) {
+      let path = node.path as AST.PathExpression;
+      return ['foo-bar'].includes(path.original);
     }
 
-    function transformTagName(key) {
+    function transformTagName(key: string) {
       return key
         .split('-')
         .map((text) => text[0].toUpperCase() + text.slice(1))
         .join('');
     }
 
-    function codemod(env) {
+    function codemod(env: TransformPluginEnv): NodeVisitor {
       let b = env.syntax.builders;
 
       return {
@@ -618,7 +631,8 @@ describe('"real life" smoke tests', function () {
             return;
           }
 
-          let tagName = transformTagName(node.path.original);
+          let path = node.path as AST.PathExpression;
+          let tagName = transformTagName(path.original);
 
           return b.element(
             { name: tagName, selfClosing: true },
@@ -627,8 +641,8 @@ describe('"real life" smoke tests', function () {
                 let value = b.mustache(pair.value);
 
                 if (pair.value.type === 'SubExpression') {
-                  pair.value.type = 'MustacheStatement';
-                  value = pair.value;
+                  value = pair.value as any;
+                  value.type = 'MustacheStatement';
                 }
 
                 return b.attr(`@${pair.key}`, value);
@@ -640,9 +654,7 @@ describe('"real life" smoke tests', function () {
     }
 
     test('works for simple mustache', function () {
-      let template = stripIndent`
-        {{foo-bar baz=qux}}
-      `;
+      let template = `{{foo-bar baz=qux}}`;
 
       let { code } = transform(template, codemod);
 
@@ -650,21 +662,11 @@ describe('"real life" smoke tests', function () {
     });
 
     test('preserves nested invocation whitespace', function () {
-      let template = stripIndent`
-        {{foo-bar baz=(something
-          goes=here
-          and=here
-        )}}
-      `;
+      let template = `{{foo-bar baz=(something\n  goes=here\n  and=here\n)}}`;
 
       let { code } = transform(template, codemod);
 
-      expect(code).toEqual(stripIndent`
-      <FooBar @baz={{something
-        goes=here
-        and=here
-      }} />
-    `);
+      expect(code).toEqual(`<FooBar @baz={{something\n  goes=here\n  and=here\n}} />`);
     });
   });
 
@@ -700,8 +702,10 @@ describe('"real life" smoke tests', function () {
     let { code } = transform(template, () => {
       return {
         MustacheStatement(node) {
-          if (node.path.original === 'foo') {
-            node.path.original = 'oof';
+          let path = node.path as AST.PathExpression;
+
+          if (path.original === 'foo') {
+            path.original = 'oof';
           }
         },
       };
@@ -752,11 +756,13 @@ describe('"real life" smoke tests', function () {
     let { code } = transform(template, () => {
       return {
         MustacheStatement(node) {
-          if (node.path.original === 'foo') {
-            node.path.original = 'oof';
+          let path = node.path as AST.PathExpression;
+
+          if (path.original === 'foo') {
+            path.original = 'oof';
           }
-          if (node.path.original === 'quack') {
-            node.path.original = 'honk';
+          if (path.original === 'quack') {
+            path.original = 'honk';
           }
         },
       };
@@ -793,12 +799,12 @@ describe('"real life" smoke tests', function () {
 
       return {
         MustacheStatement(node) {
-          if (node.path && node.path.original === 'foo-bar') {
+          if (node.path.type === 'PathExpression' && node.path.original === 'foo-bar') {
             let models = node.params.slice();
-            let _qpParam = b.attr(
-              '@query',
-              b.mustache(b.path('hash'), [], models[models.length - 1].hash)
-            );
+
+            let lastParam = models[models.length - 1] as AST.SubExpression;
+
+            let _qpParam = b.attr('@query', b.mustache(b.path('hash'), [], lastParam.hash));
             return b.element({ name: 'FooBar', selfClosing: true }, { attrs: [_qpParam] });
           }
         },
@@ -809,7 +815,7 @@ describe('"real life" smoke tests', function () {
   });
 
   describe('can modify attribute indentation', function () {
-    function attributeIndentationFixer(env) {
+    function attributeIndentationFixer(env: TransformPluginEnv): NodeVisitor {
       const template = env.contents;
       const seen = new WeakSet();
 

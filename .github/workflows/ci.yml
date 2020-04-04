@@ -21,12 +21,10 @@ jobs:
     - uses: actions/setup-node@v1
       with:
         node-version: 12.x
-    - name: install yarn
-      run: npm install -g yarn
     - name: install dependencies
       run: yarn install
     - name: linting
-      run: yarn lint:js
+      run: yarn lint
 
   test:
     name: "Node ${{ matrix.node }}: ${{ matrix.os }}"
@@ -42,10 +40,10 @@ jobs:
     - uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node }}
-    - name: install dependencies
-      run: yarn install
+    - run: yarn install
+    - run: yarn build
     - name: test
-      run: yarn test
+      run: yarn npm-run-all test:*
 
   floating-test:
     name: Floating dependencies
@@ -56,9 +54,7 @@ jobs:
     - uses: actions/setup-node@v1
       with:
         node-version: '12.x'
-    - name: install yarn
-      run: npm install -g yarn
-    - name: install dependencies
-      run: yarn install --no-lockfile
+    - run: yarn install --no-lockfile
+    - run: yarn build
     - name: test
-      run: yarn test
+      run: yarn test:jest
