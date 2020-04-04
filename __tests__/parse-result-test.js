@@ -196,16 +196,12 @@ describe('ember-template-recast', function () {
 
     test('adding attribute to ElementNode with block params (extra whitespace)', function (
     ) {
-      let template = stripIndent`<Foo as |
-        bar
-          |></Foo>`;
+      let template = `<Foo as |\nbar\n  |></Foo>`;
 
       let ast = parse(template);
       ast.body[0].attributes.push(builders.attr('data-test', builders.string('wheee')));
 
-      expect(print(ast)).toEqual(stripIndent`<Foo data-test="wheee" as |
-      bar
-        |></Foo>`);
+      expect(print(ast)).toEqual(`<Foo data-test="wheee" as |\nbar\n  |></Foo>`);
     });
 
     test('adding boolean attribute to ElementNode', function () {
