@@ -141,6 +141,15 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '<Qux />');
     });
 
+    QUnit.test('Convert self-closing element with attributes to block element', function(assert) {
+      let ast = parse('<Foo bar="baz" />');
+
+      ast.body[0].tag = 'Qux';
+      ast.body[0].children = [builders.text('bay')];
+
+      assert.equal(print(ast), '<Qux bar="baz">bay</Qux>');
+    });
+
     QUnit.test('adding attribute when none originally existed', function(assert) {
       let template = stripIndent`
       <div></div>`;
