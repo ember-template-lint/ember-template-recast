@@ -141,6 +141,45 @@ QUnit.module('ember-template-recast', function() {
       assert.equal(print(ast), '<Qux />');
     });
 
+    QUnit.test(
+      'Rename tag and convert from self-closing with attributes to block element',
+      function(assert) {
+        let ast = parse('<Foo bar="baz" />');
+
+        ast.body[0].tag = 'Qux';
+        ast.body[0].children = [builders.text('bay')];
+
+        assert.equal(print(ast), '<Qux bar="baz">bay</Qux>');
+      }
+    );
+
+    QUnit.test('convert from self-closing with attributes to block element', function(assert) {
+      let ast = parse('<Foo bar="baz" />');
+
+      ast.body[0].children = [builders.text('bay')];
+
+      assert.equal(print(ast), '<Foo bar="baz">bay</Foo>');
+    });
+
+    QUnit.test(
+      'convert from self-closing with specially spaced attributes to block element',
+      function(assert) {
+        let ast = parse('<Foo\n  bar="baz"\n />');
+
+        ast.body[0].children = [builders.text('bay')];
+
+        assert.equal(print(ast), '<Foo\n  bar="baz"\n >bay</Foo>');
+      }
+    );
+
+    QUnit.test('Convert self-closing element with modifiers block element', function(assert) {
+      let ast = parse('<Foo {{on "click" this.doSomething}} />');
+
+      ast.body[0].children = [builders.text('bay')];
+
+      assert.equal(print(ast), '<Foo {{on "click" this.doSomething}}>bay</Foo>');
+    });
+
     QUnit.test('adding attribute when none originally existed', function(assert) {
       let template = stripIndent`
       <div></div>`;

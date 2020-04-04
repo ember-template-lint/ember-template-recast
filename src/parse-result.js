@@ -495,9 +495,16 @@ module.exports = class ParseResult {
 
             if (selfClosing) {
               closeOpen = `>`;
-              postTagWhitespace = '';
               closeSource = `</${ast.tag}>`;
               ast.selfClosing = false;
+
+              if (originalOpenParts.length === 0 && postTagWhitespace === ' ') {
+                postTagWhitespace = '';
+              }
+
+              if (originalOpenParts.length > 0 && postPartsWhitespace === ' ') {
+                postPartsWhitespace = '';
+              }
             }
 
             dirtyFields.delete('children');
