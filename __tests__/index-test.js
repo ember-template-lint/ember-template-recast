@@ -2,25 +2,25 @@ const { parse, print, transform } = require('..');
 const { builders } = require('@glimmer/syntax');
 const { stripIndent } = require('common-tags');
 
-QUnit.module('ember-template-recast', function () {
-  QUnit.test('basic parse + print (no modification)', function (assert) {
+describe('ember-template-recast', function () {
+  test('basic parse + print (no modification)', function () {
     let template = stripIndent`
       {{foo-bar
         baz="stuff"
       }}`;
     let ast = parse(template);
 
-    assert.equal(print(ast), template);
+    expect(print(ast)).toEqual(template);
   });
 
-  QUnit.test('basic parse + print (no modification): void elements', function (assert) {
+  test('basic parse + print (no modification): void elements', function () {
     let template = `<br><p>Hi!</p>`;
     let ast = parse(template);
 
-    assert.equal(print(ast), template);
+    expect(print(ast)).toEqual(template);
   });
 
-  QUnit.test('basic parse + print (no modification) preserves blank lines', function (assert) {
+  test('basic parse + print (no modification) preserves blank lines', function () {
     let template = stripIndent`
       {{foo-bar
         baz="stuff"
@@ -30,10 +30,10 @@ QUnit.module('ember-template-recast', function () {
 `;
     let ast = parse(template);
 
-    assert.equal(print(ast), template);
+    expect(print(ast)).toEqual(template);
   });
 
-  QUnit.test('basic parse -> mutation -> print', function (assert) {
+  test('basic parse -> mutation -> print', function () {
     let template = stripIndent`
       {{foo-bar
         baz="stuff"
@@ -42,26 +42,23 @@ QUnit.module('ember-template-recast', function () {
     let ast = parse(template);
     ast.body[0].hash.pairs[0].key = 'derp';
 
-    assert.equal(
-      print(ast),
-      stripIndent`
-        {{foo-bar
-          derp="stuff"
-          other='single quote'
-        }}`
-    );
+    expect(print(ast)).toEqual(stripIndent`
+      {{foo-bar
+        derp="stuff"
+        other='single quote'
+      }}`);
   });
 
-  QUnit.test('basic parse -> mutation -> print: preserves HTML entities', function (assert) {
+  test('basic parse -> mutation -> print: preserves HTML entities', function () {
     let template = stripIndent`<div>&nbsp;</div>`;
     let ast = parse(template);
     ast.body[0].children.push(builders.text('derp&nbsp;'));
 
-    assert.equal(print(ast), stripIndent`<div>&nbsp;derp&nbsp;</div>`);
+    expect(print(ast)).toEqual(stripIndent`<div>&nbsp;derp&nbsp;</div>`);
   });
 
-  QUnit.module('transform', () => {
-    QUnit.test('basic traversal', function (assert) {
+  describe('transform', () => {
+    test('basic traversal', function () {
       let template = '{{foo-bar bar=foo}}';
       let paths = [];
       transform(template, function () {
@@ -72,10 +69,10 @@ QUnit.module('ember-template-recast', function () {
         };
       });
 
-      assert.deepEqual(paths, ['foo-bar', 'foo']);
+      expect(paths).toEqual(['foo-bar', 'foo']);
     });
 
-    QUnit.test('can handle comment append before html node case', function (assert) {
+    test('can handle comment append before html node case', function () {
       let template = '<table></table>';
       let seen = new Set();
 
@@ -98,13 +95,12 @@ QUnit.module('ember-template-recast', function () {
         };
       });
 
-      assert.deepEqual(
-        result.code,
+      expect(result.code).toEqual(
         ['{{!-- template-lint-disable no-table-tag --}}', '<table></table>'].join('\n')
       );
     });
 
-    QUnit.test('can handle comment append between html + newline', function (assert) {
+    test('can handle comment append between html + newline', function () {
       let template = ['\n', '<table>', '<tbody></tbody>', '</table>'].join('\n');
       let seen = new Set();
 
@@ -127,8 +123,7 @@ QUnit.module('ember-template-recast', function () {
         };
       });
 
-      assert.deepEqual(
-        result.code,
+      expect(result.code).toEqual(
         [
           '\n',
           '{{!-- template-lint-disable no-table-tag --}}',
@@ -139,7 +134,7 @@ QUnit.module('ember-template-recast', function () {
       );
     });
 
-    QUnit.test('can accept an AST', function (assert) {
+    test('can accept an AST', function () {
       let template = '{{foo-bar bar=foo}}';
       let paths = [];
       let ast = parse(template);
@@ -151,10 +146,10 @@ QUnit.module('ember-template-recast', function () {
         };
       });
 
-      assert.deepEqual(paths, ['foo-bar', 'foo']);
+      expect(paths).toEqual(['foo-bar', 'foo']);
     });
 
-    QUnit.test('returns code and ast', function (assert) {
+    test('returns code and ast', function () {
       let template = '{{foo-bar}}';
       let paths = [];
       let { ast, code } = transform(template, function () {
@@ -165,11 +160,11 @@ QUnit.module('ember-template-recast', function () {
         };
       });
 
-      assert.ok(ast);
-      assert.ok(code);
+      expect(ast).toBeTruthy();
+      expect(code).toBeTruthy();
     });
 
-    QUnit.test('replacement', function (assert) {
+    test('replacement', function () {
       let template = '{{foo-bar bar=foo}}';
       let { code } = transform(template, (env) => {
         let { builders: b } = env.syntax;
@@ -180,10 +175,10 @@ QUnit.module('ember-template-recast', function () {
         };
       });
 
-      assert.equal(code, '{{wat-wat}}');
+      expect(code).toEqual('{{wat-wat}}');
     });
 
-    QUnit.test('removing the only hash pair on MustacheStatement', function (assert) {
+    test('removing the only hash pair on MustacheStatement', function () {
       let template = '{{foo-bar hello="world"}}';
       let { code } = transform(template, () => {
         return {
@@ -193,12 +188,10 @@ QUnit.module('ember-template-recast', function () {
         };
       });
 
-      assert.equal(code, '{{foo-bar}}');
+      expect(code).toEqual('{{foo-bar}}');
     });
 
-    QUnit.test('pushing new item on to empty hash pair on MustacheStatement works', function (
-      assert
-    ) {
+    test('pushing new item on to empty hash pair on MustacheStatement works', function () {
       let template = '{{foo-bar}}{{#baz}}Hello!{{/baz}}';
       let { code } = transform(template, (env) => {
         let { builders: b } = env.syntax;
@@ -209,11 +202,11 @@ QUnit.module('ember-template-recast', function () {
         };
       });
 
-      assert.equal(code, '{{foo-bar hello="world"}}{{#baz}}Hello!{{/baz}}');
+      expect(code).toEqual('{{foo-bar hello="world"}}{{#baz}}Hello!{{/baz}}');
     });
   });
 
-  QUnit.test('Build string from escaped string', function (assert) {
+  test('Build string from escaped string', function () {
     let template = '{{foo-bar placeholder="Choose a \\"thing\\"..."}}';
 
     let { code } = transform(template, (env) => ({
@@ -223,8 +216,7 @@ QUnit.module('ember-template-recast', function () {
       },
     }));
 
-    assert.equal(
-      code,
+    expect(code).toEqual(
       '{{foo-bar placeholder="Choose a \\"thing\\"..." p1="Choose a \\"thing\\"..."}}'
     );
   });

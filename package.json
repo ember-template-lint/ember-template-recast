@@ -25,7 +25,7 @@
     "changelog": "lerna-changelog",
     "lint:js": "eslint .",
     "release": "release-it",
-    "test": "qunit tests/**/*-test.js"
+    "test": "jest"
   },
   "dependencies": {
     "@glimmer/syntax": "^0.50.0",
@@ -46,9 +46,9 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^3.1.2",
     "execa": "^4.0.0",
+    "jest": "^25.2.7",
     "lerna-changelog": "^1.0.1",
     "prettier": "^2.0.2",
-    "qunit": "^2.9.3",
     "release-it": "^13.5.1",
     "release-it-lerna-changelog": "^2.1.2"
   },
