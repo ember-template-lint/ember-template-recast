@@ -116,3 +116,36 @@ module.exports = function({ source, path }, { parse, visit }) {
   });
 };
 ```
+
+## SemVer Policy
+
+Due to usage of TypeScript and bundling external APIs this project has somewhat
+unique SemVer commitments. A high level summary is:
+
+### Major Version
+
+The following are scenarios that would cause a major version (aka breaking change) release:
+
+* Dropping support for Node versions (e.g. dropping Node 10 support)
+* Non-additive changes to the underlying AST (which we bundle from `@glimmer/syntax`)
+* Breaking changes to the `@glimmer/syntax` builder APIs
+
+### Minor Version
+
+The following are scenarios that would cause a minor version (aka new feature) release:
+
+* Changes to TypeScript version used internally by `ember-template-recast`
+* Changes to make the types used by `ember-template-recast` to be more accurate
+  (e.g. narrowing / broadening of previously published types).
+* Adding new features
+
+### Patch Version
+
+The following are scenarios that would cause a patch release:
+
+* Bug fixes to internal re-writing logic
+* Bug fix releases of `@glimmer/syntax`
+
+## License
+
+This project is distributed under the MIT license, see [LICENSE](./LICENSE) for details.
