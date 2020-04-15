@@ -1,3 +1,15 @@
+## v4.1.3 (2020-04-15)
+
+#### :bug: Bug Fix
+* [#264](https://github.com/ember-template-lint/ember-template-recast/pull/264) Update to @glimmer/syntax@0.50.3. ([@rwjblue](https://github.com/rwjblue))
+
+#### :house: Internal
+* [#254](https://github.com/ember-template-lint/ember-template-recast/pull/254) Add prettier style autofix test. ([@rwjblue](https://github.com/rwjblue))
+* [#253](https://github.com/ember-template-lint/ember-template-recast/pull/253) Rewrite tests to use Jest (from QUnit). ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 1
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+
 ## v4.1.2 (2020-04-04)
 
 #### :bug: Bug Fix
