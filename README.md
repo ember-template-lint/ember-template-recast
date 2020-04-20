@@ -66,7 +66,7 @@ export interface Syntax {
 ```
 
 The list of known builders on the `env.syntax.builders` are [found
-here](https://github.com/glimmerjs/glimmer-vm/blob/master/packages/@glimmer/syntax/lib/builders.ts#L308-L337)
+here](https://github.com/glimmerjs/glimmer-vm/blob/f765e14a86500bb5cdc1edc90297e7150ed8b44d/packages/%40glimmer/syntax/lib/builders.ts#L547-L578).
 
 Example:
 ```js
