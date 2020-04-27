@@ -277,30 +277,30 @@
   resolved "https://registry.yarnpkg.com/@glimmer/env/-/env-0.1.7.tgz#fd2d2b55a9029c6b37a6c935e8c8871ae70dfa07"
   integrity sha1-/S0rVakCnGs3psk16MiHGucN+gc=
 
-"@glimmer/interfaces@^0.50.4":
-  version "0.50.4"
-  resolved "https://registry.yarnpkg.com/@glimmer/interfaces/-/interfaces-0.50.4.tgz#b92c92bce4afb2488f1335a2ac095c686d96812c"
-  integrity sha512-Unca/P41yhOTK9EVSoFdnKoAs5IY2NbXrBEhXhD5E+Sp76pux+4YknxD+sOuAynaxAcarUcj37u95ZO8TGGC1w==
+"@glimmer/interfaces@^0.51.1":
+  version "0.51.1"
+  resolved "https://registry.yarnpkg.com/@glimmer/interfaces/-/interfaces-0.51.1.tgz#c5637669ff83c630d91c700598b9963225d656f2"
+  integrity sha512-ImwkFNj92RaeANQPlnSQ5kTtK18JzkY2FPE7N7Ktn3AvdXgM4P3puQzPuXhTn4UCBl6NZtN8YqCAy7kQ6eRC0w==
   dependencies:
     "@simple-dom/interface" "^1.4.0"
 
-"@glimmer/syntax@^0.50.4":
-  version "0.50.4"
-  resolved "https://registry.yarnpkg.com/@glimmer/syntax/-/syntax-0.50.4.tgz#974c7d98f281d688d02c456bb774099a4a48480b"
-  integrity sha512-LcxISf0Qs2uiSnKCflmkJIDkNreo72fKcfq3JfkGsIU3w4wWjr1rHVA17xWKSljCyb9NeFXGlzxu7/rwh8EApA==
+"@glimmer/syntax@^0.51.1":
+  version "0.51.1"
+  resolved "https://registry.yarnpkg.com/@glimmer/syntax/-/syntax-0.51.1.tgz#24cb4f01693bd934075d03087bdc76ab6bff0524"
+  integrity sha512-z5XSbLgMKGU8tgSm9Ju4mimSAJ6/SZrY2Xw2znEAmUJOIPte+tmkdpggpgj7lAjD5u2YVBVHDbz6RaZDhYASsw==
   dependencies:
-    "@glimmer/interfaces" "^0.50.4"
-    "@glimmer/util" "^0.50.4"
+    "@glimmer/interfaces" "^0.51.1"
+    "@glimmer/util" "^0.51.1"
     handlebars "^4.7.4"
     simple-html-tokenizer "^0.5.9"
 
-"@glimmer/util@^0.50.4":
-  version "0.50.4"
-  resolved "https://registry.yarnpkg.com/@glimmer/util/-/util-0.50.4.tgz#94a6a6a049c5c8af6e88f951d94a27d200700278"
-  integrity sha512-lKKGe5rbuSHRPBp4JdSyOVW4AvU/LONEtxuGsSVh0KltSR8zuEYPBjLIwe54g4Gumj9om5yg6zC/WNozKOjdzA==
+"@glimmer/util@^0.51.1":
+  version "0.51.1"
+  resolved "https://registry.yarnpkg.com/@glimmer/util/-/util-0.51.1.tgz#db27afd2ee7191e8e399c272b9f7fbe05cc26691"
+  integrity sha512-MCwUvV3z4pqLpeXcv5Mbchdgw0GeEPH8jUEkUTG837b5XlC2M/NO893E5A8AZbGNSP7CDsYibDExz7mjaLqq/A==
   dependencies:
     "@glimmer/env" "0.1.7"
-    "@glimmer/interfaces" "^0.50.4"
+    "@glimmer/interfaces" "^0.51.1"
     "@simple-dom/interface" "^1.4.0"
 
 "@iarna/toml@2.2.4":
@@ -591,14 +591,7 @@
     "@octokit/plugin-request-log" "^1.0.0"
     "@octokit/plugin-rest-endpoint-methods" "3.7.1"
 
-"@octokit/types@^2.0.0", "@octokit/types@^2.8.2":
-  version "2.9.0"
-  resolved "https://registry.yarnpkg.com/@octokit/types/-/types-2.9.0.tgz#b3b69cddab629dd31a559ffb25c9f471301d7538"
-  integrity sha512-IzptUpoDsFlXF+AOys+KnfItIVY3EK+eH9Akv+lJYELnMSGkJnIcClt6Cm0QRR4ecsUTsmFJWn10iFgJ9BQqIQ==
-  dependencies:
-    "@types/node" ">= 8"
-
-"@octokit/types@^2.11.1", "@octokit/types@^2.9.0":
+"@octokit/types@^2.0.0", "@octokit/types@^2.11.1", "@octokit/types@^2.8.2", "@octokit/types@^2.9.0":
   version "2.11.1"
   resolved "https://registry.yarnpkg.com/@octokit/types/-/types-2.11.1.tgz#bd5b059596b42845be3f8e66065667aff8c8bf8b"
   integrity sha512-QaLoLkmFdfoNbk3eOzPv7vKrUY0nRJIYmZDoz/pTer4ICpqu80aSQTVHnnUxEFuURCiidig76CcxUOYC/bY3RQ==
@@ -4968,14 +4961,7 @@ resolve@1.1.7:
   resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.1.7.tgz#203114d82ad2c5ed9e8e0411b3932875e889e97b"
   integrity sha1-IDEU2CrSxe2ejgQRs5ModeiJ6Xs=
 
-resolve@^1.1.6, resolve@^1.10.1, resolve@^1.15.1, resolve@^1.3.2:
-  version "1.15.1"
-  resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.15.1.tgz#27bdcdeffeaf2d6244b95bb0f9f4b4653451f3e8"
-  integrity sha512-84oo6ZTtoTUpjgNEr5SJyzQhzL72gaRodsSfyxC/AXRvwu0Yse9H8eF9IpGo7b8YetZhlI6v7ZQ6bKBFV/6S7w==
-  dependencies:
-    path-parse "^1.0.6"
-
-resolve@^1.10.0:
+resolve@^1.1.6, resolve@^1.10.0, resolve@^1.10.1, resolve@^1.15.1, resolve@^1.3.2:
   version "1.16.1"
   resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.16.1.tgz#49fac5d8bacf1fd53f200fa51247ae736175832c"
   integrity sha512-rmAglCSqWWMrrBv/XM6sW0NuRFiKViw/W4d9EbC4pt+49H8JwHy+mcGmALTEg504AUDcLTvb1T2q3E9AnmY+ig==
