@@ -687,6 +687,23 @@ describe('ember-template-recast', function () {
           here=false
         }}`);
     });
+
+    test('creating new MustacheStatement with single param has correct whitespace', function () {
+      let ast = parse('');
+
+      ast.body.push(builders.mustache('foo', [builders.string('hi')]));
+
+      expect(print(ast)).toEqual(`{{foo "hi"}}`);
+    });
+
+    test('copying params and hash from a sub expression into a new MustacheStatement has correct whitespace', function () {
+      let ast = parse('{{some-helper (foo "hi")}}');
+
+      let [sexpr] = ast.body[0].params;
+      ast.body.push(builders.mustache(sexpr.path, sexpr.params, sexpr.hash));
+
+      expect(print(ast)).toEqual(`{{some-helper (foo "hi")}}{{foo "hi"}}`);
+    });
   });
 
   describe('SubExpression', function () {
