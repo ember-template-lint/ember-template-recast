@@ -1,3 +1,12 @@
+## v4.1.4 (2020-04-27)
+
+#### :bug: Bug Fix
+* [#279](https://github.com/ember-template-lint/ember-template-recast/pull/279) Ensure reusing an empty hash does not add extraneous whitespace ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 2
+- Patrick Berkeley ([@patrickberkeley](https://github.com/patrickberkeley))
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+
 ## v4.1.3 (2020-04-15)
 
 #### :bug: Bug Fix
