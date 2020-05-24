@@ -49,6 +49,24 @@ describe('ember-template-recast', function () {
       }}`);
   });
 
+  test('basic parse -> mutation: element attribute value -> print', function () {
+    let template = stripIndent`
+      <div class="foo" ...attributes></div>
+    `;
+    let ast = parse(template);
+    let b = builders;
+    let node = ast.body[0];
+    let { attributes } = node;
+    let classAttribute = attributes.find(({ name }) => name === 'class');
+    let index = attributes.indexOf(classAttribute);
+    attributes[index] = b.attr('class', b.text('bar'));
+
+    expect(print(ast)).toEqual(stripIndent`
+      <div class="bar" ...attributes></div>
+    `);
+  });
+
+
   test('basic parse -> mutation -> print: preserves HTML entities', function () {
     let template = stripIndent`<div>&nbsp;</div>`;
     let ast = parse(template);
