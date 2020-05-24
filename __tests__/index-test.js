@@ -66,7 +66,6 @@ describe('ember-template-recast', function () {
     `);
   });
 
-
   test('basic parse -> mutation -> print: preserves HTML entities', function () {
     let template = stripIndent`<div>&nbsp;</div>`;
     let ast = parse(template);
