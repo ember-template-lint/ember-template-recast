@@ -6,13 +6,13 @@ const PARSE_RESULT_FOR = new WeakMap();
 function parse(template) {
   let result = new ParseResult(template);
 
-  PARSE_RESULT_FOR.set(result.ast, result);
+  PARSE_RESULT_FOR.set(result.ast.body, result);
 
   return result.ast;
 }
 
 function print(ast) {
-  let parseResult = PARSE_RESULT_FOR.get(ast);
+  let parseResult = PARSE_RESULT_FOR.get(ast.body);
   return parseResult.print();
 }
 
