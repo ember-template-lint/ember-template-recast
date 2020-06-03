@@ -2,19 +2,12 @@ module.exports = {
   root: true,
   parserOptions: {
     ecmaVersion: 2017,
-    sourceType: 'script'
+    sourceType: 'script',
   },
-  plugins: [
-    'prettier',
-    'node',
-  ],
-  extends: [
-    'eslint:recommended',
-    'plugin:node/recommended',
-    'prettier',
-  ],
+  plugins: ['prettier', 'node'],
+  extends: ['eslint:recommended', 'plugin:node/recommended', 'prettier'],
   env: {
-    node: true
+    node: true,
   },
   rules: {
     'prettier/prettier': 'error',
@@ -25,8 +18,8 @@ module.exports = {
       files: ['__tests__/**'],
 
       env: {
-        jest: true
-      }
-    }
-  ]
+        jest: true,
+      },
+    },
+  ],
 };
