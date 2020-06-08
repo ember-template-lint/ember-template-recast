@@ -498,6 +498,26 @@ describe('ember-template-recast', function () {
         <Foo></Foo>
       `);
     });
+
+    test('adding a new attribute to an ElementNode while preserving the existing whitespaces', function () {
+      let template = stripIndent`
+        <div data-foo
+         data-bar="lol"
+              some-other-thing={{haha}}>
+        </div>
+      `;
+
+      let ast = parse(template);
+      ast.body[0].attributes.push(builders.attr('foo-foo', builders.string('wheee')));
+
+      expect(print(ast)).toEqual(stripIndent`
+        <div data-foo
+         data-bar="lol"
+              some-other-thing={{haha}}
+        foo-foo="wheee">
+        </div>
+      `);
+    });
   });
 
   describe('MustacheStatement', function () {
