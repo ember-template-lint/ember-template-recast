@@ -520,20 +520,26 @@ module.exports = class ParseResult {
           ) {
             let openParts = [].concat(ast.attributes, ast.modifiers, ast.comments).sort(sortByLoc);
 
-            let joinOpenPartsWith = ' ';
-            if (originalOpenParts.length > 1) {
-              joinOpenPartsWith = this.sourceForLoc({
-                start: originalOpenParts[0].loc.end,
-                end: originalOpenParts[1].loc.start,
-              });
-            }
+            openPartsSource = openParts.reduce((acc, part, index, parts) => {
+              let partSource = this.print(part);
 
-            if (joinOpenPartsWith.trim() !== '') {
-              // if the autodetection above resulted in some non whitespace
-              // values, reset to `' '`
-              joinOpenPartsWith = ' ';
-            }
-            openPartsSource = openParts.map((part) => this.print(part)).join(joinOpenPartsWith);
+              if (index === parts.length - 1) {
+                return acc + partSource;
+              }
+
+              let joinPartWith = this.sourceForLoc({
+                start: parts[index].loc.end,
+                end: parts[index + 1].loc.start,
+              });
+
+              if (joinPartWith === '' || joinPartWith.trim() !== '') {
+                // if the autodetection above resulted in some non whitespace
+                // values, reset to `' '`
+                joinPartWith = ' ';
+              }
+
+              return acc + partSource + joinPartWith;
+            }, '');
 
             if (originalOpenParts.length === 0) {
               postTagWhitespace = ' ';

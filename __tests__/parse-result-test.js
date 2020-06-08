@@ -217,8 +217,7 @@ describe('ember-template-recast', function () {
       expect(print(ast)).toEqual(stripIndent`
       <div
         data-foo='lol'
-        data-bar=hahaha
-        data-test="wheee"
+        data-bar=hahaha data-test="wheee"
       ></div>`);
     });
 
@@ -513,8 +512,7 @@ describe('ember-template-recast', function () {
       expect(print(ast)).toEqual(stripIndent`
         <div data-foo
          data-bar="lol"
-              some-other-thing={{haha}}
-        foo-foo="wheee">
+              some-other-thing={{haha}} foo-foo="wheee">
         </div>
       `);
     });
