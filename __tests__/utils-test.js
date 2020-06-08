@@ -9,7 +9,7 @@ describe('utils', function () {
 
       let actual = [a, b].sort(sortByLoc);
 
-      expect(actual.map((i) => i.key)).toEqual(['b', 'a']);
+      expect(actual.map((i) => i.key)).toEqual(['a', 'b']);
     });
 
     test('sorts nodes by their line numbers', function () {
