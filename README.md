@@ -1,5 +1,38 @@
 # ember-template-recast
 
+
+With ember-template-recast, transform a template's AST and reprint it. Its
+formatting will be preserved.
+
+For instance, it is possible to change a component's property while preserving
+its formatting:
+```js
+const recast = require('ember-template-recast');
+
+const template = `
+<Sidebar
+  foo="bar"
+     item={{hmmm}}
+/>
+`;
+
+// parse
+let ast = recast.parse(template);
+
+// transform
+ast.body[1].attributes[1].value.path = builders.path('this.hmmm');
+
+// print
+let ouput = recast.print(ast);
+
+output === `
+<Sidebar
+  foo="bar"
+     item={{this.hmmm}}
+/>
+`; // is true!
+```
+
 ## APIs
 
 ### parse
