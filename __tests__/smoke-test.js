@@ -825,7 +825,7 @@ describe('"real life" smoke tests', function () {
     expect(code).toEqual('ZOMG other things here');
   });
 
-  test('cannot replace whole template (formatting is lost)', function () {
+  test('preserve formatting when replacing a whole template', function () {
     let template = `<div data-foo
  data-bar="lol"
       some-other-thing={{haha}}>
