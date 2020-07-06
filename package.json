@@ -28,7 +28,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@glimmer/syntax": "^0.54.0",
+    "@glimmer/syntax": "^0.54.1",
     "async-promise-queue": "^1.0.5",
     "colors": "^1.4.0",
     "commander": "^5.1.0",
