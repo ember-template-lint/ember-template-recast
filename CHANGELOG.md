@@ -1,3 +1,16 @@
+## v4.1.5 (2020-07-15)
+
+#### :bug: Bug Fix
+* [#303](https://github.com/ember-template-lint/ember-template-recast/pull/303) Preserve formatting when switching a template's body ([@dcyriller](https://github.com/dcyriller))
+* [#302](https://github.com/ember-template-lint/ember-template-recast/pull/302) Improve whitespace preservation around dirty attributes / comments / modifiers ([@dcyriller](https://github.com/dcyriller))
+
+#### :memo: Documentation
+* [#307](https://github.com/ember-template-lint/ember-template-recast/pull/307) Add an intro note to README ([@dcyriller](https://github.com/dcyriller))
+
+#### Committers: 2
+- Cyrille ([@dcyriller](https://github.com/dcyriller))
+- [@dependabot-preview[bot]](https://github.com/apps/dependabot-preview)
+
 ## v4.1.4 (2020-04-27)
 
 #### :bug: Bug Fix
