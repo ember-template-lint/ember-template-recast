@@ -2,9 +2,10 @@ const { traverse, builders, Walker } = require('@glimmer/syntax');
 const ParseResult = require('./parse-result');
 
 const PARSE_RESULT_FOR = new WeakMap();
+const NODES_INFO = new Map();
 
 function parse(template) {
-  let result = new ParseResult(template);
+  let result = new ParseResult(template, NODES_INFO);
 
   PARSE_RESULT_FOR.set(result.ast, result);
 

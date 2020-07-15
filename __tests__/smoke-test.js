@@ -824,4 +824,28 @@ describe('"real life" smoke tests', function () {
 
     expect(code).toEqual('ZOMG other things here');
   });
+
+  test('preserve formatting when replacing a whole template', function () {
+    let template = `<div data-foo
+ data-bar="lol"
+      some-other-thing={{haha}}>
+</div>`;
+    let replacement = `<div
+data-foo
+data-bar="lol"
+some-other-thing={{haha}}></div>`;
+
+    let { code } = transform(template, (env) => {
+      return {
+        Program: {
+          exit(node) {
+            let ast = env.syntax.parse(replacement);
+            node.body = ast.body;
+          },
+        },
+      };
+    });
+
+    expect(code).toEqual(replacement);
+  });
 });

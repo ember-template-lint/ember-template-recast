@@ -86,7 +86,7 @@ function fixASTIssues(sourceLines, ast) {
 }
 
 module.exports = class ParseResult {
-  constructor(template) {
+  constructor(template, nodesInfo) {
     let ast = preprocess(template, {
       mode: 'codemod',
     });
@@ -97,7 +97,7 @@ module.exports = class ParseResult {
     this.source = source;
     this._originalAst = ast;
 
-    this.nodeInfo = new Map();
+    this.nodeInfo = nodesInfo;
     this.ancestor = new Map();
     this.dirtyFields = new Map();
 
