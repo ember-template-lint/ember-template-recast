@@ -49,6 +49,23 @@ describe('ember-template-recast', function () {
       }}`);
   });
 
+  test('basic parse -> mutation: attributes order can be changed -> print', function () {
+    let template = stripIndent`
+      <div ...attributes class="foo"></div>
+      <div class="foo" ...attributes></div>
+    `;
+    let ast = parse(template);
+    let { body } = ast;
+
+    body[0].attributes = body[0].attributes.reverse();
+    body[2].attributes = body[2].attributes.reverse();
+
+    expect(print(ast)).toEqual(stripIndent`
+      <div class="foo" ...attributes></div>
+      <div ...attributes class="foo"></div>
+    `);
+  });
+
   test('basic parse -> mutation -> print: preserves HTML entities', function () {
     let template = stripIndent`<div>&nbsp;</div>`;
     let ast = parse(template);
