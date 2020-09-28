@@ -1,3 +1,12 @@
+## v4.1.6 (2020-09-28)
+
+#### :bug: Bug Fix
+* [#354](https://github.com/ember-template-lint/ember-template-recast/pull/354) performance: Fix memory heap issue ([@dcyriller](https://github.com/dcyriller))
+
+#### Committers: 2
+- Cyrille David ([@dcyriller](https://github.com/dcyriller))
+- [@dependabot-preview[bot]](https://github.com/apps/dependabot-preview)
+
 ## v4.1.5 (2020-07-15)
 
 #### :bug: Bug Fix
