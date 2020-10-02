@@ -1,3 +1,16 @@
+## v4.1.7 (2020-10-02)
+
+#### :bug: Bug Fix
+* [#299](https://github.com/ember-template-lint/ember-template-recast/pull/299) Ensure replacement of an ElementNode's attribute preserves its original position. ([@lifeart](https://github.com/lifeart))
+
+#### :memo: Documentation
+* [#258](https://github.com/ember-template-lint/ember-template-recast/pull/258) Clearly define our SemVer policy. ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 3
+- Alex Kanunnikov ([@lifeart](https://github.com/lifeart))
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+- [@dependabot-preview[bot]](https://github.com/apps/dependabot-preview)
+
 ## v4.1.6 (2020-09-28)
 
 #### :bug: Bug Fix
