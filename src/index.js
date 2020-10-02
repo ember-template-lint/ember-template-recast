@@ -1,5 +1,6 @@
 const { traverse, builders, Walker } = require('@glimmer/syntax');
 const ParseResult = require('./parse-result');
+const { sourceForLoc } = require('./utils');
 
 const PARSE_RESULT_FOR = new WeakMap();
 const NODES_INFO = new WeakMap();
@@ -44,4 +45,5 @@ module.exports = {
   print,
   transform,
   traverse,
+  sourceForLoc,
 };

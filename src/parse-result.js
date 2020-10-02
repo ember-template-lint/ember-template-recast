@@ -1,7 +1,6 @@
 const { preprocess, print: _print, traverse } = require('@glimmer/syntax');
-const { sortByLoc, sourceForLoc } = require('./utils');
+const { sortByLoc, sourceForLoc, getLines } = require('./utils');
 
-const reLines = /(.*?(?:\r\n?|\n|$))/gm;
 const leadingWhitespace = /(^\s+)/;
 const attrNodeParts = /(^[^=]+)(\s+)?(=)?(\s+)?(['"])?(\S+)?/;
 const hashPairParts = /(^[^=]+)(\s+)?=(\s+)?(\S+)/;
@@ -24,12 +23,6 @@ const voidTagNames = new Set([
   'track',
   'wbr',
 ]);
-
-function getLines(source) {
-  let result = source.match(reLines);
-
-  return result.slice(0, -1);
-}
 
 /*
   This is needed to address issues in the glimmer-vm AST _before_ any of the nodes and node

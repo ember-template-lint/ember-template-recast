@@ -1,4 +1,8 @@
-function sourceForLoc(sourceLines, loc) {
+const reLines = /(.*?(?:\r\n?|\n|$))/gm;
+
+function sourceForLoc(source, loc) {
+  let sourceLines = Array.isArray(source) ? source : getLines(source);
+
   if (!loc) {
     return;
   }
@@ -77,9 +81,16 @@ function compactJoin(array, delimeter = '') {
   return compact(array).join(delimeter);
 }
 
+function getLines(source) {
+  let result = source.match(reLines);
+
+  return result.slice(0, -1);
+}
+
 module.exports = {
   sortByLoc,
   compact,
   compactJoin,
   sourceForLoc,
+  getLines,
 };
