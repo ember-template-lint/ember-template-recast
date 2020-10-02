@@ -19,8 +19,9 @@ function print(ast) {
 }
 
 function transform(template, plugin) {
-  let ast;
+  let ast, contents;
   if (typeof template === 'string') {
+    contents = template;
     ast = parse(template);
   } else {
     // assume we were passed an ast
@@ -33,7 +34,7 @@ function transform(template, plugin) {
     traverse,
     Walker,
   };
-  let env = { syntax };
+  let env = { contents, syntax };
   let visitor = plugin(env);
   traverse(ast, visitor);
   return { ast, code: print(ast) };
