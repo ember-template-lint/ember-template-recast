@@ -1,3 +1,12 @@
+## v4.2.0 (2020-10-02)
+
+#### :rocket: Enhancement
+* [#361](https://github.com/ember-template-lint/ember-template-recast/pull/361) Expose the original contents on the plugin's `env`. ([@rwjblue](https://github.com/rwjblue))
+* [#360](https://github.com/ember-template-lint/ember-template-recast/pull/360) Expose sourceForLoc utility method. ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 1
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+
 ## v4.1.7 (2020-10-02)
 
 #### :bug: Bug Fix
