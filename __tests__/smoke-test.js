@@ -1,4 +1,5 @@
-const { transform } = require('..');
+const { parse, sourceForLoc, transform } = require('..');
+const { sortByLoc } = require('../src/utils');
 const { stripIndent } = require('common-tags');
 
 describe('"real life" smoke tests', function () {
@@ -805,6 +806,124 @@ describe('"real life" smoke tests', function () {
     });
 
     expect(code).toEqual('<FooBar @query={{hash foo="baz"}} />');
+  });
+
+  describe('can modify attribute indentation', function () {
+    function attributeIndentationFixer(env) {
+      const template = env.contents;
+      const seen = new WeakSet();
+
+      return {
+        ElementNode(node) {
+          // when returning a new node from a visitor hook the new node
+          // is _also_ traversed, we want to avoid attempting to calculate
+          // the source **again**
+          if (seen.has(node)) {
+            return node;
+          }
+
+          let startLocation = node.loc.start.column;
+          let indentation = ' '.repeat(startLocation + 2);
+
+          let parts = [...node.attributes, ...node.modifiers, ...node.comments];
+
+          // decide if we should emit a single line or multiple
+          let multiline = parts.length >= 2;
+
+          let partsSource = parts
+            .sort(sortByLoc)
+            .map((part) => sourceForLoc(template, part.loc))
+            .map((partSource) => `${indentation}${partSource}`)
+            .join(multiline ? '\n' : '');
+
+          let blockParamsSource = '';
+          if (node.blockParams.length > 0) {
+            blockParamsSource = `${multiline ? '\n' : ''}${indentation}as |${node.blockParams.join(
+              ' '
+            )}|`;
+          }
+
+          let childrenSource =
+            node.children.length > 0
+              ? node.children.map((child) => sourceForLoc(template, child.loc)).join('')
+              : '';
+
+          let closingOpenSource = node.selfClosing ? '\n/>' : '\n>';
+          let closingSource = node.selfClosing ? '' : `</${node.tag}>`;
+
+          let replacementElementSource = [
+            `<${node.tag}\n`,
+            partsSource,
+            blockParamsSource,
+            closingOpenSource,
+            childrenSource,
+            closingSource,
+          ].join('');
+
+          let fakeElement = parse(replacementElementSource).body[0];
+          seen.add(fakeElement);
+
+          return fakeElement;
+        },
+      };
+    }
+
+    test('can modify the attribute indentation of selfClosing element', function () {
+      let template = `
+<Foo hmm="lol"
+@bar={{derp}}
+  data-wat="zozers"
+  disabled />`;
+
+      let { code } = transform(template, attributeIndentationFixer);
+
+      expect(code).toEqual(`
+<Foo
+  hmm="lol"
+  @bar={{derp}}
+  data-wat="zozers"
+  disabled
+/>`);
+    });
+
+    test('can modify the attribute indentation of element with children', function () {
+      let template = `
+<Foo hmm="lol"
+@bar={{derp}}
+  data-wat="zozers"
+  disabled>lol</Foo>`;
+
+      let { code } = transform(template, attributeIndentationFixer);
+
+      expect(code).toEqual(`
+<Foo
+  hmm="lol"
+  @bar={{derp}}
+  data-wat="zozers"
+  disabled
+>lol</Foo>`);
+    });
+
+    test('can modify the attribute indentation of element with block params', function () {
+      let template = `
+<Foo hmm="lol"
+@bar={{derp}}
+  data-wat="zozers"
+  disabled
+        as |some thing|
+ >lol</Foo>`;
+
+      let { code } = transform(template, attributeIndentationFixer);
+
+      expect(code).toEqual(`
+<Foo
+  hmm="lol"
+  @bar={{derp}}
+  data-wat="zozers"
+  disabled
+  as |some thing|
+>lol</Foo>`);
+    });
   });
 
   test('can replace whole template (aka what a prettier autofixer would want to do)', function () {
