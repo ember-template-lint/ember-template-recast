@@ -43,14 +43,9 @@ function isSynthetic(node) {
 }
 
 function sortByLoc(a, b) {
-  // sort b higher than synthetic a
-  if (isSynthetic(a)) {
-    return 1;
-  }
-
-  // sort a higher than synthetic b
-  if (isSynthetic(b)) {
-    return -1;
+  // be conservative about the location where a new node is inserted
+  if (isSynthetic(a) || isSynthetic(b)) {
+    return 0;
   }
 
   if (a.loc.start.line < b.loc.start.line) {
