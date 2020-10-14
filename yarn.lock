@@ -6391,10 +6391,10 @@ wordwrap@^1.0.0:
   resolved "https://registry.yarnpkg.com/wordwrap/-/wordwrap-1.0.0.tgz#27584810891456a4171c8d0226441ade90cbcaeb"
   integrity sha1-J1hIEIkUVqQXHI0CJkQa3pDLyus=
 
-workerpool@^6.0.1:
-  version "6.0.1"
-  resolved "https://registry.yarnpkg.com/workerpool/-/workerpool-6.0.1.tgz#9e661102e074138125cb12197a7867547f2558d4"
-  integrity sha512-4I1YJngJuIAsJHOOJNPHQUjoA/Kr1QNtdRoPX8w92BtNy2pIo7zr6hQHDqm3d0CWnxmfcWsqxcFWN1Ni3w4C+g==
+workerpool@^6.0.2:
+  version "6.0.2"
+  resolved "https://registry.yarnpkg.com/workerpool/-/workerpool-6.0.2.tgz#e241b43d8d033f1beb52c7851069456039d1d438"
+  integrity sha512-DSNyvOpFKrNusaaUwk+ej6cBj1bmhLcBfj80elGk+ZIo5JSkq+unB1dLKEOcNfJDZgjGICfhQ0Q5TbP0PvF4+Q==
 
 wrap-ansi@^5.1.0:
   version "5.1.0"
