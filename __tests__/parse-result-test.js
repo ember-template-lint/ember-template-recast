@@ -1193,6 +1193,21 @@ describe('ember-template-recast', function () {
       expect(print(ast)).toEqual('<Foo \n  bar = {{ bar }} />');
     });
 
+    test('mutations retain textarea whitespace formatting', function () {
+      let template = stripIndent`
+        <textarea name="foo">
+        </textarea>
+      `;
+
+      let ast = parse(template);
+      ast.body[0].attributes[0].value.chars = 'bar';
+
+      expect(print(ast)).toEqual(stripIndent`
+        <textarea name="bar">
+        </textarea>
+      `);
+    });
+
     test('quotes are preserved when updated a TextNode value (double quote)', function () {
       let template = `<div class="lol"></div>`;
 
