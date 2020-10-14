@@ -1,3 +1,14 @@
+## v4.2.1 (2020-10-14)
+
+#### :bug: Bug Fix
+* [#368](https://github.com/ember-template-lint/ember-template-recast/pull/368) Ensure whitespace inside (and trailing) a text area is preserved. ([@rwjblue](https://github.com/rwjblue))
+
+#### :house: Internal
+* [#362](https://github.com/ember-template-lint/ember-template-recast/pull/362) Add a test showing how attribute-indentation might be fixable. ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 1
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+
 ## v4.2.0 (2020-10-02)
 
 #### :rocket: Enhancement
