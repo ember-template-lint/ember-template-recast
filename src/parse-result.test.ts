@@ -1224,6 +1224,24 @@ describe('ember-template-recast', function () {
       `);
     });
 
+    test('mutations in MustacheStatements retain whitespace in AttrNode', function () {
+      let template = stripIndent`
+        <div
+          class="
+            block
+            {{if this.foo "bar"}}
+          "
+        >
+          hello
+        </div>
+      `;
+
+      let ast = parse(template) as any;
+      ast.body[0].attributes[0].value.parts[1].params[1].value = 'bar';
+
+      expect(print(ast)).toEqual(template);
+    });
+
     test('quotes are preserved when updated a TextNode value (double quote)', function () {
       let template = `<div class="lol"></div>`;
 
