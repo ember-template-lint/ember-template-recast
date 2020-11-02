@@ -36,7 +36,7 @@
     "ora": "^5.1.0",
     "slash": "^3.0.0",
     "tmp": "^0.2.1",
-    "workerpool": "^6.0.2"
+    "workerpool": "^6.0.3"
   },
   "devDependencies": {
     "broccoli-test-helper": "^2.0.0",
