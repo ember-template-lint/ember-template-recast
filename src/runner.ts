@@ -1,67 +1,78 @@
-const http = require('http');
-const https = require('https');
-const { writeFileSync } = require('fs');
-const { resolve } = require('path');
-const colors = require('colors/safe');
-const slash = require('slash');
-const globby = require('globby');
-const ora = require('ora');
-const queue = require('async-promise-queue');
-const tmp = require('tmp');
-const workerpool = require('workerpool');
+import * as http from 'http';
+import * as https from 'https';
+import { writeFileSync } from 'fs';
+import { resolve } from 'path';
+import colors from 'colors/safe';
+import slash from 'slash';
+import globby from 'globby';
+import ora from 'ora';
+import queue from 'async-promise-queue';
+import tmp from 'tmp';
+import workerpool from 'workerpool';
 
 tmp.setGracefulCleanup();
 
 class NoFilesError extends Error {}
 
-const silentLogger = {
-  info() {},
-  warning() {},
-  error() {},
-  spin() {},
-  updateSpinner() {},
-  stopSpinner() {},
-};
+class SilentLogger {
+  info() {}
+  warning() {}
+  error() {}
+  spin() {}
+  updateSpinner() {}
+  stopSpinner() {}
+}
 
 /* eslint-disable no-console */
-const verboseLogger = {
-  info(message) {
+class VerboseLogger {
+  private spinner: any;
+
+  info(message: string) {
     console.log(message);
-  },
-  warning(message) {
-    console.log(`${colors.white.bgYellow(' WARN ')} ${message}`);
-  },
-  error(message) {
-    console.log(`${colors.white.bgRed(' ERR ')} ${message}`);
-  },
-  spin(message) {
+  }
+
+  warning(message: string) {
+    console.log(`${(colors.white as any).bgYellow(' WARN ')} ${message}`);
+  }
+
+  error(message: string) {
+    console.log(`${(colors.white as any).bgRed(' ERR ')} ${message}`);
+  }
+
+  spin(message: string) {
     this.spinner = ora(message).start();
-  },
-  updateSpinner(message) {
+  }
+
+  updateSpinner(message: string) {
     if (this.spinner) {
       this.spinner.text = message;
     }
-  },
-  stopSpinner(persistentMessage) {
+  }
+
+  stopSpinner(persistentMessage?: string | { symbol: string; text: string }) {
     if (persistentMessage) {
       this.spinner && this.spinner.stopAndPersist(persistentMessage);
     } else {
       this.spinner && this.spinner.stop();
     }
-  },
-};
+  }
+}
 /* eslint-enable no-console */
 
+type Logger = VerboseLogger | SilentLogger;
+
 class StatsCollector {
-  constructor(logger) {
+  private logger: VerboseLogger | SilentLogger;
+  public changed = 0;
+  public unchanged = 0;
+  public skipped = 0;
+  public errors: any[] = [];
+
+  constructor(logger: VerboseLogger | SilentLogger) {
     this.logger = logger;
-    this.changed = 0;
-    this.unchanged = 0;
-    this.skipped = 0;
-    this.errors = [];
   }
 
-  update(message) {
+  update(message: any) {
     switch (message.type) {
       case 'update':
         switch (message.status) {
@@ -107,8 +118,12 @@ class StatsCollector {
   }
 }
 
-module.exports = async function run(transformFile, filePaths, options) {
-  const logger = options.silent ? silentLogger : verboseLogger;
+export default async function run(
+  transformFile: string,
+  filePaths: string[],
+  options: { silent?: boolean; cpus: number }
+): Promise<void> {
+  const logger = options.silent ? new SilentLogger() : new VerboseLogger();
   const stats = new StatsCollector(logger);
 
   try {
@@ -126,16 +141,15 @@ module.exports = async function run(transformFile, filePaths, options) {
     stats.print();
   } catch (err) {
     logger.stopSpinner();
+    process.exitCode = 1;
     handleError(err, logger);
   }
-};
+}
 
 /**
  * Returns the location of the transform module on disk.
- * @param {string} transformFile
- * @returns {Promise<string>}
  */
-async function loadTransform(transformFile) {
+async function loadTransform(transformFile: string): Promise<string> {
   const isRemote = transformFile.startsWith('http');
 
   if (!isRemote) {
@@ -150,11 +164,7 @@ async function loadTransform(transformFile) {
   return filePath.name;
 }
 
-/**
- * @param {string} url
- * @returns {Promise<string>}
- */
-function downloadFile(url) {
+function downloadFile(url: string): Promise<string> {
   return new Promise((resolve, reject) => {
     const transport = url.startsWith('https') ? https : http;
 
@@ -170,10 +180,8 @@ function downloadFile(url) {
 /**
  * Convert array of paths into an array of absolute file paths. Uses globby
  * under the hood so it respects .gitignore files.
- * @param {string[]} paths
- * @returns {Promise<string[]>}
  */
-async function getAllFiles(paths) {
+async function getAllFiles(paths: string[]): Promise<string[]> {
   const files = await globby(paths, {
     // must specify a properly escaped `cwd` because globby infers from
     // process.cwd() directly and without correcting back to posix paths
@@ -186,6 +194,7 @@ async function getAllFiles(paths) {
     absolute: true,
     gitignore: true,
   });
+
   if (files.length < 1) {
     throw new NoFilesError();
   }
@@ -195,15 +204,14 @@ async function getAllFiles(paths) {
 
 /**
  * Divides files into chunks and distributes them across worker processes.
- * @param {string} transformPath
- * @param {string[]} files
- * @param {number} options.cpus
- * @param {boolean} options.dry
- * @param {StatsCollector} stats
- * @param {Logger} logger
- * @returns {Promise<void>}
  */
-async function spawnWorkers(transformPath, files, { cpus, dry }, stats, logger) {
+async function spawnWorkers(
+  transformPath: string,
+  files: string[],
+  { cpus, dry = false }: { silent?: boolean; cpus: number; dry?: boolean },
+  stats: StatsCollector,
+  logger: Logger
+): Promise<void> {
   const processCount = Math.min(files.length, cpus);
 
   logger.info(`Processing ${files.length} file${files.length !== 1 ? 's' : ''}…`);
@@ -211,10 +219,10 @@ async function spawnWorkers(transformPath, files, { cpus, dry }, stats, logger) 
 
   logger.spin('Processed 0 files');
 
-  const pool = workerpool.pool(require.resolve('./worker.js'), { maxWorkers: cpus });
+  const pool = workerpool.pool(require.resolve('./worker'), { maxWorkers: cpus });
 
   let i = 0;
-  const worker = queue.async.asyncify(async (file) => {
+  const worker = (queue as any).async.asyncify(async (file: string) => {
     const message = await pool.exec('run', [transformPath, file, { dry }]);
 
     stats.update(message);
@@ -228,7 +236,7 @@ async function spawnWorkers(transformPath, files, { cpus, dry }, stats, logger) 
   }
 }
 
-function handleError(err, logger) {
+function handleError(err: any, logger: Logger): void {
   if (err.code === 'MODULE_NOT_FOUND') {
     logger.error('Transform plugin not found');
   } else if (err instanceof NoFilesError) {
@@ -239,5 +247,4 @@ function handleError(err, logger) {
       logger.error(err.stack);
     }
   }
-  return 1;
 }

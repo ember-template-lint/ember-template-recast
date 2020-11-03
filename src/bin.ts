@@ -1,12 +1,11 @@
 #!/usr/bin/env node
 
-const os = require('os');
-const program = require('commander');
-const pkg = require('../package.json');
-const run = require('../src/runner');
+import * as os from 'os';
+import program from 'commander';
+import run from './runner';
 
 program
-  .version(pkg.version)
+  .version(require('../package').version)
   .usage('<files> -t transform-plugin.js')
   .option(
     '-t, --transform <file>',
@@ -26,5 +25,11 @@ program
 if (program.args.length < 1 || !program.transform) {
   program.help();
 } else {
-  run(program.transform, program.args, program).then(process.exit);
+  const options = {
+    cpus: program.cpus,
+    dry: program.dry,
+    silent: program.silent,
+  };
+
+  run(program.transform, program.args, options);
 }
