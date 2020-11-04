@@ -42,6 +42,10 @@ export interface Syntax {
 export interface TransformPluginEnv {
   syntax: Syntax;
   contents: string;
+  filePath?: string;
+  parseOptions: {
+    srcName?: string;
+  };
 }
 
 export interface TransformPluginBuilder {
@@ -58,19 +62,61 @@ export interface TransformResult {
   code: string;
 }
 
+export interface TransformOptions {
+  /**
+    The template to transform (either as a string or a pre-parsed AST.Template).
+  */
+  template: string | AST.Template;
+
+  /**
+    The plugin to use for transformation.
+  */
+  plugin: TransformPluginBuilder;
+
+  /**
+    The path (relative to the current working directory) to the file being transformed.
+
+    This is useful when a given transform need to have differing behavior based on the
+    location of the file (e.g. a component template should be modified differently than
+    a route template).
+  */
+  filePath?: string;
+}
+
 export function transform(
   template: string | AST.Template,
   plugin: TransformPluginBuilder
+): TransformResult;
+export function transform(options: TransformOptions): TransformResult;
+export function transform(
+  templateOrOptions: string | AST.Template | TransformOptions,
+  plugin?: TransformPluginBuilder
 ): TransformResult {
-  let ast, contents;
+  let ast: AST.Template;
+  let contents: string;
+  let filePath: undefined | string;
+  let template: string | AST.Template;
+
+  if (plugin === undefined) {
+    let options = templateOrOptions as TransformOptions;
+    // TransformOptions invocation style
+    template = options.template;
+    plugin = options.plugin;
+    filePath = options.filePath;
+  } else {
+    template = templateOrOptions as AST.Template;
+    filePath = undefined;
+  }
+
   if (typeof template === 'string') {
     ast = parse(template);
     contents = template;
   } else {
     // assume we were passed an ast
     ast = template;
-    contents = print(template);
+    contents = print(ast);
   }
+
   const syntax = {
     parse,
     builders,
@@ -78,9 +124,19 @@ export function transform(
     traverse,
     Walker,
   };
-  const env = { contents, syntax };
+
+  const env: TransformPluginEnv = {
+    contents,
+    filePath,
+    syntax,
+    parseOptions: {
+      srcName: filePath,
+    },
+  };
+
   const visitor = plugin(env);
   traverse(ast, visitor);
+
   return { ast, code: print(ast) };
 }
 

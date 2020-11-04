@@ -80,15 +80,6 @@ resulting AST and the printed template.
 The plugin argument has roughly the following interface:
 
 ```ts
-export interface ASTPluginBuilder {
-  (env: ASTPluginEnvironment): NodeVisitor;
-}
-
-export interface ASTPluginEnvironment {
-  meta?: any;
-  syntax: Syntax;
-}
-
 export interface Syntax {
   parse: typeof preprocess;
   builders: typeof builders;
@@ -96,27 +87,45 @@ export interface Syntax {
   traverse: typeof traverse;
   Walker: typeof Walker;
 }
+
+export interface TransformPluginEnv {
+  syntax: Syntax;
+  contents: string;
+  filePath?: string;
+  parseOptions: {
+    srcName?: string;
+  };
+}
+
+export interface TransformPluginBuilder {
+  (env: TransformPluginEnv): NodeVisitor;
+}
 ```
 
 The list of known builders on the `env.syntax.builders` are [found
-here](https://github.com/glimmerjs/glimmer-vm/blob/v0.50.4/packages/%40glimmer/syntax/lib/builders.ts#L547-L578).
+here](https://github.com/glimmerjs/glimmer-vm/blob/v0.62.4/packages/%40glimmer/syntax/lib/builders.ts#L547-L578).
 
 Example:
 ```js
 const { transform } = require('ember-template-recast');
+
 const template = `
 {{foo-bar
   baz="stuff"
 }}
 `;
-let { code } = transform(template, env => {
-  let { builders: b } = env.syntax;
 
-  return {
-    MustacheStatement() {
-      return b.mustache(b.path('wat-wat'));
-    },
-  };
+let { code } = transform({
+  template,
+  plugin(env) {
+    let { builders: b } = env.syntax;
+
+    return {
+      MustacheStatement() {
+        return b.mustache(b.path('wat-wat'));
+      },
+    };
+  }
 });
 
 console.log(code); // => {{wat-wat}}
