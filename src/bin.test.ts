@@ -17,18 +17,14 @@ function run(args: string[], cwd: string) {
 }
 
 const transform = `
-module.exports = function ({ source }, { parse, visit }) {
-  const ast = parse(source);
+module.exports = (env) => {
+  let { builders: b } = env.syntax;
 
-  return visit(ast, (env) => {
-    let { builders: b } = env.syntax;
-
-    return {
-      MustacheStatement() {
-        return b.mustache(b.path('wat-wat'));
-      },
-    };
-  });
+  return {
+    MustacheStatement() {
+      return b.mustache(b.path('wat-wat'));
+    },
+  };
 };
 `;
 
