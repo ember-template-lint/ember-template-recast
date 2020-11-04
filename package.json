@@ -68,7 +68,7 @@
     "typescript": "^4.0.3"
   },
   "engines": {
-    "node": "10.* || >= 12.*"
+    "node": "10.* || 12.* || >= 14.*"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
