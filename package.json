@@ -15,14 +15,13 @@
   "repository": "github:ember-template-lint/ember-template-recast",
   "license": "MIT",
   "author": "Robert Jackson <me@rwjblue.com>",
+  "main": "lib/index.js",
+  "bin": "lib/bin.js",
   "files": [
     "lib/",
     "!lib/**/*.test.*"
   ],
-  "main": "lib/index.js",
-  "bin": "lib/bin.js",
   "scripts": {
-    "changelog": "lerna-changelog",
     "build": "tsc",
     "lint": "npm-run-all lint:*",
     "lint:files": "eslint .",
@@ -59,7 +58,6 @@
     "eslint-plugin-prettier": "^3.1.4",
     "execa": "^4.0.3",
     "jest": "^26.6.1",
-    "lerna-changelog": "^1.0.1",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.1.2",
     "release-it": "^14.2.1",
@@ -86,14 +84,16 @@
   "release-it": {
     "plugins": {
       "release-it-lerna-changelog": {
-        "infile": "CHANGELOG.md"
+        "infile": "CHANGELOG.md",
+        "launchEditor": true
       }
     },
     "git": {
       "tagName": "v${version}"
     },
     "github": {
-      "release": true
+      "release": true,
+      "tokenRef": "GITHUB_AUTH"
     }
   }
 }
