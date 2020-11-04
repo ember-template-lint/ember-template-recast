@@ -1,3 +1,12 @@
+## v4.3.0 (2020-11-04)
+
+#### :rocket: Enhancement
+* [#384](https://github.com/ember-template-lint/ember-template-recast/pull/384) Allow passing `filePath` to `transform`. ([@rwjblue](https://github.com/rwjblue))
+* [#255](https://github.com/ember-template-lint/ember-template-recast/pull/255) Convert to TypeScript. ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 1
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+
 ## v4.2.1 (2020-10-14)
 
 #### :bug: Bug Fix
