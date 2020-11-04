@@ -1,5 +1,21 @@
 # Changelog
 
+## v5.0.0 (2020-11-04)
+
+#### :boom: Breaking Change
+* [#385](https://github.com/ember-template-lint/ember-template-recast/pull/385) Drop Node 13 support. ([@rwjblue](https://github.com/rwjblue))
+* [#386](https://github.com/ember-template-lint/ember-template-recast/pull/386) Refactor command line transform API to match JS API. ([@rwjblue](https://github.com/rwjblue))
+
+#### :house: Internal
+* [#389](https://github.com/ember-template-lint/ember-template-recast/pull/389) Update automated release setup. ([@rwjblue](https://github.com/rwjblue))
+* [#387](https://github.com/ember-template-lint/ember-template-recast/pull/387) Update Typescript related dependencies to latest. ([@rwjblue](https://github.com/rwjblue))
+* [#388](https://github.com/ember-template-lint/ember-template-recast/pull/388) Remove macOS from CI. ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 2
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+- [@dependabot-preview[bot]](https://github.com/apps/dependabot-preview)
+
+
 ## v4.3.0 (2020-11-04)
 
 #### :rocket: Enhancement
