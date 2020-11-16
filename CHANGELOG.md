@@ -1,5 +1,17 @@
 # Changelog
 
+## v5.0.1 (2020-11-16)
+
+#### :bug: Bug Fix
+* [#400](https://github.com/ember-template-lint/ember-template-recast/pull/400) Publish types and sourcemaps ([@rwjblue](https://github.com/rwjblue))
+
+#### :house: Internal
+* [#399](https://github.com/ember-template-lint/ember-template-recast/pull/399) Update to latest glimmer-vm. ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 1
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+
+
 ## v5.0.0 (2020-11-04)
 
 #### :boom: Breaking Change
