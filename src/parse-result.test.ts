@@ -8,7 +8,7 @@ describe('ember-template-recast', function () {
       let template = ``;
 
       let ast = parse(template);
-      ast.body.push(builders.element('img'));
+      ast.body.push(builders.element('img', { loc: builders.loc(1, 0, 1, 0) }));
 
       expect(print(ast)).toEqual(`<img>`);
     });
@@ -244,6 +244,7 @@ describe('ember-template-recast', function () {
                 )
               ),
             ],
+            loc: builders.loc(1, 0, 1, 0),
           }
         )
       );
@@ -453,7 +454,10 @@ describe('ember-template-recast', function () {
         2,
         0,
         builders.text('\n  '),
-        builders.element('li', { attrs: [builders.attr('data-foo', builders.text('bar'))] })
+        builders.element('li', {
+          attrs: [builders.attr('data-foo', builders.text('bar'))],
+          loc: builders.loc(1, 0, 1, 0),
+        })
       );
 
       expect(print(ast)).toEqual(stripIndent`
