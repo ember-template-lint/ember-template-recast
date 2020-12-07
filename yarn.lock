@@ -313,6 +313,13 @@
   dependencies:
     "@simple-dom/interface" "^1.4.0"
 
+"@glimmer/interfaces@0.68.1":
+  version "0.68.1"
+  resolved "https://registry.yarnpkg.com/@glimmer/interfaces/-/interfaces-0.68.1.tgz#a4d4b0380f0094c7f5901c26b54ccf40ddef521e"
+  integrity sha512-QNsWfMe5Aob++aM+OBJOUAn6DXwNK84p7ISkzxKZYdNNgLavjI5Coo2N577I95x42h1k9fdUoIxBKKC7aCSx4g==
+  dependencies:
+    "@simple-dom/interface" "^1.4.0"
+
 "@glimmer/reference@^0.65.0":
   version "0.65.0"
   resolved "https://registry.yarnpkg.com/@glimmer/reference/-/reference-0.65.0.tgz#8863308d0865d45ae1fc5d07d5ccef9da4dff2d7"
@@ -324,13 +331,13 @@
     "@glimmer/util" "0.65.0"
     "@glimmer/validator" "0.65.0"
 
-"@glimmer/syntax@^0.65.0":
-  version "0.65.0"
-  resolved "https://registry.yarnpkg.com/@glimmer/syntax/-/syntax-0.65.0.tgz#a4fd943ca558e15c77619d49a4d4500dd252868c"
-  integrity sha512-juVFrA62oFdr2FSxLMb7c3j7KU/onQlC7c4E9rnkivXqE7EmNGI7/+I48L/DsMmDOZDOf4bIhjeCWbXNB4dS9g==
+"@glimmer/syntax@^0.68.1":
+  version "0.68.1"
+  resolved "https://registry.yarnpkg.com/@glimmer/syntax/-/syntax-0.68.1.tgz#e7bebdc26b2b4586ca27ae2d577a712b5bf9a6c3"
+  integrity sha512-c1XXV6Oy2ogYQSef3CYvlv/YRz1O5nZ71UadpUYtkchfQdgbwEQgCtIXKIvet5eMuvoYudnXHidSi91QEWaLOA==
   dependencies:
-    "@glimmer/interfaces" "0.65.0"
-    "@glimmer/util" "0.65.0"
+    "@glimmer/interfaces" "0.68.1"
+    "@glimmer/util" "0.68.1"
     "@handlebars/parser" "^1.1.0"
     simple-html-tokenizer "^0.5.10"
 
@@ -341,6 +348,15 @@
   dependencies:
     "@glimmer/env" "0.1.7"
     "@glimmer/interfaces" "0.65.0"
+    "@simple-dom/interface" "^1.4.0"
+
+"@glimmer/util@0.68.1":
+  version "0.68.1"
+  resolved "https://registry.yarnpkg.com/@glimmer/util/-/util-0.68.1.tgz#d522ff4b91f0a59a23327f336bb90ddc55685ca1"
+  integrity sha512-eg1etiyeaxXL63ZONvl4+AVPN64dl84hFYXJCngb4qRXCXuAzSH+lepkJtKwhzJUEMlASwqk75Au9CyoGM4SOg==
+  dependencies:
+    "@glimmer/env" "0.1.7"
+    "@glimmer/interfaces" "0.68.1"
     "@simple-dom/interface" "^1.4.0"
 
 "@glimmer/validator@0.65.0", "@glimmer/validator@^0.65.0":
