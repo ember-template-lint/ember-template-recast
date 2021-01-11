@@ -46,7 +46,7 @@
   },
   "devDependencies": {
     "@types/common-tags": "^1.8.0",
-    "@types/jest": "^26.0.19",
+    "@types/jest": "^26.0.20",
     "@types/workerpool": "^6.0.0",
     "@typescript-eslint/eslint-plugin": "^4.11.1",
     "@typescript-eslint/parser": "^4.11.1",
