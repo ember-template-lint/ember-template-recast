@@ -96,7 +96,6 @@ export function envForTransformPlugin(
     let options = templateOrOptions as TransformOptions;
     // TransformOptions invocation style
     template = options.template;
-    plugin = options.plugin;
     filePath = options.filePath;
   } else {
     template = templateOrOptions as AST.Template;
