@@ -84,21 +84,26 @@ export interface TransformOptions {
 }
 
 export function envForTransformPlugin(
-  templateOrOptions: string | AST.Template | TransformOptions,
-  plugin?: TransformPluginBuilder
+  templateOrOptions: string | AST.Template | TransformOptions
 ): TransformPluginEnv {
   let contents: string;
-  let filePath: undefined | string;
+  let filePath: undefined | string = undefined;
   let template: string | AST.Template;
 
-  if (plugin === undefined) {
-    let options = templateOrOptions as TransformOptions;
-    // TransformOptions invocation style
-    template = options.template;
-    filePath = options.filePath;
+  if (typeof templateOrOptions !== 'string') {
+    if ('plugin' in templateOrOptions) {
+      let options = templateOrOptions as TransformOptions;
+      if ('template' in options) {
+        template = options.template;
+      }
+      if ('filePath' in options) {
+        filePath = options.filePath;
+      }
+    } else {
+      template = templateOrOptions as AST.Template;
+    }
   } else {
-    template = templateOrOptions as AST.Template;
-    filePath = undefined;
+    template = templateOrOptions as string;
   }
 
   let getAST = (): AST.Template => {
@@ -151,7 +156,7 @@ export function transform(
   let ast: AST.Template;
   let template: string | AST.Template;
 
-  const env = envForTransformPlugin(templateOrOptions, plugin);
+  const env = envForTransformPlugin(templateOrOptions);
 
   if (plugin === undefined) {
     let options = templateOrOptions as TransformOptions;

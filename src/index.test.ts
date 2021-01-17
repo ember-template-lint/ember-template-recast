@@ -1,4 +1,11 @@
-import { builders, parse, print, transform } from './index';
+import {
+  builders,
+  parse,
+  print,
+  transform,
+  envForTransformPlugin,
+  TransformPluginBuilder,
+} from './index';
 import type { AST } from '@glimmer/syntax';
 import { stripIndent } from 'common-tags';
 
@@ -84,6 +91,48 @@ describe('ember-template-recast', function () {
     element.children.push(builders.text('derp&nbsp;'));
 
     expect(print(ast)).toEqual(stripIndent`<div>&nbsp;derp&nbsp;</div>`);
+  });
+
+  describe('envForTransformPlugin', () => {
+    test('it return correct TransformPluginEnv instance if there is no plugin argument', function () {
+      let env = envForTransformPlugin('{{foo-bar}}');
+
+      expect(env.filePath).toEqual(undefined);
+      expect(env.contents).toEqual('{{foo-bar}}');
+      expect(env.parseOptions.srcName).toEqual(undefined);
+    });
+
+    test('it return correct TransformPluginEnv instance with  plugin argument', function () {
+      let env = envForTransformPlugin({
+        plugin: ((() => {}) as unknown) as TransformPluginBuilder,
+        template: '{{foo-bar}}',
+        filePath: 'foo',
+      });
+
+      expect(env.contents).toEqual('{{foo-bar}}');
+      expect(env.filePath).toEqual('foo');
+      expect(env.parseOptions.srcName).toEqual('foo');
+    });
+
+    test('it return correct TransformPluginEnv instance with ast as argument', function () {
+      let env = envForTransformPlugin(parse('{{foo-bar}}'));
+
+      expect(env.contents).toEqual('{{foo-bar}}');
+      expect(env.filePath).toEqual(undefined);
+      expect(env.parseOptions.srcName).toEqual(undefined);
+    });
+
+    test('it return correct TransformPluginEnv instance with ast as argument template param', function () {
+      let env = envForTransformPlugin({
+        plugin: ((() => {}) as unknown) as TransformPluginBuilder,
+        template: parse('{{foo-bar}}'),
+        filePath: 'foo',
+      });
+
+      expect(env.contents).toEqual('{{foo-bar}}');
+      expect(env.filePath).toEqual('foo');
+      expect(env.parseOptions.srcName).toEqual('foo');
+    });
   });
 
   describe('transform', () => {

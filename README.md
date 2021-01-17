@@ -153,6 +153,16 @@ let { code } = transform({
 console.log(code); // => {{wat-wat}}
 ```
 
+
+
+### envForTransformPlugin
+
+Used to get `TransformPluginEnv` object from template or transform options without plugin invocation;
+
+```ts
+envForTransformPlugin(templateOrOptions: string | AST.Template | TransformOptions): TransformPluginEnv
+```
+
 ## SemVer Policy
 
 Due to usage of TypeScript and bundling external APIs this project has somewhat
