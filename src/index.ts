@@ -87,7 +87,6 @@ export function envForTransformPlugin(
   templateOrOptions: string | AST.Template | TransformOptions,
   plugin?: TransformPluginBuilder
 ): TransformPluginEnv {
-  let ast: AST.Template;
   let contents: string;
   let filePath: undefined | string;
   let template: string | AST.Template;
@@ -102,14 +101,13 @@ export function envForTransformPlugin(
     filePath = undefined;
   }
 
-  if (typeof template === 'string') {
-    ast = parse(template);
-    contents = template;
-  } else {
-    // assume we were passed an ast
-    ast = template;
-    contents = print(ast);
-  }
+  let getAST = (): AST.Template => {
+    if (typeof template === 'string') {
+      return parse(template);
+    } else {
+      return template;
+    }
+  };
 
   const syntax = {
     parse,
@@ -120,7 +118,17 @@ export function envForTransformPlugin(
   };
 
   const env: TransformPluginEnv = {
-    contents,
+    get contents() {
+      if (typeof contents === 'undefined') {
+        if (typeof template === 'string') {
+          contents = template;
+        } else {
+          contents = print(getAST());
+        }
+      }
+
+      return contents;
+    },
     filePath,
     syntax,
     parseOptions: {
@@ -164,11 +172,16 @@ export function transform(
 
   traverse(ast, visitor);
 
-  let code = print(ast);
+  let code: string;
 
   return {
     ast,
-    code,
+    get code() {
+      if (typeof code === 'undefined') {
+        code = print(ast);
+      }
+      return code;
+    },
   };
 }
 
