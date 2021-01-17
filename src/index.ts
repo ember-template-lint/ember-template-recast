@@ -83,15 +83,10 @@ export interface TransformOptions {
   filePath?: string;
 }
 
-export function transform(
-  template: string | AST.Template,
-  plugin: TransformPluginBuilder
-): TransformResult;
-export function transform(options: TransformOptions): TransformResult;
-export function transform(
+export function envForTransformPlugin(
   templateOrOptions: string | AST.Template | TransformOptions,
   plugin?: TransformPluginBuilder
-): TransformResult {
+): TransformPluginEnv {
   let ast: AST.Template;
   let contents: string;
   let filePath: undefined | string;
@@ -134,10 +129,44 @@ export function transform(
     },
   };
 
+  return env;
+}
+
+export function transform(
+  template: string | AST.Template,
+  plugin: TransformPluginBuilder
+): TransformResult;
+export function transform(options: TransformOptions): TransformResult;
+export function transform(
+  templateOrOptions: string | AST.Template | TransformOptions,
+  plugin?: TransformPluginBuilder
+): TransformResult {
+  let ast: AST.Template;
+
+  const env = envForTransformPlugin(templateOrOptions, plugin);
+
+  if (plugin === undefined) {
+    let options = templateOrOptions as TransformOptions;
+    plugin = options.plugin;
+  }
+
   const visitor = plugin(env);
+
+  if (typeof templateOrOptions === 'string') {
+    ast = parse(templateOrOptions as string);
+  } else {
+    // assume we were passed an ast
+    ast = templateOrOptions as AST.Template;
+  }
+
   traverse(ast, visitor);
 
-  return { ast, code: print(ast) };
+  let code = print(ast);
+
+  return {
+    ast,
+    code,
+  };
 }
 
 export { builders, traverse } from '@glimmer/syntax';
