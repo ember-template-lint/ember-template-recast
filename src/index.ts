@@ -141,21 +141,25 @@ export function transform(
   plugin?: TransformPluginBuilder
 ): TransformResult {
   let ast: AST.Template;
+  let template: string | AST.Template;
 
   const env = envForTransformPlugin(templateOrOptions, plugin);
 
   if (plugin === undefined) {
     let options = templateOrOptions as TransformOptions;
     plugin = options.plugin;
+    template = options.template;
+  } else {
+    template = templateOrOptions as string;
   }
 
   const visitor = plugin(env);
 
-  if (typeof templateOrOptions === 'string') {
-    ast = parse(templateOrOptions as string);
+  if (typeof template === 'string') {
+    ast = parse(template as string);
   } else {
     // assume we were passed an ast
-    ast = templateOrOptions as AST.Template;
+    ast = template as AST.Template;
   }
 
   traverse(ast, visitor);
