@@ -1,7 +1,49 @@
-import { sortByLoc } from './utils';
-import { builders } from '.';
+import { envForTransformPlugin, sortByLoc } from './utils';
+import { builders, parse, TransformPluginBuilder } from '.';
 
 describe('utils', function () {
+  describe('envForTransformPlugin', () => {
+    test('it return correct TransformPluginEnv instance if there is no plugin argument', function () {
+      let { env } = envForTransformPlugin('{{foo-bar}}');
+
+      expect(env.filePath).toEqual(undefined);
+      expect(env.contents).toEqual('{{foo-bar}}');
+      expect(env.parseOptions.srcName).toEqual(undefined);
+    });
+
+    test('it return correct TransformPluginEnv instance with  plugin argument', function () {
+      let { env } = envForTransformPlugin({
+        plugin: ((() => {}) as unknown) as TransformPluginBuilder,
+        template: '{{foo-bar}}',
+        filePath: 'foo',
+      });
+
+      expect(env.contents).toEqual('{{foo-bar}}');
+      expect(env.filePath).toEqual('foo');
+      expect(env.parseOptions.srcName).toEqual('foo');
+    });
+
+    test('it return correct TransformPluginEnv instance with ast as argument', function () {
+      let { env } = envForTransformPlugin(parse('{{foo-bar}}'));
+
+      expect(env.contents).toEqual('{{foo-bar}}');
+      expect(env.filePath).toEqual(undefined);
+      expect(env.parseOptions.srcName).toEqual(undefined);
+    });
+
+    test('it return correct TransformPluginEnv instance with ast as argument template param', function () {
+      let { env } = envForTransformPlugin({
+        plugin: ((() => {}) as unknown) as TransformPluginBuilder,
+        template: parse('{{foo-bar}}'),
+        filePath: 'foo',
+      });
+
+      expect(env.contents).toEqual('{{foo-bar}}');
+      expect(env.filePath).toEqual('foo');
+      expect(env.parseOptions.srcName).toEqual('foo');
+    });
+  });
+
   describe('sortByLoc', function () {
     test('sorts synthetic nodes last', function () {
       let a = builders.pair('a', builders.path('foo') /* no loc, "synthetic" */);

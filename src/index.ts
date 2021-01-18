@@ -1,6 +1,7 @@
 import { traverse, builders, Walker, print as glimmerPrint } from '@glimmer/syntax';
 import type { AST, NodeVisitor } from '@glimmer/syntax';
 import ParseResult, { NodeInfo } from './parse-result';
+import { envForTransformPlugin } from './utils';
 
 const PARSE_RESULT_FOR = new WeakMap<AST.Node, ParseResult>();
 const NODE_INFO = new WeakMap<AST.Node, NodeInfo>();
@@ -83,67 +84,6 @@ export interface TransformOptions {
   filePath?: string;
 }
 
-export function envForTransformPlugin(
-  templateOrOptions: string | AST.Template | TransformOptions
-): TransformPluginEnv {
-  let contents: string;
-  let filePath: undefined | string = undefined;
-  let template: string | AST.Template;
-
-  if (typeof templateOrOptions !== 'string') {
-    if ('plugin' in templateOrOptions) {
-      let options = templateOrOptions as TransformOptions;
-      if ('template' in options) {
-        template = options.template;
-      }
-      if ('filePath' in options) {
-        filePath = options.filePath;
-      }
-    } else {
-      template = templateOrOptions as AST.Template;
-    }
-  } else {
-    template = templateOrOptions as string;
-  }
-
-  let getAST = (): AST.Template => {
-    if (typeof template === 'string') {
-      return parse(template);
-    } else {
-      return template;
-    }
-  };
-
-  const syntax = {
-    parse,
-    builders,
-    print,
-    traverse,
-    Walker,
-  };
-
-  const env: TransformPluginEnv = {
-    get contents() {
-      if (typeof contents === 'undefined') {
-        if (typeof template === 'string') {
-          contents = template;
-        } else {
-          contents = print(getAST());
-        }
-      }
-
-      return contents;
-    },
-    filePath,
-    syntax,
-    parseOptions: {
-      srcName: filePath,
-    },
-  };
-
-  return env;
-}
-
 export function transform(
   template: string | AST.Template,
   plugin: TransformPluginBuilder
@@ -153,27 +93,14 @@ export function transform(
   templateOrOptions: string | AST.Template | TransformOptions,
   plugin?: TransformPluginBuilder
 ): TransformResult {
-  let ast: AST.Template;
-  let template: string | AST.Template;
-
-  const env = envForTransformPlugin(templateOrOptions);
+  let { ast, env } = envForTransformPlugin(templateOrOptions);
 
   if (plugin === undefined) {
     let options = templateOrOptions as TransformOptions;
     plugin = options.plugin;
-    template = options.template;
-  } else {
-    template = templateOrOptions as string;
   }
 
-  const visitor = plugin(env);
-
-  if (typeof template === 'string') {
-    ast = parse(template as string);
-  } else {
-    // assume we were passed an ast
-    ast = template as AST.Template;
-  }
+  let visitor = plugin(env);
 
   traverse(ast, visitor);
 

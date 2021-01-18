@@ -1,6 +1,8 @@
 const reLines = /(.*?(?:\r\n?|\n|$))/gm;
 
 import type { AST } from '@glimmer/syntax';
+import { traverse, builders, Walker } from '@glimmer/syntax';
+import { TransformPluginEnv, TransformOptions, parse, print } from '..';
 
 export function sourceForLoc(source: string | string[], loc?: AST.SourceLocation): string {
   if (!loc) {
@@ -91,4 +93,73 @@ export function getLines(source: string): string[] {
   }
 
   return result.slice(0, -1);
+}
+
+export function envForTransformPlugin(
+  templateOrOptions: string | AST.Template | TransformOptions
+): { env: TransformPluginEnv; ast: AST.Template } {
+  let contents: string;
+  let filePath: undefined | string = undefined;
+  let template: string | AST.Template;
+
+  if (typeof templateOrOptions !== 'string') {
+    if ('plugin' in templateOrOptions) {
+      let options = templateOrOptions as TransformOptions;
+      if ('template' in options) {
+        template = options.template;
+      }
+      if ('filePath' in options) {
+        filePath = options.filePath;
+      }
+    } else {
+      template = templateOrOptions as AST.Template;
+    }
+  } else {
+    template = templateOrOptions as string;
+  }
+
+  let resolvedAST: AST.Template | undefined = undefined;
+
+  let getAST = (): AST.Template => {
+    if (resolvedAST === undefined) {
+      if (typeof template === 'string') {
+        resolvedAST = parse(template);
+      } else {
+        resolvedAST = template;
+      }
+    }
+    return resolvedAST;
+  };
+
+  const syntax = {
+    parse,
+    builders,
+    print,
+    traverse,
+    Walker,
+  };
+
+  const env: TransformPluginEnv = {
+    get contents() {
+      if (typeof contents === 'undefined') {
+        if (typeof template === 'string') {
+          contents = template;
+        } else {
+          contents = print(getAST());
+        }
+      }
+
+      return contents;
+    },
+    filePath,
+    syntax,
+    parseOptions: {
+      srcName: filePath,
+    },
+  };
+
+  return {
+    env,
+    ast: getAST(),
+  };
 }
