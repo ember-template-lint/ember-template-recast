@@ -2,7 +2,7 @@ const reLines = /(.*?(?:\r\n?|\n|$))/gm;
 
 import type { AST } from '@glimmer/syntax';
 import { traverse, builders, Walker } from '@glimmer/syntax';
-import { TransformPluginEnv, TransformOptions, parse, print } from '..';
+import { TransformPluginEnv, TransformOptions, parse, print } from '.';
 
 export function sourceForLoc(source: string | string[], loc?: AST.SourceLocation): string {
   if (!loc) {
@@ -98,16 +98,15 @@ export function getLines(source: string): string[] {
 export function envForTransformPlugin(
   templateOrOptions: string | AST.Template | TransformOptions
 ): { env: TransformPluginEnv; ast: AST.Template } {
+  let ast: AST.Template;
   let contents: string;
-  let filePath: undefined | string = undefined;
+  let filePath: undefined | string;
   let template: string | AST.Template;
 
   if (typeof templateOrOptions !== 'string') {
     if ('plugin' in templateOrOptions) {
       let options = templateOrOptions as TransformOptions;
-      if ('template' in options) {
-        template = options.template;
-      }
+      template = options.template;
       if ('filePath' in options) {
         filePath = options.filePath;
       }
@@ -118,18 +117,11 @@ export function envForTransformPlugin(
     template = templateOrOptions as string;
   }
 
-  let resolvedAST: AST.Template | undefined = undefined;
-
-  let getAST = (): AST.Template => {
-    if (resolvedAST === undefined) {
-      if (typeof template === 'string') {
-        resolvedAST = parse(template);
-      } else {
-        resolvedAST = template;
-      }
-    }
-    return resolvedAST;
-  };
+  if (typeof template === 'string') {
+    ast = parse(template);
+  } else {
+    ast = template as AST.Template;
+  }
 
   const syntax = {
     parse,
@@ -145,7 +137,7 @@ export function envForTransformPlugin(
         if (typeof template === 'string') {
           contents = template;
         } else {
-          contents = print(getAST());
+          contents = print(ast);
         }
       }
 
@@ -160,6 +152,6 @@ export function envForTransformPlugin(
 
   return {
     env,
-    ast: getAST(),
+    ast,
   };
 }
