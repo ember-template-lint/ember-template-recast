@@ -374,6 +374,22 @@ describe('ember-template-recast', function () {
       expect(code).toEqual('{{wat-wat}}');
     });
 
+    test('replacing a @class with a class', function () {
+      let template = '<div @class="{{if foo "bar"}} baz" />';
+      let { code } = transform({
+        template,
+        plugin() {
+          return {
+            AttrNode(node) {
+              node.name = 'class';
+            },
+          };
+        },
+      });
+
+      expect(code).toEqual('<div class="{{if foo "bar"}} baz" />');
+    });
+
     test('removing the only hash pair on MustacheStatement', function () {
       let template = '{{foo-bar hello="world"}}';
       let { code } = transform({
