@@ -42,7 +42,7 @@
     "ora": "^5.3.0",
     "slash": "^3.0.0",
     "tmp": "^0.2.1",
-    "workerpool": "^6.0.4"
+    "workerpool": "^6.1.0"
   },
   "devDependencies": {
     "@types/common-tags": "^1.8.0",
