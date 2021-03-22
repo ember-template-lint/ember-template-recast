@@ -305,6 +305,13 @@
   dependencies:
     "@glimmer/env" "^0.1.7"
 
+"@glimmer/global-context@0.77.3":
+  version "0.77.3"
+  resolved "https://registry.yarnpkg.com/@glimmer/global-context/-/global-context-0.77.3.tgz#b83f2c9d2d0720fdbd49d1ecf33d6836d06c3af2"
+  integrity sha512-bNPwdoW0/+bwSAR3Ek5C+xo+xkIlUxR4LljfRuwDOXlTebm7YPVDNLN+Vb2XUGNZfMgyNDRPkMO9P3CxW1wDTA==
+  dependencies:
+    "@glimmer/env" "^0.1.7"
+
 "@glimmer/interfaces@0.65.0":
   version "0.65.0"
   resolved "https://registry.yarnpkg.com/@glimmer/interfaces/-/interfaces-0.65.0.tgz#e3852efb63fc9f18268991caea4ab362b75ae231"
@@ -342,13 +349,21 @@
     "@glimmer/interfaces" "0.65.0"
     "@simple-dom/interface" "^1.4.0"
 
-"@glimmer/validator@0.65.0", "@glimmer/validator@^0.65.0":
+"@glimmer/validator@0.65.0":
   version "0.65.0"
   resolved "https://registry.yarnpkg.com/@glimmer/validator/-/validator-0.65.0.tgz#e4411e0a979f002efe236e3bcc91de5f5aaeaed2"
   integrity sha512-nwFReFT9zOOV+9iSqhNookTfHbOsqqPvtsALXl5Rn4QmtAHFLdehiWyN6ddb/sJwllWq+fNW8DxQdiY1xRwn9A==
   dependencies:
     "@glimmer/env" "^0.1.7"
     "@glimmer/global-context" "0.65.0"
+
+"@glimmer/validator@^0.77.3":
+  version "0.77.3"
+  resolved "https://registry.yarnpkg.com/@glimmer/validator/-/validator-0.77.3.tgz#bbbd802742983ad5deed66c02d636e0faa520c65"
+  integrity sha512-e/eUJszfBrr0wQkW1+vsiP8Sa+S7oBuSa1XPh1b7maGUNkWpk49THERfyULsWYGzrl5iYHWmM+Cl6proAXdI6g==
+  dependencies:
+    "@glimmer/env" "^0.1.7"
+    "@glimmer/global-context" "0.77.3"
 
 "@handlebars/parser@^1.1.0":
   version "1.1.0"
