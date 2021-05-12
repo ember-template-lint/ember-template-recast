@@ -32,9 +32,9 @@
     "test:jest": "jest"
   },
   "dependencies": {
-    "@glimmer/reference": "^0.66.0",
-    "@glimmer/syntax": "^0.66.0",
-    "@glimmer/validator": "^0.66.0",
+    "@glimmer/reference": "^0.79.0",
+    "@glimmer/syntax": "^0.79.0",
+    "@glimmer/validator": "^0.79.0",
     "async-promise-queue": "^1.0.5",
     "colors": "^1.4.0",
     "commander": "^6.2.1",
