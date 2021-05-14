@@ -967,6 +967,10 @@ export default class ParseResult {
           const wasQuotableValue = attrNode.value.type === 'TextNode';
 
           if (dirtyFields.has('name')) {
+            if (!wasQuotableValue) {
+              quote = '';
+            }
+
             nameSource = ast.name;
 
             dirtyFields.delete('name');
