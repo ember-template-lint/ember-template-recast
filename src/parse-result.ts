@@ -952,14 +952,8 @@ export default class ParseResult {
             throw new Error(`Could not match attr node parts for ${source}`);
           }
 
-          let [
-            ,
-            nameSource,
-            postNameWhitespace,
-            equals,
-            postEqualsWhitespace,
-            quote,
-          ] = attrNodePartsResults;
+          let [, nameSource, postNameWhitespace, equals, postEqualsWhitespace, quote] =
+            attrNodePartsResults;
           let valueSource = this.sourceForLoc(attrNode.value.loc);
 
           // does not include ConcatStatement because `_print` automatically
