@@ -46,8 +46,10 @@ function fixASTIssues(sourceLines: any, ast: any) {
       if (isValueless && node.value.type === 'TextNode' && node.value.chars === '') {
         // \n is not valid within an attribute name (it would indicate two attributes)
         // always assume the attribute ends on the starting line
-        node.loc.end.line = node.loc.start.line;
-        node.loc.end.column = node.loc.start.column + node.name.length;
+        const {
+          start: { line, column },
+        } = node.loc;
+        node.loc = builders.loc(line, column, line, column + node.name.length);
       }
 
       (node as any).isValueless = isValueless;
@@ -79,7 +81,8 @@ function fixASTIssues(sourceLines: any, ast: any) {
           const isFirstPart = parent.parts.indexOf(node) === 0;
 
           if (isFirstPart && node.loc.start.column > path.parentNode.loc.start.column + 1) {
-            node.loc.start.column = node.loc.start.column - 1;
+            const { start, end } = node.loc;
+            node.loc = builders.loc(start.line, start.column, end.line, end.column - 1);
           }
         }
       }
