@@ -1,4 +1,4 @@
-import { preprocess, print as _print, traverse, AST } from '@glimmer/syntax';
+import { builders, preprocess, print as _print, traverse, AST } from '@glimmer/syntax';
 import { getLines, sortByLoc, sourceForLoc } from './utils';
 
 const leadingWhitespace = /(^\s+)/;
@@ -68,8 +68,8 @@ function fixASTIssues(sourceLines: any, ast: any) {
             ((source.startsWith(`'`) && source.endsWith(`'`)) ||
               (source.startsWith(`"`) && source.endsWith(`"`)))
           ) {
-            node.loc.end.column = node.loc.end.column - 1;
-            node.loc.start.column = node.loc.start.column + 1;
+            const { start, end } = node.loc;
+            node.loc = builders.loc(start.line, start.column + 1, end.line, end.column - 1);
           }
           break;
         }
