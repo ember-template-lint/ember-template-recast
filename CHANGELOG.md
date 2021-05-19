@@ -1,5 +1,15 @@
 # Changelog
 
+## v5.0.2 (2021-05-19)
+
+#### :rocket: Enhancement
+* [#569](https://github.com/ember-template-lint/ember-template-recast/pull/569) Export AST and NodeVisitor types from @glimmer/syntax. ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 2
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+- [@dependabot-preview[bot]](https://github.com/apps/dependabot-preview)
+
+
 ## v5.0.1 (2020-11-16)
 
 #### :bug: Bug Fix
