@@ -140,5 +140,7 @@ export function transform(
   return { ast, code: print(ast) };
 }
 
+export type { AST, NodeVisitor } from '@glimmer/syntax';
+
 export { builders, traverse } from '@glimmer/syntax';
 export { sourceForLoc } from './utils';
