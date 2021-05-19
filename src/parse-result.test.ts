@@ -1257,6 +1257,14 @@ describe('ember-template-recast', function () {
 
       expect(print(ast)).toEqual('<div class="hahah {{foo}}"></div>');
     });
+
+    test('quotes are preserved when updating an AttrNode name - issue #319', function () {
+      let template = '<div @class="{{if foo "bar"}} baz" />';
+
+      let ast = parse(template) as any;
+      ast.body[0].attributes[0].name = 'class';
+      expect(print(ast)).toEqual('<div class="{{if foo "bar"}} baz" />');
+    });
   });
 
   describe('HashPair', function () {
