@@ -647,6 +647,7 @@ describe('"real life" smoke tests', function () {
 
                 return b.attr(`@${pair.key}`, value);
               }),
+              loc: builders.loc(1, 0, 1, 0),
             }
           );
         },
@@ -805,7 +806,10 @@ describe('"real life" smoke tests', function () {
             let lastParam = models[models.length - 1] as AST.SubExpression;
 
             let _qpParam = b.attr('@query', b.mustache(b.path('hash'), [], lastParam.hash));
-            return b.element({ name: 'FooBar', selfClosing: true }, { attrs: [_qpParam] });
+            return b.element(
+              { name: 'FooBar', selfClosing: true },
+              { attrs: [_qpParam], loc: node.loc }
+            );
           }
         },
       };
