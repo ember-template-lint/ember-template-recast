@@ -1,5 +1,14 @@
 # Changelog
 
+## v5.0.3 (2021-05-19)
+
+#### :bug: Bug Fix
+* [#555](https://github.com/ember-template-lint/ember-template-recast/pull/555) Fix extra quoting being applied to ConcatStatement ([@dcyriller](https://github.com/dcyriller))
+
+#### Committers: 1
+- Cyrille David ([@dcyriller](https://github.com/dcyriller))
+
+
 ## v5.0.2 (2021-05-19)
 
 #### :rocket: Enhancement
