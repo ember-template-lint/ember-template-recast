@@ -1295,6 +1295,14 @@ describe('ember-template-recast', function () {
       expect(print(ast)).toEqual('<div class="{{if foo "bar"}} baz" />');
     });
 
+    test('quotes are preserved when updating an AttrNode value - issue #588', function () {
+      let template = '<div class="{{if foo "bar"}} baz" />';
+
+      let ast = parse(template) as any;
+      ast.body[0].attributes[0].value = builders.concat([builders.text('foobar')]);
+      expect(print(ast)).toEqual('<div class="foobar" />');
+    });
+
     test('TextNode quote types can be changed', function () {
       let template = '<div class=foo />';
       let ast = parse(template) as any;
