@@ -431,4 +431,21 @@ describe('ember-template-recast', function () {
       '{{foo-bar placeholder="Choose a \\"thing\\"..." p1="Choose a \\"thing\\"..."}}'
     );
   });
+
+  test('stack trace does not exceed', function () {
+    let b = builders;
+    let template = '<div @class="{{if foo "bar"}} baz" />';
+    let { code } = transform({
+      template,
+      plugin() {
+        return {
+          AttrNode(node) {
+            node.value = b.concat([b.text('foobar')]);
+          },
+        };
+      },
+    });
+
+    expect(code).toEqual('<div @class="foobar" />');
+  });
 });
