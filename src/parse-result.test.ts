@@ -37,6 +37,14 @@ describe('ember-template-recast', function () {
       expect(print(ast)).toEqual(`<img src="foo {{bar}}">`);
     });
 
+    test('can print parsed element', function () {
+      let template = `<img src="foo {{bar}} baz">`;
+      let original = parse(template);
+      let element = original.body[0] as AST.ElementNode;
+
+      expect(print(element)).toEqual(`<img src="foo {{bar}}">`);
+    });
+
     test('changing an element to a void element does not print closing tag', function () {
       let template = `<div data-foo="{{something}}"></div>`;
 
