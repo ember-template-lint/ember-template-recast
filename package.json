@@ -37,7 +37,7 @@
     "@glimmer/validator": "^0.65.0",
     "async-promise-queue": "^1.0.5",
     "colors": "^1.4.0",
-    "commander": "^6.2.1",
+    "commander": "^8.0.0",
     "globby": "^11.0.3",
     "ora": "^5.4.0",
     "slash": "^3.0.0",
