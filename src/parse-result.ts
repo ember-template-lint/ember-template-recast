@@ -1,5 +1,5 @@
-import { preprocess, print as _print, traverse, AST } from '@glimmer/syntax';
-import { getLines, sortByLoc, sourceForLoc, isSynthetic } from './utils';
+import { preprocess, builders, print as _print, traverse, ASTv1 as AST } from '@glimmer/syntax';
+import { getLines, sortByLoc, sourceForLoc, isSyntheticWithNoLocation } from './utils';
 
 const leadingWhitespace = /(^\s+)/;
 const attrNodeParts = /(^[^=]+)(\s+)?(=)?(\s+)?(['"])?(\S+)?/;
@@ -982,7 +982,10 @@ export default class ParseResult {
               quote = '"';
             } else if (wasQuotableValue && !newValueNeedsQuotes) {
               quote = '';
-            } else if (ast.value.type === 'ConcatStatement' && isSynthetic(ast.value)) {
+            } else if (
+              ast.value.type === 'ConcatStatement' &&
+              isSyntheticWithNoLocation(ast.value)
+            ) {
               // double quotes are automatically added around synthetic ConcatStatements
               quote = '';
             }

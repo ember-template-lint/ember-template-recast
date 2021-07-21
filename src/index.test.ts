@@ -432,20 +432,20 @@ describe('ember-template-recast', function () {
     );
   });
 
-  test('stack trace does not exceed', function () {
+  test('can replace an `AttrNode`s value with a new `ConcatStatement`', function () {
     let b = builders;
-    let template = '<div @class="{{if foo "bar"}} baz" />';
+    let template = '<div class="{{if foo "bar"}} baz" />';
     let { code } = transform({
       template,
       plugin() {
         return {
           AttrNode(node) {
-            node.value = b.concat([b.text('foobar')]);
+            node.value = b.concat([b.text('foobar'), b.text('baz')]);
           },
         };
       },
     });
 
-    expect(code).toEqual('<div @class="foobar" />');
+    expect(code).toEqual('<div class="foobarbaz" />');
   });
 });
