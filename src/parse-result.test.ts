@@ -1,5 +1,5 @@
 import { builders, parse, print, transform } from '.';
-import type { AST } from '@glimmer/syntax';
+import type { ASTv1 as AST } from '@glimmer/syntax';
 import { stripIndent } from 'common-tags';
 
 describe('ember-template-recast', function () {

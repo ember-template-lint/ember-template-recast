@@ -1,6 +1,6 @@
 const reLines = /(.*?(?:\r\n?|\n|$))/gm;
 
-import type { AST } from '@glimmer/syntax';
+import type { ASTv1 as AST } from '@glimmer/syntax';
 
 export function sourceForLoc(source: string | string[], loc?: AST.SourceLocation): string {
   if (!loc) {
@@ -42,7 +42,8 @@ export function sourceForLoc(source: string | string[], loc?: AST.SourceLocation
 
 export function isSynthetic(node: AST.Node): boolean {
   if (node && node.loc) {
-    return node.loc.source === '(synthetic)';
+    const { start, end } = node.loc;
+    return start.column === end.column && start.line === end.line;
   }
 
   return false;
