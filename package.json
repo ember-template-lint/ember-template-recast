@@ -95,5 +95,8 @@
       "release": true,
       "tokenRef": "GITHUB_AUTH"
     }
+  },
+  "volta": {
+    "yarn": "1.22.15"
   }
 }
