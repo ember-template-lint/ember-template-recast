@@ -1249,6 +1249,15 @@ describe('ember-template-recast', function () {
       expect(print(ast)).toEqual('<div class=zomgyasss></div>');
     });
 
+    test('quoteless attribute values can be updated to a must-quote attribute value', function () {
+      let template = `<div class=wat></div>`;
+
+      let ast = parse(template) as any;
+      ast.body[0].attributes[0].value.chars = 'foo bar baz';
+
+      expect(print(ast)).toEqual('<div class="foo bar baz"></div>');
+    });
+
     test('quotes are preserved when updating a ConcatStatement value', function () {
       let template = `<div class="lol {{foo}}"></div>`;
 
@@ -1264,6 +1273,99 @@ describe('ember-template-recast', function () {
       let ast = parse(template) as any;
       ast.body[0].attributes[0].name = 'class';
       expect(print(ast)).toEqual('<div class="{{if foo "bar"}} baz" />');
+    });
+
+    test('TextNode quote types can be changed', function () {
+      let template = '<div class=foo />';
+      let ast = parse(template) as any;
+
+      ast.body[0].attributes[0].quoteType = "'";
+      expect(print(ast)).toEqual("<div class='foo' />");
+      ast.body[0].attributes[0].quoteType = '"';
+      expect(print(ast)).toEqual('<div class="foo" />');
+
+      template = '<div class="foo" />';
+      ast = parse(template) as any;
+
+      ast.body[0].attributes[0].quoteType = null;
+      expect(print(ast)).toEqual('<div class=foo />');
+    });
+
+    test('ConcatStatement quote types can be changed', function () {
+      let template = '<div class="{{foo}} static {{bar}}" />';
+      let ast = parse(template) as any;
+
+      ast.body[0].attributes[0].quoteType = "'";
+      expect(print(ast)).toEqual("<div class='{{foo}} static {{bar}}' />");
+
+      template = "<div class='{{foo}} static {{bar}}' />";
+      ast = parse(template) as any;
+
+      ast.body[0].attributes[0].quoteType = '"';
+      expect(print(ast)).toEqual('<div class="{{foo}} static {{bar}}" />');
+    });
+
+    test('can create a single-quoted concat value', function () {
+      // We usually use the glimmer printer for any user-created nodes.
+      // But the glimmer printer hardcodes double-quotes for ConcatStatements.
+      // So, if the user specifies single quotes and creates a concat value,
+      // make sure it doesn't accidentally use multiple qutoes.
+      let template = '<div class="foo" />';
+
+      let ast = parse(template) as any;
+      ast.body[0].attributes[0].quoteType = "'";
+      ast.body[0].attributes[0].value = builders.concat([
+        builders.mustache('foo'),
+        builders.text(' static '),
+        builders.mustache('bar'),
+      ]);
+      expect(print(ast)).toEqual("<div class='{{foo}} static {{bar}}' />");
+    });
+
+    test('can specify quote style on a new attribute', function () {
+      let template = '<div />';
+
+      let ast = parse(template) as any;
+      let c = builders.attr('class', builders.text('foo'));
+      c.quoteType = null;
+      ast.body[0].attributes.push(c);
+      expect(print(ast)).toEqual('<div class=foo />');
+    });
+
+    test('can specify valueless on a new attribute', function () {
+      let template = '<div />';
+
+      let ast = parse(template) as any;
+      let c = builders.attr('...attributes', builders.text(''));
+      c.isValueless = true;
+      ast.body[0].attributes.push(c);
+      expect(print(ast)).toEqual('<div ...attributes />');
+    });
+
+    test('invalid quote types are rejected', function () {
+      let template: string;
+      let ast: any;
+
+      template = '<div class="foo" />';
+      ast = parse(template);
+      ast.body[0].attributes[0].quoteType = '"';
+      ast.body[0].attributes[0].value = builders.mustache('foo');
+      expect(() => print(ast)).toThrow('should not be quoted');
+      ast.body[0].attributes[0].quoteType = "'";
+      expect(() => print(ast)).toThrow('should not be quoted');
+
+      ast = parse(template);
+      ast.body[0].attributes[0].quoteType = null;
+      ast.body[0].attributes[0].value = builders.concat([
+        builders.mustache('foo'),
+        builders.text(' static'),
+      ]);
+      expect(() => print(ast)).toThrow('must be quoted');
+
+      ast = parse(template);
+      ast.body[0].attributes[0].quoteType = null;
+      ast.body[0].attributes[0].value = builders.text('foo bar');
+      expect(() => print(ast)).toThrow('`foo bar` is invalid as an unquoted attribute');
     });
   });
 
@@ -1400,6 +1502,29 @@ describe('ember-template-recast', function () {
       ast.body[0].params[0].value = 'derp';
 
       expect(print(ast)).toEqual(`{{foo "derp"}}`);
+    });
+
+    test('can determine type of quotes used from AST (required by ember-template-lint)', function () {
+      expect((parse(`{{foo "blah"}}`) as any).body[0].params[0].quoteType).toBe('"');
+      expect((parse(`{{foo 'blah'}}`) as any).body[0].params[0].quoteType).toBe("'");
+    });
+
+    test('can update quote style', function () {
+      let ast = parse(`{{foo "blah"}}`) as any;
+      ast.body[0].params[0].quoteType = "'";
+      expect(print(ast)).toEqual(`{{foo 'blah'}}`);
+
+      ast = parse(`{{foo 'blah'}}`) as any;
+      ast.body[0].params[0].quoteType = '"';
+      expect(print(ast)).toEqual(`{{foo "blah"}}`);
+    });
+
+    test('can specify quote style on a new string literal', function () {
+      let ast = parse(`{{foo}}`) as any;
+      let s = builders.string('blah');
+      s.quoteType = "'";
+      ast.body[0].params.push(s);
+      expect(print(ast)).toEqual(`{{foo 'blah'}}`);
     });
   });
 

@@ -1,9 +1,16 @@
 import { preprocess, print as _print, traverse, AST } from '@glimmer/syntax';
 import { getLines, sortByLoc, sourceForLoc } from './utils';
+import {
+  QuoteType,
+  AnnotatedAttrNode,
+  AnnotatedStringLiteral,
+  useCustomPrinter,
+} from './custom-nodes';
 
 const leadingWhitespace = /(^\s+)/;
 const attrNodeParts = /(^[^=]+)(\s+)?(=)?(\s+)?(['"])?(\S+)?/;
 const hashPairParts = /(^[^=]+)(\s+)?=(\s+)?(\S+)/;
+const invalidUnquotedAttrValue = /[^-.a-zA-Z0-9]/;
 
 const voidTagNames = new Set([
   'area',
@@ -33,7 +40,8 @@ const voidTagNames = new Set([
 */
 function fixASTIssues(sourceLines: any, ast: any) {
   traverse(ast, {
-    AttrNode(node) {
+    AttrNode(attr) {
+      const node = attr as AnnotatedAttrNode;
       const source = sourceForLoc(sourceLines, node.loc);
       const attrNodePartsResults = source.match(attrNodeParts);
       if (attrNodePartsResults === null) {
@@ -50,8 +58,17 @@ function fixASTIssues(sourceLines: any, ast: any) {
         node.loc.end.column = node.loc.start.column + node.name.length;
       }
 
-      (node as any).isValueless = isValueless;
-      (node as any).quoteType = quote ? quote : null;
+      node.isValueless = isValueless;
+      node.quoteType = (quote as QuoteType) || null;
+    },
+    StringLiteral(lit) {
+      const quotes = /^['"]/;
+      const node = lit as AnnotatedStringLiteral;
+      const source = sourceForLoc(sourceLines, node.loc);
+      if (!source.match(quotes)) {
+        throw new Error('Invalid string literal found');
+      }
+      node.quoteType = source[0] as QuoteType;
     },
     TextNode(node, path) {
       const source = sourceForLoc(sourceLines, node.loc);
@@ -363,15 +380,7 @@ export default class ParseResult {
     const nodeInfo = this.nodeInfo.get(_ast);
 
     if (nodeInfo === undefined) {
-      return _print(_ast, {
-        entityEncoding: 'raw',
-
-        override: (ast) => {
-          if (this.nodeInfo.has(ast)) {
-            return this.print(ast);
-          }
-        },
-      });
+      return this.printUserSuppliedNode(_ast);
     }
 
     // this ensures that we are operating on the actual node and not a
@@ -955,34 +964,65 @@ export default class ParseResult {
           let [, nameSource, postNameWhitespace, equals, postEqualsWhitespace, quote] =
             attrNodePartsResults;
           let valueSource = this.sourceForLoc(attrNode.value.loc);
+          // Source of ConcatStatements includes their quotes,
+          // but source of an AttrNode's TextNode value does not.
+          // Normalize on not including them, then always printing them ourselves:
+          if (attrNode.value.type === 'ConcatStatement') {
+            valueSource = valueSource.slice(1, -1);
+          }
 
-          // does not include ConcatStatement because `_print` automatically
-          // adds a `"` around them, meaning we do not need to add our own quotes
-          const wasQuotableValue = attrNode.value.type === 'TextNode';
+          const node = ast as AnnotatedAttrNode;
 
           if (dirtyFields.has('name')) {
-            if (!wasQuotableValue) {
-              quote = '';
-            }
-
-            nameSource = ast.name;
-
+            nameSource = node.name;
             dirtyFields.delete('name');
           }
 
-          if (dirtyFields.has('value')) {
-            const newValueNeedsQuotes = ast.value.type === 'TextNode';
-
-            if (!wasQuotableValue && newValueNeedsQuotes) {
-              quote = '"';
-            } else if (wasQuotableValue && !newValueNeedsQuotes) {
-              quote = '';
+          if (dirtyFields.has('quoteType')) {
+            // Ensure the quote type they've specified is valid for the value
+            if (node.value.type === 'MustacheStatement' && node.quoteType) {
+              throw new Error('Mustache statements should not be quoted as attribute values');
+            } else if (node.value.type === 'ConcatStatement' && !node.quoteType) {
+              throw new Error('ConcatStatements must be quoted as attribute values');
+            } else if (
+              node.value.type == 'TextNode' &&
+              !node.quoteType &&
+              (node.value as AST.TextNode).chars.match(invalidUnquotedAttrValue)
+            ) {
+              throw new Error(
+                `\`${node.value.chars}\` is invalid as an unquoted attribute value. Alphanumeric, hyphens, and periods only`
+              );
             }
-
-            valueSource = this.print(ast.value);
-
-            dirtyFields.delete('value');
+            quote = node.quoteType || ''; // null => empty string
+          } else if (dirtyFields.has('value')) {
+            // They updated the value without choosing a quote type. We'll use the previous quote
+            // type or default to double quote if necessary
+            if (node.value.type === 'MustacheStatement') {
+              quote = '';
+            } else if (
+              node.value.type === 'TextNode' &&
+              node.quoteType === null &&
+              !node.value.chars.match(invalidUnquotedAttrValue)
+            ) {
+              // If old value was unquoted, and new value is also ok as unquoted, preserve that.
+              quote = '';
+            } else {
+              quote = quote || '"';
+            }
           }
+          dirtyFields.delete('quoteType');
+
+          if (dirtyFields.has('value')) {
+            // If they created a ConcatStatement node, we need to print it ourselves here.
+            // Otherwise, since it has no nodeInfo, it will print using the glimmer printer
+            // which hardcodes double quotes.
+            if (node.value.type === 'ConcatStatement') {
+              valueSource = node.value.parts.map((part) => this.print(part)).join('');
+            } else {
+              valueSource = this.print(node.value);
+            }
+          }
+          dirtyFields.delete('value');
 
           output.push(
             nameSource,
@@ -1039,18 +1079,8 @@ export default class ParseResult {
         break;
       case 'StringLiteral':
         {
-          const { source } = nodeInfo;
-
-          const openQuote = source[0];
-          const closeQuote = source[source.length - 1];
-          let valueSource = source.slice(1, -1);
-
-          if (dirtyFields.has('value')) {
-            valueSource = ast.value;
-            dirtyFields.delete('value');
-          }
-
-          output.push(openQuote, valueSource, closeQuote);
+          const node = ast as AnnotatedStringLiteral;
+          output.push(node.quoteType, node.value, node.quoteType);
         }
         break;
       case 'BooleanLiteral':
@@ -1083,5 +1113,77 @@ export default class ParseResult {
     }
 
     return output.join('');
+  }
+
+  // User-created nodes will have no nodeInfo, but we support
+  // formatting properties that the glimmer printer does not.
+  // If the user-created node specifies no custom formatting,
+  // just use the glimmer printer.
+  // These overrides could go away if glimmer had a concrete
+  // syntax tree type and printer.
+  printUserSuppliedNode(_ast: AST.Node): string {
+    switch (_ast.type) {
+      case 'StringLiteral':
+        {
+          let quote = (_ast as AnnotatedStringLiteral).quoteType || '"';
+          return quote + _ast.value + quote;
+        }
+        break;
+      case 'AttrNode':
+        {
+          const node = _ast as AnnotatedAttrNode;
+          if (node.isValueless) {
+            if (node.value.type !== 'TextNode' || node.value.chars !== '') {
+              throw new Error('The value property of a valueless attr must be an empty TextNode');
+            }
+            return node.name;
+          }
+          if (
+            node.isValueless === undefined &&
+            node.value.type === 'TextNode' &&
+            node.value.chars === ''
+          ) {
+            return node.name;
+          }
+          switch (node.value.type) {
+            case 'MustacheStatement':
+              return node.name + '=' + this.print(node.value);
+              break;
+            case 'ConcatStatement':
+              {
+                const value = node.value.parts.map((part) => this.print(part)).join('');
+                const quote = node.quoteType || '"';
+                return node.name + '=' + quote + value + quote;
+              }
+              break;
+            case 'TextNode':
+              {
+                if (node.quoteType === null && node.value.chars.match(invalidUnquotedAttrValue)) {
+                  throw new Error(
+                    `You specified a quoteless attribute \`${node.value.chars}\`, which is invalid without quotes`
+                  );
+                }
+                let quote: string;
+                if (node.quoteType === null) {
+                  quote = '';
+                } else {
+                  quote = node.quoteType || '"';
+                }
+                return node.name + '=' + quote + node.value.chars + quote;
+              }
+              break;
+          }
+        }
+        break;
+      default:
+        return _print(_ast, {
+          entityEncoding: 'raw',
+          override: (ast) => {
+            if (this.nodeInfo.has(ast) || useCustomPrinter(ast)) {
+              return this.print(ast);
+            }
+          },
+        });
+    }
   }
 }

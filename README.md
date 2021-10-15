@@ -125,7 +125,9 @@ export interface TransformPluginBuilder {
 ```
 
 The list of known builders on the `env.syntax.builders` are [found
-here](https://github.com/glimmerjs/glimmer-vm/blob/v0.62.4/packages/%40glimmer/syntax/lib/builders.ts#L547-L578).
+here](https://github.com/glimmerjs/glimmer-vm/blob/v0.62.4/packages/%40glimmer/syntax/lib/builders.ts#L547-L578),
+although there are a few small extensions related to formatting
+[in `custom-nodes.ts`](src/custom-nodes.ts)
 
 Example:
 ```js
