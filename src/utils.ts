@@ -1,6 +1,7 @@
 const reLines = /(.*?(?:\r\n?|\n|$))/gm;
 
 import type { ASTv1 as AST } from '@glimmer/syntax';
+import { sortByLoc as glimmerSortByLoc } from '@glimmer/syntax';
 
 export function sourceForLoc(source: string | string[], loc?: AST.SourceLocation): string {
   if (!loc) {
@@ -52,24 +53,15 @@ export function isSyntheticWithNoLocation(node: AST.Node): boolean {
 }
 
 export function sortByLoc(a: AST.Node, b: AST.Node): -1 | 0 | 1 {
-  // be conservative about the location where a new node is inserted
+  // the sortByLoc function in @glimmmer/syntax
+  // sorts the synthetic nodes that don't have any location
+  // at the beginning of the range
+  // in ember-template-recast, we preserve the index at which they were inserted
   if (isSyntheticWithNoLocation(a) || isSyntheticWithNoLocation(b)) {
     return 0;
   }
 
-  if (a.loc.start.line < b.loc.start.line) {
-    return -1;
-  }
-
-  if (a.loc.start.line === b.loc.start.line && a.loc.start.column < b.loc.start.column) {
-    return -1;
-  }
-
-  if (a.loc.start.line === b.loc.start.line && a.loc.start.column === b.loc.start.column) {
-    return 0;
-  }
-
-  return 1;
+  return glimmerSortByLoc(a, b);
 }
 
 export function compact(array: unknown[]): unknown[] {
