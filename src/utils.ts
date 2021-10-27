@@ -43,7 +43,9 @@ export function sourceForLoc(source: string | string[], loc?: AST.SourceLocation
 export function isSynthetic(node: AST.Node): boolean {
   if (node && node.loc) {
     const { start, end } = node.loc;
-    return start.column === end.column && start.line === end.line;
+    return (
+      node.loc.module === '(synthetic)' && start.column === end.column && start.line === end.line
+    );
   }
 
   return false;
