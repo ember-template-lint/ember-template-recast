@@ -1,5 +1,6 @@
 import { preprocess, builders, print as _print, traverse, ASTv1 as AST } from '@glimmer/syntax';
 import { getLines, sortByLoc, sourceForLoc } from './utils';
+import { klona } from 'klona/full';
 
 const leadingWhitespace = /(^\s+)/;
 const attrNodeParts = /(^[^=]+)(\s+)?(=)?(\s+)?(['"])?(\S+)?/;
@@ -135,7 +136,7 @@ export default class ParseResult {
 
     const nodeInfo = {
       node,
-      original: JSON.parse(JSON.stringify(node)),
+      original: klona(node),
       source: this.sourceForLoc(node.loc),
     };
 
