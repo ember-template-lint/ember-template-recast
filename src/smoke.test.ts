@@ -1,5 +1,4 @@
 import { parse, sourceForLoc, transform, builders, TransformPluginEnv } from '.';
-import { sortByLoc } from './utils';
 import type { AST, NodeVisitor } from '@glimmer/syntax';
 import { stripIndent } from 'common-tags';
 
@@ -837,7 +836,6 @@ describe('"real life" smoke tests', function () {
           let multiline = parts.length >= 2;
 
           let partsSource = parts
-            .sort(sortByLoc)
             .map((part) => sourceForLoc(template, part.loc))
             .map((partSource) => `${indentation}${partSource}`)
             .join(multiline ? '\n' : '');
