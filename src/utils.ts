@@ -40,7 +40,7 @@ export function sourceForLoc(source: string | string[], loc?: AST.SourceLocation
   return string.join('');
 }
 
-export function isSynthetic(node: AST.Node): boolean {
+export function isSyntheticWithNoLocation(node: AST.Node): boolean {
   if (node && node.loc) {
     const { start, end } = node.loc;
     return (
@@ -53,7 +53,7 @@ export function isSynthetic(node: AST.Node): boolean {
 
 export function sortByLoc(a: AST.Node, b: AST.Node): -1 | 0 | 1 {
   // be conservative about the location where a new node is inserted
-  if (isSynthetic(a) || isSynthetic(b)) {
+  if (isSyntheticWithNoLocation(a) || isSyntheticWithNoLocation(b)) {
     return 0;
   }
 
