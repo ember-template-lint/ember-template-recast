@@ -1,6 +1,6 @@
 const reLines = /(.*?(?:\r\n?|\n|$))/gm;
 
-import type { AST } from '@glimmer/syntax';
+import type { ASTv1 as AST } from '@glimmer/syntax';
 
 export function sourceForLoc(source: string | string[], loc?: AST.SourceLocation): string {
   if (!loc) {
@@ -40,9 +40,12 @@ export function sourceForLoc(source: string | string[], loc?: AST.SourceLocation
   return string.join('');
 }
 
-export function isSynthetic(node: AST.Node): boolean {
+export function isSyntheticWithNoLocation(node: AST.Node): boolean {
   if (node && node.loc) {
-    return node.loc.source === '(synthetic)';
+    const { start, end } = node.loc;
+    return (
+      node.loc.module === '(synthetic)' && start.column === end.column && start.line === end.line
+    );
   }
 
   return false;
@@ -50,7 +53,7 @@ export function isSynthetic(node: AST.Node): boolean {
 
 export function sortByLoc(a: AST.Node, b: AST.Node): -1 | 0 | 1 {
   // be conservative about the location where a new node is inserted
-  if (isSynthetic(a) || isSynthetic(b)) {
+  if (isSyntheticWithNoLocation(a) || isSyntheticWithNoLocation(b)) {
     return 0;
   }
 
