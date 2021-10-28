@@ -8,7 +8,9 @@ describe('ember-template-recast', function () {
       let template = ``;
 
       let ast = parse(template);
-      ast.body.push(builders.element('img'));
+      // in @glimmer/syntax v0.82.0,
+      // builders.element requires an empty object as a second arg
+      ast.body.push(builders.element('img', {}));
 
       expect(print(ast)).toEqual(`<img>`);
     });
