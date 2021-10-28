@@ -193,7 +193,7 @@ export default class ParseResult {
     for (const key in node) {
       const value = node[key];
 
-      if (typeof value === 'object' && value !== null) {
+      if (key !== 'loc' && typeof value === 'object' && value !== null) {
         const propertyProxy = this.wrapNode({ node, key }, value);
 
         propertyProxyMap.set(key, propertyProxy);
