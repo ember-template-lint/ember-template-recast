@@ -162,7 +162,7 @@ unique SemVer commitments. A high level summary is:
 
 The following are scenarios that would cause a major version (aka breaking change) release:
 
-* Dropping support for Node versions (e.g. dropping Node 10 support)
+* Dropping support for Node versions (e.g. dropping Node 12 support)
 * Non-additive changes to the underlying AST (which we bundle from `@glimmer/syntax`)
 * Breaking changes to the `@glimmer/syntax` builder APIs
 
