@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import * as os from 'os';
-import program from 'commander';
+import { program } from 'commander';
 import run from './runner';
 
 program
@@ -22,14 +22,15 @@ program
   .option('-s, --silent', 'no output', false)
   .parse(process.argv);
 
-if (program.args.length < 1 || !program.transform) {
+const programOptions = program.opts();
+if (program.args.length < 1 || !programOptions.transform) {
   program.help();
 } else {
   const options = {
-    cpus: program.cpus,
-    dry: program.dry,
-    silent: program.silent,
+    cpus: programOptions.cpus,
+    dry: programOptions.dry,
+    silent: programOptions.silent,
   };
 
-  run(program.transform, program.args, options);
+  run(programOptions.transform, program.args, options);
 }
