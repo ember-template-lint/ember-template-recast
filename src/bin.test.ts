@@ -80,9 +80,9 @@ Unchanged: 1`);
 
     try {
       await run(['files', '-t', 'bad-transform.js'], fixture.path());
-    } catch ({ stdout }) {
-      expect(stdout.includes('Error: Unexpected identifier')).toBeTruthy();
-      expect(stdout.includes(join(fixture.path(), 'bad-transform.js'))).toBeTruthy();
+    } catch (error: any) {
+      expect(error.stdout.includes('Error: Unexpected identifier')).toBeTruthy();
+      expect(error.stdout.includes(join(fixture.path(), 'bad-transform.js'))).toBeTruthy();
     }
   });
 
