@@ -56,7 +56,6 @@ function fixASTIssues(sourceLines: any, ast: any) {
       (node as any).quoteType = quote ? quote : null;
     },
     TextNode(node, path) {
-      const source = sourceForLoc(sourceLines, node.loc);
       if (path.parentNode === null) {
         throw new Error(
           'ember-template-recast: Error while sanitizing input AST: found TextNode with no parentNode'
@@ -65,6 +64,7 @@ function fixASTIssues(sourceLines: any, ast: any) {
 
       switch (path.parentNode.type) {
         case 'AttrNode': {
+          const source = sourceForLoc(sourceLines, node.loc);
           if (
             node.chars.length > 0 &&
             ((source.startsWith(`'`) && source.endsWith(`'`)) ||
@@ -76,13 +76,15 @@ function fixASTIssues(sourceLines: any, ast: any) {
           break;
         }
         case 'ConcatStatement': {
-          // TODO: manually working around https://github.com/glimmerjs/glimmer-vm/pull/954
           const parent = path.parentNode as AST.ConcatStatement;
           const isFirstPart = parent.parts.indexOf(node) === 0;
 
+          const { start, end } = node.loc;
           if (isFirstPart && node.loc.start.column > path.parentNode.loc.start.column + 1) {
-            const { start, end } = node.loc;
+            // TODO: manually working around https://github.com/glimmerjs/glimmer-vm/pull/954
             node.loc = builders.loc(start.line, start.column - 1, end.line, end.column);
+          } else if (isFirstPart && node.chars.charAt(0) === '\n') {
+            node.loc = builders.loc(start.line, start.column + 1, end.line, end.column);
           }
         }
       }
