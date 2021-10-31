@@ -124,7 +124,7 @@ function fixASTIssues(sourceLines: any, ast: any) {
  * ```
  */
 function rangeOfBlockParam(source: string): [number, number] {
-  const index = source.indexOf('as |');
+  const index = source.search(/as\s+\|/);
   return [index, source.indexOf('|', index + 4)];
 }
 
