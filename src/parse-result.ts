@@ -111,6 +111,40 @@ function fixASTIssues(sourceLines: any, ast: any) {
   return ast;
 }
 
+/*
+ * This function takes a string (the source of an ElementNode or a
+ * BlockStatement) and returns its block param's range.
+ *
+ * If the block param is not found, the function will return [-1, -1];
+ *
+ * For example:
+ * ```
+ * rangeOfBlockParam("<Component as |bar|></Component>") // => [11, 18]
+ * rangeOfBlockParam("{{#BlockStatement as |bar|}}{{/BlockStatement}}") // => [18, 25]
+ * ```
+ */
+function rangeOfBlockParam(source: string): [number, number] {
+  const index = source.indexOf('as |');
+  return [index, source.indexOf('|', index + 4)];
+}
+
+/*
+ * This function takes a string (the source of an ElementNode or a
+ * BlockStatement) and returns its block param.
+ *
+ * If the block param is not found, the function will return "";
+ *
+ * For example:
+ * ```
+ * blockParamSource("<Component as |bar|></Component>") // => "as |bar|"
+ * blockParamSource("{{#BlockStatement as |bar|}}{{/BlockStatement}}") // => "as |bar|"
+ * ```
+ */
+function blockParamSource(source: string): string {
+  const [indexOfAsPipe, indexOfEndPipe] = rangeOfBlockParam(source);
+  return source.substring(indexOfAsPipe, indexOfEndPipe + 1);
+}
+
 export interface NodeInfo {
   node: AST.Node;
   original: AST.Node;
@@ -504,13 +538,9 @@ export default class ParseResult {
           let blockParamsSource = '';
           let postBlockParamsWhitespace = '';
           if (element.blockParams.length > 0) {
-            const blockParamStartIndex = nodeInfo.source.indexOf('as |');
-            const blockParamsEndIndex = nodeInfo.source.indexOf('|', blockParamStartIndex + 4);
-            blockParamsSource = nodeInfo.source.substring(
-              blockParamStartIndex,
-              blockParamsEndIndex + 1
-            );
+            blockParamsSource = blockParamSource(nodeInfo.source);
 
+            const [, blockParamsEndIndex] = rangeOfBlockParam(nodeInfo.source);
             const closeOpenIndex = nodeInfo.source.indexOf(selfClosing ? '/>' : '>');
             postBlockParamsWhitespace = nodeInfo.source.substring(
               blockParamsEndIndex + 1,
@@ -742,14 +772,9 @@ export default class ParseResult {
               end: original.loc.end,
             });
 
-            const indexOfAsPipe = blockParamsSourceScratch.indexOf('as |');
-            const indexOfEndPipe = blockParamsSourceScratch.indexOf('|', indexOfAsPipe + 4);
+            blockParamsSource = blockParamSource(blockParamsSourceScratch);
 
-            blockParamsSource = blockParamsSourceScratch.substring(
-              indexOfAsPipe,
-              indexOfEndPipe + 1
-            );
-
+            const [, indexOfEndPipe] = rangeOfBlockParam(blockParamsSourceScratch);
             const postBlockParamsWhitespaceMatch = blockParamsSourceScratch
               .substring(indexOfEndPipe + 1)
               .match(leadingWhitespace);
@@ -771,8 +796,7 @@ export default class ParseResult {
 
             let startingOffset = 0;
             if (hadProgramBlockParams) {
-              const indexOfAsPipe = openEndSourceScratch.indexOf('as |');
-              const indexOfEndPipe = openEndSourceScratch.indexOf('|', indexOfAsPipe + 4);
+              const [, indexOfEndPipe] = rangeOfBlockParam(openEndSourceScratch);
 
               startingOffset = indexOfEndPipe + 1;
             }
