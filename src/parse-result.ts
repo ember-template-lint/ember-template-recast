@@ -113,7 +113,7 @@ function fixASTIssues(sourceLines: any, ast: any) {
 
 /*
  * This function takes a string (the source of an ElementNode or a
- * BlockStatement) and returns its block param's range.
+ * BlockStatement) and returns the first possible block param's range.
  *
  * If the block param is not found, the function will return [-1, -1];
  *
@@ -123,9 +123,39 @@ function fixASTIssues(sourceLines: any, ast: any) {
  * rangeOfBlockParam("{{#BlockStatement as |bar|}}{{/BlockStatement}}") // => [18, 25]
  * ```
  */
+function rangeOfFirstBlockParam(source: string): [number, number] {
+  let start = source.search(/as\s+\|/);
+  return [start, source.indexOf('|', start + 4)];
+}
+
+/*
+ * This function takes a string (the source of an ElementNode or a
+ * BlockStatement) and returns the range of the last possible block param's
+ * range.
+ *
+ * If the block param is not found, the function will return [-1, -1];
+ *
+ * For example:
+ * ```
+ * rangeOfBlockParam('<Component data-foo="as |foo|" as |bar|></Component>') // => [31, 38]
+ * rangeOfBlockParam('{{#BlockStatement data-foo="as |foo|" as |bar|}}{{/BlockStatement}}') // => [38, 45]
+ * ```
+ */
 function rangeOfBlockParam(source: string): [number, number] {
-  const index = source.search(/as\s+\|/);
-  return [index, source.indexOf('|', index + 4)];
+  let [start, end] = rangeOfFirstBlockParam(source);
+
+  let range = [start, end];
+  while (range[0] !== -1 && range[1] !== -1) {
+    const tail = source.slice(end + 1);
+    range = rangeOfFirstBlockParam(tail);
+
+    if (range[0] !== -1 && range[1] !== -1) {
+      start = end + 1 + range[0];
+      end = end + 1 + range[1];
+    }
+  }
+
+  return [start, end];
 }
 
 /*
