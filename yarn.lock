@@ -310,6 +310,13 @@
   dependencies:
     "@glimmer/env" "^0.1.7"
 
+"@glimmer/interfaces@0.80.3":
+  version "0.80.3"
+  resolved "https://registry.yarnpkg.com/@glimmer/interfaces/-/interfaces-0.80.3.tgz#c7c866376d73b9c4e4282e9056c6798e84ce7331"
+  integrity sha512-38PVcR7uFdFdJnqDNhLMbaluZhJezdwRAJCTkwk/AxlC2bGa6iCv2GDQhErXp1qr26gyO7dt37gbtwLojBDauA==
+  dependencies:
+    "@simple-dom/interface" "^1.4.0"
+
 "@glimmer/interfaces@0.82.0":
   version "0.82.0"
   resolved "https://registry.yarnpkg.com/@glimmer/interfaces/-/interfaces-0.82.0.tgz#e3f21e51a421b4c1ee34dcb682c719832f4a36f5"
@@ -328,15 +335,24 @@
     "@glimmer/util" "0.82.0"
     "@glimmer/validator" "0.82.0"
 
-"@glimmer/syntax@^0.82.0":
-  version "0.82.0"
-  resolved "https://registry.yarnpkg.com/@glimmer/syntax/-/syntax-0.82.0.tgz#b45d932a3c3de83710324a676af49d02a0940cf3"
-  integrity sha512-KjtLyJ0EZLLDMsPOgDtPXClMK1zgi1vNUI3VIk02L6plFV/ACus0YTgkZ/DJZptnHTEAj2Ip9dSUS8otC6pzsg==
+"@glimmer/syntax@^0.80.3":
+  version "0.80.3"
+  resolved "https://registry.yarnpkg.com/@glimmer/syntax/-/syntax-0.80.3.tgz#9018469f03c9ad5ee9e14446280f5f6312bdf130"
+  integrity sha512-hACbTpXgNO2l7USDVDUPvXh4Xo9e06sQEyv1QvGn/MK8FKfMkThxOmLrWy/pcEdeePmCMNGMLGgfjG6bO5FCUQ==
   dependencies:
-    "@glimmer/interfaces" "0.82.0"
-    "@glimmer/util" "0.82.0"
+    "@glimmer/interfaces" "0.80.3"
+    "@glimmer/util" "0.80.3"
     "@handlebars/parser" "~2.0.0"
-    simple-html-tokenizer "^0.5.11"
+    simple-html-tokenizer "^0.5.10"
+
+"@glimmer/util@0.80.3":
+  version "0.80.3"
+  resolved "https://registry.yarnpkg.com/@glimmer/util/-/util-0.80.3.tgz#573e562e20c7c1a869d84095a987d641ea9885d1"
+  integrity sha512-H6u9gPpBrZWfdHAXQyVTsttSJzBfpQ2NWc2Jnh35b7HxPpg0npcLsjIAuba4gHlcsKLwlN42s3O+J8x9weL4gQ==
+  dependencies:
+    "@glimmer/env" "0.1.7"
+    "@glimmer/interfaces" "0.80.3"
+    "@simple-dom/interface" "^1.4.0"
 
 "@glimmer/util@0.82.0":
   version "0.82.0"
@@ -6011,7 +6027,7 @@ silent-error@^1.1.0:
   dependencies:
     debug "^2.2.0"
 
-simple-html-tokenizer@^0.5.11:
+simple-html-tokenizer@^0.5.10:
   version "0.5.11"
   resolved "https://registry.yarnpkg.com/simple-html-tokenizer/-/simple-html-tokenizer-0.5.11.tgz#4c5186083c164ba22a7b477b7687ac056ad6b1d9"
   integrity sha512-C2WEK/Z3HoSFbYq8tI7ni3eOo/NneSPRoPpcM7WdLjFOArFuyXEjAoCdOC3DgMfRyziZQ1hCNR4mrNdWEvD0og==
