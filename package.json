@@ -21,6 +21,7 @@
     "lib/",
     "!lib/**/*.test.*"
   ],
+  "type": "module",
   "scripts": {
     "build": "tsc",
     "lint": "npm-run-all lint:*",
