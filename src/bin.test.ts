@@ -1,4 +1,3 @@
-import * as path from 'path';
 import { existsSync } from 'fs';
 import execa from 'execa';
 import { join } from 'path';
