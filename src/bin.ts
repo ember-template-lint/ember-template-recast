@@ -4,6 +4,7 @@ import * as os from 'os';
 import { readFileSync } from 'fs';
 import { program } from 'commander';
 import run from './runner.js';
+import { pathToFileURL } from 'url';
 
 const version = JSON.parse(
   readFileSync(new URL('../package.json', import.meta.url), { encoding: 'utf-8' })
@@ -36,5 +37,6 @@ if (program.args.length < 1 || !programOptions.transform) {
     silent: programOptions.silent,
   };
 
-  run(programOptions.transform, program.args, options);
+  const transformPath = pathToFileURL(programOptions.transform);
+  run(transformPath, program.args, options);
 }
