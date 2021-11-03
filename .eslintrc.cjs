@@ -10,6 +10,12 @@ module.exports = {
     node: true,
   },
   rules: {
+    // these are disabled because the import statements have to use `.js` extension,
+    // but eslint-plugin-node can only see `.ts` files (so it flags them as missing)
+    'node/no-missing-import': 'off',
+    'node/no-unpublished-import': 'off',
+
+    'node/no-unsupported-features/es-syntax': ['error', { ignores: ['dynamicImport', 'modules'] }],
     'prettier/prettier': 'error',
   },
 
