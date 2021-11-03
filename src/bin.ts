@@ -1,11 +1,18 @@
 #!/usr/bin/env node
 
 import * as os from 'os';
+import { readFileSync } from 'fs';
 import { program } from 'commander';
-import run from './runner';
+import run from './runner.js';
 
+const version = JSON.parse(
+  readFileSync(
+    new URL('../package.json', import.meta.url),
+    { encoding: 'utf-8' }
+  )
+);
 program
-  .version(require('../package').version)
+  .version(version)
   .usage('<files> -t transform-plugin.js')
   .option(
     '-t, --transform <file>',

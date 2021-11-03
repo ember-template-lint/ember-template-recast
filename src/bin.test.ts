@@ -5,7 +5,7 @@ import { join } from 'path';
 import { createTempDir, TempDir } from 'broccoli-test-helper';
 import slash from 'slash';
 
-const COMPILED_BIN_PATH = path.join(__dirname, '../lib/bin.js');
+const COMPILED_BIN_PATH = (new URL('./bin.js', import.meta.url)).pathname;
 if (!existsSync(COMPILED_BIN_PATH)) {
   throw new Error('Missing compiled output, run `yarn build`!');
 }

@@ -2,7 +2,7 @@ import * as http from 'http';
 import * as https from 'https';
 import { writeFileSync } from 'fs';
 import { resolve } from 'path';
-import colors from 'colors/safe';
+import colors from 'colors/safe.js';
 import slash from 'slash';
 import globby from 'globby';
 import ora from 'ora';
@@ -11,6 +11,8 @@ import tmp from 'tmp';
 import workerpool from 'workerpool';
 
 tmp.setGracefulCleanup();
+
+const WORKER_URL = new URL('./worker.js', import.meta.url);
 
 class NoFilesError extends Error {}
 
@@ -219,7 +221,7 @@ async function spawnWorkers(
 
   logger.spin('Processed 0 files');
 
-  const pool = workerpool.pool(require.resolve('./worker'), { maxWorkers: cpus });
+  const pool = workerpool.pool(WORKER_URL.pathname, { maxWorkers: cpus });
 
   let i = 0;
   const worker = (queue as any).async.asyncify(async (file: string) => {
