@@ -30,7 +30,7 @@
     "prepare": "tsc",
     "release": "release-it",
     "test": "npm-run-all lint build test:*",
-    "test:jest": "NODE_OPTIONS=--experimental-vm-modules jest"
+    "test:jest": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js"
   },
   "dependencies": {
     "@glimmer/reference": "^0.82.0",
