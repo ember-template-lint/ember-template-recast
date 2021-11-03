@@ -6,10 +6,7 @@ import { program } from 'commander';
 import run from './runner.js';
 
 const version = JSON.parse(
-  readFileSync(
-    new URL('../package.json', import.meta.url),
-    { encoding: 'utf-8' }
-  )
+  readFileSync(new URL('../package.json', import.meta.url), { encoding: 'utf-8' })
 );
 program
   .version(version)
