@@ -27,18 +27,6 @@ describe('ember-template-recast', function () {
       expect(print(ast)).toEqual(`<img src="{{this.something}}">`);
     });
 
-    test('can reuse previous concat parts', function () {
-      let template = `<img src="foo {{bar}} baz">`;
-      let original = parse(template);
-      let element = original.body[0] as AST.ElementNode;
-      let attribute = element.attributes[0] as AST.AttrNode;
-      let concat = attribute.value as AST.ConcatStatement;
-
-      let ast = builders.concat([concat.parts[0], concat.parts[1]]);
-
-      expect(print(ast)).toEqual(`<img src="foo {{bar}}">`);
-    });
-
     test('can print parsed element', function () {
       let template = `<img src="foo {{bar}} baz">`;
       let original = parse(template);
