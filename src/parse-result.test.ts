@@ -27,12 +27,13 @@ describe('ember-template-recast', function () {
       expect(print(ast)).toEqual(`<img src="{{this.something}}">`);
     });
 
-    test('can print parsed element', function () {
-      let template = `<img src="foo {{bar}} baz">`;
+    test('reusing another template part to build a new template', function () {
+      let template = `foo`;
       let original = parse(template);
-      let element = original.body[0] as AST.ElementNode;
+      let text = original.body[0] as AST.TextNode;
+      let ast = builders.template([text]);
 
-      expect(print(element)).toEqual(`<img src="foo {{bar}}">`);
+      expect(print(ast)).toEqual(`foo`);
     });
 
     test('changing an element to a void element does not print closing tag', function () {
