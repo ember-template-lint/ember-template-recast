@@ -18,14 +18,7 @@ export function print(ast: AST.Node): string {
 
   // TODO: write a test for this case
   if (parseResult === undefined) {
-    return glimmerPrint(ast, {
-      entityEncoding: 'raw',
-      override: (ast) => {
-        if (NODE_INFO.has(ast)) {
-          return print(ast);
-        }
-      },
-    });
+    return glimmerPrint(ast, { entityEncoding: 'raw' });
   }
 
   return parseResult.print();
