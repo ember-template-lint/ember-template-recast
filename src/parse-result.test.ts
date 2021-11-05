@@ -36,6 +36,23 @@ describe('ember-template-recast', function () {
       expect(print(ast)).toEqual(`foo`);
     });
 
+    test('wrapping a parsed node (which uses custom formatting) with a raw node', function () {
+      // Ensuring fix for GH#586
+      // (infinite recursion when printing custom nodes containing parsed nodes)
+      // plays nicely with custom printing from GH#653
+      // (specifying quoteType on custom nodes, adds a printing override)
+      let template = `<Foo @class='a {{b}} c' />`;
+      let original = parse(template);
+
+      let raw_wrapping_ast = builders.template([
+        builders.element('div', {
+          children: original.body,
+        }),
+      ]);
+
+      expect(print(raw_wrapping_ast)).toEqual(`<div><Foo @class='a {{b}} c' /></div>`);
+    });
+
     test('changing an element to a void element does not print closing tag', function () {
       let template = `<div data-foo="{{something}}"></div>`;
 
