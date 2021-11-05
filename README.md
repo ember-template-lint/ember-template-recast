@@ -125,7 +125,7 @@ export interface TransformPluginBuilder {
 ```
 
 The list of known builders on the `env.syntax.builders` are [found
-here](https://github.com/glimmerjs/glimmer-vm/blob/v0.62.4/packages/%40glimmer/syntax/lib/builders.ts#L547-L578),
+here](https://github.com/glimmerjs/glimmer-vm/blob/v0.82.0/packages/%40glimmer/syntax/lib/v1/public-builders.ts#L530),
 although there are a few small extensions related to formatting
 [in `custom-nodes.ts`](src/custom-nodes.ts)
 
@@ -164,7 +164,7 @@ unique SemVer commitments. A high level summary is:
 
 The following are scenarios that would cause a major version (aka breaking change) release:
 
-* Dropping support for Node versions (e.g. dropping Node 10 support)
+* Dropping support for Node versions (e.g. dropping Node 12 support)
 * Non-additive changes to the underlying AST (which we bundle from `@glimmer/syntax`)
 * Breaking changes to the `@glimmer/syntax` builder APIs
 

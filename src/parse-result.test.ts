@@ -1,5 +1,5 @@
 import { builders, parse, print, transform } from '.';
-import type { AST } from '@glimmer/syntax';
+import type { ASTv1 as AST } from '@glimmer/syntax';
 import { stripIndent } from 'common-tags';
 
 describe('ember-template-recast', function () {
@@ -8,7 +8,9 @@ describe('ember-template-recast', function () {
       let template = ``;
 
       let ast = parse(template);
-      ast.body.push(builders.element('img'));
+      // in @glimmer/syntax v0.82.0,
+      // builders.element requires an empty object as a second arg
+      ast.body.push(builders.element('img', {}));
 
       expect(print(ast)).toEqual(`<img>`);
     });
@@ -1220,6 +1222,24 @@ describe('ember-template-recast', function () {
         <textarea name="bar">
         </textarea>
       `);
+    });
+
+    test('mutations in MustacheStatements retain whitespace in AttrNode', function () {
+      let template = stripIndent`
+        <div
+          class="
+            block
+            {{if this.foo "bar"}}
+          "
+        >
+          hello
+        </div>
+      `;
+
+      let ast = parse(template) as any;
+      ast.body[0].attributes[0].value.parts[1].params[1].value = 'bar';
+
+      expect(print(ast)).toEqual(template);
     });
 
     test('quotes are preserved when updated a TextNode value (double quote)', function () {

@@ -1,4 +1,4 @@
-import { AST, builders as _builders } from '@glimmer/syntax';
+import { ASTv1 as AST, builders as _builders } from '@glimmer/syntax';
 
 export type QuoteType = '"' | "'";
 export interface AnnotatedAttrNode extends AST.AttrNode {

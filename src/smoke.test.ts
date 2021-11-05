@@ -1,6 +1,5 @@
 import { parse, sourceForLoc, transform, builders, TransformPluginEnv } from '.';
-import { sortByLoc } from './utils';
-import type { AST, NodeVisitor } from '@glimmer/syntax';
+import type { ASTv1 as AST, NodeVisitor } from '@glimmer/syntax';
 import { stripIndent } from 'common-tags';
 
 describe('"real life" smoke tests', function () {
@@ -424,7 +423,7 @@ describe('"real life" smoke tests', function () {
         let { builders: b } = env.syntax;
         return {
           MustacheStatement(node) {
-            if (node.loc.source === '(synthetic)') return node;
+            if (node.loc.module === '(synthetic)') return node;
             return funkyIf(b);
           },
         };
@@ -587,7 +586,7 @@ describe('"real life" smoke tests', function () {
         let { builders: b } = env.syntax;
         return {
           MustacheStatement(node) {
-            if (node.loc.source === '(synthetic)') return node;
+            if (node.loc.module === '(synthetic)') return node;
             return funkyIf(b);
           },
         };
@@ -837,7 +836,6 @@ describe('"real life" smoke tests', function () {
           let multiline = parts.length >= 2;
 
           let partsSource = parts
-            .sort(sortByLoc)
             .map((part) => sourceForLoc(template, part.loc))
             .map((partSource) => `${indentation}${partSource}`)
             .join(multiline ? '\n' : '');

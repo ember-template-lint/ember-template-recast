@@ -1,4 +1,4 @@
-import { preprocess, print as _print, traverse, AST } from '@glimmer/syntax';
+import { preprocess, builders, print as _print, traverse, ASTv1 as AST } from '@glimmer/syntax';
 import { getLines, sortByLoc, sourceForLoc } from './utils';
 import {
   QuoteType,
@@ -40,7 +40,7 @@ const voidTagNames = new Set([
 */
 function fixASTIssues(sourceLines: any, ast: any) {
   traverse(ast, {
-    AttrNode(attr) {
+    AttrNode(attr: AST.AttrNode) {
       const node = attr as AnnotatedAttrNode;
       const source = sourceForLoc(sourceLines, node.loc);
       const attrNodePartsResults = source.match(attrNodeParts);
@@ -54,8 +54,10 @@ function fixASTIssues(sourceLines: any, ast: any) {
       if (isValueless && node.value.type === 'TextNode' && node.value.chars === '') {
         // \n is not valid within an attribute name (it would indicate two attributes)
         // always assume the attribute ends on the starting line
-        node.loc.end.line = node.loc.start.line;
-        node.loc.end.column = node.loc.start.column + node.name.length;
+        const {
+          start: { line, column },
+        } = node.loc;
+        node.loc = builders.loc(line, column, line, column + node.name.length);
       }
 
       node.isValueless = isValueless;
@@ -71,7 +73,6 @@ function fixASTIssues(sourceLines: any, ast: any) {
       node.quoteType = source[0] as QuoteType;
     },
     TextNode(node, path) {
-      const source = sourceForLoc(sourceLines, node.loc);
       if (path.parentNode === null) {
         throw new Error(
           'ember-template-recast: Error while sanitizing input AST: found TextNode with no parentNode'
@@ -80,23 +81,27 @@ function fixASTIssues(sourceLines: any, ast: any) {
 
       switch (path.parentNode.type) {
         case 'AttrNode': {
+          const source = sourceForLoc(sourceLines, node.loc);
           if (
             node.chars.length > 0 &&
             ((source.startsWith(`'`) && source.endsWith(`'`)) ||
               (source.startsWith(`"`) && source.endsWith(`"`)))
           ) {
-            node.loc.end.column = node.loc.end.column - 1;
-            node.loc.start.column = node.loc.start.column + 1;
+            const { start, end } = node.loc;
+            node.loc = builders.loc(start.line, start.column + 1, end.line, end.column - 1);
           }
           break;
         }
         case 'ConcatStatement': {
-          // TODO: manually working around https://github.com/glimmerjs/glimmer-vm/pull/954
           const parent = path.parentNode as AST.ConcatStatement;
           const isFirstPart = parent.parts.indexOf(node) === 0;
 
+          const { start, end } = node.loc;
           if (isFirstPart && node.loc.start.column > path.parentNode.loc.start.column + 1) {
-            node.loc.start.column = node.loc.start.column - 1;
+            // TODO: manually working around https://github.com/glimmerjs/glimmer-vm/pull/954
+            node.loc = builders.loc(start.line, start.column - 1, end.line, end.column);
+          } else if (isFirstPart && node.chars.charAt(0) === '\n') {
+            node.loc = builders.loc(start.line, start.column + 1, end.line, end.column);
           }
         }
       }
@@ -207,7 +212,7 @@ export default class ParseResult {
     for (const key in node) {
       const value = node[key];
 
-      if (typeof value === 'object' && value !== null) {
+      if (key !== 'loc' && typeof value === 'object' && value !== null) {
         const propertyProxy = this.wrapNode({ node, key }, value);
 
         propertyProxyMap.set(key, propertyProxy);

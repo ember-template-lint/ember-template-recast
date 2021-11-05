@@ -1,5 +1,5 @@
 import { traverse, Walker, print as glimmerPrint } from '@glimmer/syntax';
-import type { AST, NodeVisitor } from '@glimmer/syntax';
+import type { ASTv1 as AST, NodeVisitor } from '@glimmer/syntax';
 import ParseResult, { NodeInfo } from './parse-result';
 import { builders } from './custom-nodes';
 
