@@ -5,7 +5,7 @@ import {
   AnnotatedStringLiteral,
   useCustomPrinter,
 } from './custom-nodes';
-import { getLines, sortByLoc, sourceForLoc, rangeOfBlockParam, blockParamSource } from './utils';
+import { getLines, sortByLoc, sourceForLoc, rangeOfBlockParam, getBlockParams } from './utils';
 
 const leadingWhitespace = /(^\s+)/;
 const attrNodeParts = /(^[^=]+)(\s+)?(=)?(\s+)?(['"])?(\S+)?/;
@@ -504,7 +504,7 @@ export default class ParseResult {
           let blockParamsSource = '';
           let postBlockParamsWhitespace = '';
           if (element.blockParams.length > 0) {
-            blockParamsSource = blockParamSource(nodeInfo.source);
+            blockParamsSource = getBlockParams(nodeInfo.source);
 
             const [, blockParamsEndIndex] = rangeOfBlockParam(nodeInfo.source);
             const closeOpenIndex = nodeInfo.source.indexOf(selfClosing ? '/>' : '>');
@@ -738,7 +738,7 @@ export default class ParseResult {
               end: original.loc.end,
             });
 
-            blockParamsSource = blockParamSource(blockParamsSourceScratch);
+            blockParamsSource = getBlockParams(blockParamsSourceScratch);
 
             const [, indexOfEndPipe] = rangeOfBlockParam(blockParamsSourceScratch);
             const postBlockParamsWhitespaceMatch = blockParamsSourceScratch

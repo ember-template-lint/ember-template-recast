@@ -151,11 +151,11 @@ export function rangeOfBlockParam(source: string): [number, number] {
  *
  * For example:
  * ```
- * blockParamSource("<Component as |bar|></Component>") // => "as |bar|"
- * blockParamSource("{{#BlockStatement as |bar|}}{{/BlockStatement}}") // => "as |bar|"
+ * getBlockParams("<Component as |bar|></Component>") // => "as |bar|"
+ * getBlockParams("{{#BlockStatement as |bar|}}{{/BlockStatement}}") // => "as |bar|"
  * ```
  */
-export function blockParamSource(source: string): string {
+export function getBlockParams(source: string): string {
   const [indexOfAsPipe, indexOfEndPipe] = rangeOfBlockParam(source);
   return source.substring(indexOfAsPipe, indexOfEndPipe + 1);
 }
