@@ -1,5 +1,23 @@
 # Changelog
 
+## v6.0.0 (2021-11-08)
+
+#### :boom: Breaking Change
+* [#663](https://github.com/ember-template-lint/ember-template-recast/pull/663) Drop support for Node 10 and 15 ([@dcyriller](https://github.com/dcyriller))
+* [#627](https://github.com/ember-template-lint/ember-template-recast/pull/627) Upgrade @glimmer/syntax to v0.82.0 ([@lifeart](https://github.com/lifeart))
+
+#### :bug: Bug Fix
+* [#665](https://github.com/ember-template-lint/ember-template-recast/pull/665) fix: Attribute closes the quotations prematurely ([@dcyriller](https://github.com/dcyriller))
+
+#### :house: Internal
+* [#670](https://github.com/ember-template-lint/ember-template-recast/pull/670) Update eslint related packages to latest ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 3
+- Alex Kanunnikov ([@lifeart](https://github.com/lifeart))
+- Cyrille ([@dcyriller](https://github.com/dcyriller))
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+
+
 ## v5.0.3 (2021-05-19)
 
 #### :bug: Bug Fix
