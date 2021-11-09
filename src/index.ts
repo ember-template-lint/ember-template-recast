@@ -1,6 +1,6 @@
 import { traverse, builders, Walker, print as glimmerPrint } from '@glimmer/syntax';
 import type { ASTv1 as AST, NodeVisitor } from '@glimmer/syntax';
-import ParseResult, { NodeInfo } from './parse-result';
+import ParseResult, { NodeInfo } from './parse-result.js';
 
 const PARSE_RESULT_FOR = new WeakMap<AST.Node, ParseResult>();
 const NODE_INFO = new WeakMap<AST.Node, NodeInfo>();
@@ -143,4 +143,4 @@ export function transform(
 export type { AST, NodeVisitor } from '@glimmer/syntax';
 
 export { builders, traverse } from '@glimmer/syntax';
-export { sourceForLoc } from './utils';
+export { sourceForLoc } from './utils.js';

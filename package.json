@@ -21,6 +21,7 @@
     "lib/",
     "!lib/**/*.test.*"
   ],
+  "type": "module",
   "scripts": {
     "build": "tsc",
     "lint": "npm-run-all lint:*",
@@ -28,8 +29,8 @@
     "lint:tsc": "tsc --noEmit",
     "prepare": "tsc",
     "release": "release-it",
-    "test": "npm-run-all lint test:*",
-    "test:jest": "jest"
+    "test": "npm-run-all lint build test:*",
+    "test:jest": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js"
   },
   "dependencies": {
     "@glimmer/reference": "^0.83.0",
@@ -62,7 +63,6 @@
     "prettier": "^2.4.1",
     "release-it": "^14.11.6",
     "release-it-lerna-changelog": "^4.0.1",
-    "ts-jest": "^26.5.6",
     "typescript": "~4.4.4"
   },
   "engines": {

@@ -1,8 +1,8 @@
 module.exports = {
   root: true,
   parserOptions: {
-    ecmaVersion: 2017,
-    sourceType: 'script',
+    ecmaVersion: 2019,
+    sourceType: 'module',
   },
   plugins: ['prettier', 'node'],
   extends: ['eslint:recommended', 'plugin:node/recommended', 'prettier'],
@@ -10,6 +10,12 @@ module.exports = {
     node: true,
   },
   rules: {
+    // these are disabled because the import statements have to use `.js` extension,
+    // but eslint-plugin-node can only see `.ts` files (so it flags them as missing)
+    'node/no-missing-import': 'off',
+    'node/no-unpublished-import': 'off',
+
+    'node/no-unsupported-features/es-syntax': ['error', { ignores: ['dynamicImport', 'modules'] }],
     'prettier/prettier': 'error',
   },
 
@@ -18,10 +24,6 @@ module.exports = {
       files: ['**/*.ts'],
 
       parser: '@typescript-eslint/parser',
-      parserOptions: {
-        ecmaVersion: 2017,
-        sourceType: 'module',
-      },
 
       plugins: ['@typescript-eslint'],
       extends: ['plugin:@typescript-eslint/recommended'],
@@ -39,8 +41,6 @@ module.exports = {
       },
 
       rules: {
-        'node/no-unsupported-features/es-syntax': ['error', { ignores: ['modules'] }],
-
         // we should work to remove these overrides
         '@typescript-eslint/no-var-requires': 'off',
         '@typescript-eslint/no-use-before-define': 'off',

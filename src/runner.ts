@@ -2,7 +2,7 @@ import * as http from 'http';
 import * as https from 'https';
 import { writeFileSync } from 'fs';
 import { resolve } from 'path';
-import colors from 'colors/safe';
+import colors from 'colors/safe.js';
 import slash from 'slash';
 import globby from 'globby';
 import ora from 'ora';
@@ -11,6 +11,9 @@ import tmp from 'tmp';
 import workerpool from 'workerpool';
 
 tmp.setGracefulCleanup();
+
+import { fileURLToPath } from 'url';
+const WORKER_PATH = fileURLToPath(new URL('./worker.js', import.meta.url));
 
 class NoFilesError extends Error {}
 
@@ -119,7 +122,7 @@ class StatsCollector {
 }
 
 export default async function run(
-  transformFile: string,
+  transformFile: URL,
   filePaths: string[],
   options: { silent?: boolean; cpus: number }
 ): Promise<void> {
@@ -149,11 +152,11 @@ export default async function run(
 /**
  * Returns the location of the transform module on disk.
  */
-async function loadTransform(transformFile: string): Promise<string> {
-  const isRemote = transformFile.startsWith('http');
+async function loadTransform(transformFile: URL): Promise<string> {
+  const isLocal = transformFile.protocol === 'file:';
 
-  if (!isRemote) {
-    return resolve(process.cwd(), transformFile);
+  if (isLocal) {
+    return fileURLToPath(transformFile);
   }
 
   const contents = await downloadFile(transformFile);
@@ -164,9 +167,9 @@ async function loadTransform(transformFile: string): Promise<string> {
   return filePath.name;
 }
 
-function downloadFile(url: string): Promise<string> {
+function downloadFile(url: URL): Promise<string> {
   return new Promise((resolve, reject) => {
-    const transport = url.startsWith('https') ? https : http;
+    const transport = url.protocol === 'https:' ? https : http;
 
     let contents = '';
     transport
@@ -219,7 +222,7 @@ async function spawnWorkers(
 
   logger.spin('Processed 0 files');
 
-  const pool = workerpool.pool(require.resolve('./worker'), { maxWorkers: cpus });
+  const pool = workerpool.pool(WORKER_PATH, { maxWorkers: cpus });
 
   let i = 0;
   const worker = (queue as any).async.asyncify(async (file: string) => {
@@ -238,13 +241,14 @@ async function spawnWorkers(
 
 function handleError(err: any, logger: Logger): void {
   if (err.code === 'MODULE_NOT_FOUND') {
-    logger.error('Transform plugin not found');
+    logger.error(`Transform plugin not found`);
   } else if (err instanceof NoFilesError) {
     logger.error('No files matched');
   } else {
     logger.error(err);
-    if (err.stack) {
-      logger.error(err.stack);
-    }
+  }
+
+  if (err.stack) {
+    logger.error(err.stack);
   }
 }

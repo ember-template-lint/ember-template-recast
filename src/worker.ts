@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import workerpool from 'workerpool';
-import { transform } from './index';
+import { transform } from './index.js';
 import type { TransformPluginBuilder } from './index';
 
 interface TransformResult {
@@ -14,7 +14,7 @@ interface TransformOptions {
 }
 
 async function run(transformPath: string, filePath: string, options: TransformOptions) {
-  const module = require(transformPath);
+  const module = await import(transformPath);
   const plugin: TransformPluginBuilder =
     typeof module.default === 'function' ? module.default : module;
 

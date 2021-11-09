@@ -1,13 +1,18 @@
-import * as path from 'path';
 import { existsSync } from 'fs';
+import { fileURLToPath } from 'url';
 import execa from 'execa';
 import { join } from 'path';
 import { createTempDir, TempDir } from 'broccoli-test-helper';
 import slash from 'slash';
 
-const COMPILED_BIN_PATH = path.join(__dirname, '../lib/bin.js');
+const COMPILED_BIN_PATH = fileURLToPath(new URL('./bin.js', import.meta.url));
+
 if (!existsSync(COMPILED_BIN_PATH)) {
-  throw new Error('Missing compiled output, run `yarn build`!');
+  throw new Error(
+    `Missing compiled output, run \`yarn build\`! Looked at ${COMPILED_BIN_PATH} (based on ${
+      import.meta.url
+    })`
+  );
 }
 
 function run(args: string[], cwd: string) {

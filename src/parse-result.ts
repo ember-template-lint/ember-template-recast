@@ -1,5 +1,5 @@
 import { preprocess, builders, print as _print, traverse, ASTv1 as AST } from '@glimmer/syntax';
-import { getLines, sortByLoc, sourceForLoc } from './utils';
+import { getLines, sortByLoc, sourceForLoc } from './utils.js';
 
 const leadingWhitespace = /(^\s+)/;
 const attrNodeParts = /(^[^=]+)(\s+)?(=)?(\s+)?(['"])?(\S+)?/;
