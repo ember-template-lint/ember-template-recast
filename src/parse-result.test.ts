@@ -1129,6 +1129,46 @@ describe('ember-template-recast', function () {
       expect(print(ast)).toEqual('<Foo bar={{bar}} />');
     });
 
+    test('updating attribute to be valueless', function () {
+      let template = '<Foo data-foo="bar" />';
+
+      let ast = parse(template) as any;
+      ast.body[0].attributes[0].isValueless = true;
+
+      expect(print(ast)).toEqual('<Foo data-foo />');
+
+      ast = parse(template) as any;
+      ast.body[0].attributes[0].isValueless = true;
+      ast.body[0].attributes[0].value = builders.text('blah');
+      expect(print(ast)).toEqual('<Foo data-foo />');
+    });
+
+    test('adding value to valueless attribute', function () {
+      let template = '<Foo data-foo />';
+
+      let ast = parse(template) as any;
+      ast.body[0].attributes[0].value = builders.mustache('true');
+
+      expect(print(ast)).toEqual('<Foo data-foo={{true}} />');
+    });
+
+    test('updating valueless attribute to a mustache statement does not add quotes', function () {
+      let template = '<Foo data-foo />';
+      let ast = parse(template) as any;
+      ast.body[0].attributes[0].isValueless = false;
+      ast.body[0].attributes[0].value = builders.mustache('true');
+      expect(print(ast)).toEqual('<Foo data-foo={{true}} />');
+    });
+
+    test('modifying valueless attribute to have empty value', function () {
+      let template = '<Foo data-foo />';
+
+      let ast = parse(template) as any;
+      ast.body[0].attributes[0].isValueless = false;
+
+      expect(print(ast)).toEqual('<Foo data-foo="" />');
+    });
+
     test('updating concat statement value', function () {
       let template = '<Foo class="{{foo}} static {{bar}}" />';
 
