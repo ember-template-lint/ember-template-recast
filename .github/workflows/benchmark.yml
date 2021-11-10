@@ -34,6 +34,7 @@ jobs:
         script: |
           let description = 'hello world'
           const { owner, repo } = context.repo
+          console.log(github.repos.createCommitStatus)
           await github.repos.createCommitStatus({
             description,
             owner,
