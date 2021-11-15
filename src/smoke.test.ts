@@ -438,8 +438,7 @@ describe('"real life" smoke tests', function () {
         {{#if (a)}}
           {{1}}
 
-        {{/if}}
-      `);
+        {{/if}}`);
     });
 
     test('`if` branch containing whitespace controls', function () {
@@ -603,8 +602,7 @@ describe('"real life" smoke tests', function () {
           {{1}}
 
         {{/if}}
-        <hr>
-      `);
+        <hr>`);
     });
   });
 

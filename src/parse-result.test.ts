@@ -582,8 +582,7 @@ describe('ember-template-recast', function () {
     test('MustacheStatements retain whitespace when multiline replacements occur', function () {
       let template = stripIndent`
         <p></p>
-        {{ other-stuff }}
-      `;
+        {{ other-stuff }}`;
       let { code } = transform(template, (env) => {
         let { builders: b } = env.syntax;
 
@@ -1420,8 +1419,7 @@ describe('ember-template-recast', function () {
   test('can remove during traversal by returning `null`', function () {
     let template = stripIndent`
     <p>here is some multiline string</p>
-    {{ other-stuff }}
-    `;
+    {{ other-stuff }}`;
     let { code } = transform(template, () => {
       return {
         ElementNode() {
@@ -1436,8 +1434,7 @@ describe('ember-template-recast', function () {
   test('can replace with many items during traversal by returning an array', function () {
     let template = stripIndent`
     <p>here is some multiline string</p>
-    {{other-stuff}}
-    `;
+    {{other-stuff}}`;
     let { code } = transform(template, (env) => {
       let { builders: b } = env.syntax;
 
