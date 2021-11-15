@@ -1193,10 +1193,8 @@ describe('ember-template-recast', function () {
     });
 
     test('mutations retain custom whitespace formatting', function () {
-      let template = stripIndent`
-        <Foo 
-          bar = {{ foo }} />
-      `;
+      let template = `<Foo 
+  bar = {{ foo }} />`;
 
       let ast = parse(template) as any;
       ast.body[0].attributes[0].value.path.original = 'bar';
