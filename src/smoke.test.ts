@@ -1,6 +1,6 @@
 import { parse, sourceForLoc, transform, builders, TransformPluginEnv } from '.';
 import type { ASTv1 as AST, NodeVisitor } from '@glimmer/syntax';
-import { stripIndent } from 'common-tags';
+import stripIndent from 'outdent';
 
 describe('"real life" smoke tests', function () {
   describe('line endings', function () {
