@@ -1,6 +1,6 @@
 import { builders, parse, print, transform } from '.';
 import type { ASTv1 as AST } from '@glimmer/syntax';
-import { stripIndent } from 'common-tags';
+import stripIndent from 'outdent';
 
 describe('ember-template-recast', function () {
   describe('ElementNode', function () {
@@ -797,7 +797,7 @@ describe('ember-template-recast', function () {
         builders.pair('hello', builders.string('world')),
       ]);
 
-      expect(print(ast)).toEqual(stripIndent`{{foo-bar\n  baz=(stuff hello="world")\n}}`);
+      expect(print(ast)).toEqual(`{{foo-bar\n  baz=(stuff hello="world")\n}}`);
     });
   });
 
