@@ -797,7 +797,7 @@ describe('ember-template-recast', function () {
         builders.pair('hello', builders.string('world')),
       ]);
 
-      expect(print(ast)).toEqual(stripIndent`{{foo-bar\n  baz=(stuff hello="world")\n}}`);
+      expect(print(ast)).toEqual(`{{foo-bar\n  baz=(stuff hello="world")\n}}`);
     });
   });
 
