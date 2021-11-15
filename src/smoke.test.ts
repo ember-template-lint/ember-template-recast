@@ -429,17 +429,15 @@ describe('"real life" smoke tests', function () {
         };
       });
 
-      expect(code).toEqual(stripIndent`
+      expect(code).toEqual(`        {{#if (a)}}
+  {{0}}
+
+{{/if}}
+
         {{#if (a)}}
-          {{0}}
+  {{1}}
 
-        {{/if}}
-
-        {{#if (a)}}
-          {{1}}
-
-        {{/if}}
-      `);
+{{/if}}`);
     });
 
     test('`if` branch containing whitespace controls', function () {
@@ -592,19 +590,17 @@ describe('"real life" smoke tests', function () {
         };
       });
 
-      expect(code).toEqual(stripIndent`
-        <br>
-        {{#if (a)}}
-          {{0}}
+      expect(code).toEqual(`<br>
+{{#if (a)}}
+  {{0}}
 
-        {{/if}}
-        <div></div>
-        {{#if (a)}}
-          {{1}}
+{{/if}}
+<div></div>
+{{#if (a)}}
+  {{1}}
 
-        {{/if}}
-        <hr>
-      `);
+{{/if}}
+<hr>`);
     });
   });
 
