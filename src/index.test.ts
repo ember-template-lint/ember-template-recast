@@ -1,6 +1,6 @@
 import { builders, parse, print, transform } from './index';
 import type { ASTv1 as AST } from '@glimmer/syntax';
-import { stripIndent } from 'common-tags';
+import { strip as stripIndent } from '@glimmer/util';
 
 describe('ember-template-recast', function () {
   test('basic parse + print (no modification)', function () {
