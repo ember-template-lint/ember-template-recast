@@ -98,23 +98,6 @@ export function getLines(source: string): string[] {
 
 /*
  * This function takes a string (the source of an ElementNode or a
- * BlockStatement) and returns the first possible block param's range.
- *
- * If the block param is not found, the function will return [-1, -1];
- *
- * For example:
- * ```
- * rangeOfBlockParam("<Component as |bar|></Component>") // => [11, 18]
- * rangeOfBlockParam("{{#BlockStatement as |bar|}}{{/BlockStatement}}") // => [18, 25]
- * ```
- */
-export function rangeOfFirstBlockParam(source: string): [number, number] {
-  let start = source.search(/as\s+\|/);
-  return [start, source.indexOf('|', start + 4)];
-}
-
-/*
- * This function takes a string (the source of an ElementNode or a
  * BlockStatement) and returns the range of the last possible block param's
  * range.
  *
@@ -127,20 +110,13 @@ export function rangeOfFirstBlockParam(source: string): [number, number] {
  * ```
  */
 export function rangeOfBlockParam(source: string): [number, number] {
-  let [start, end] = rangeOfFirstBlockParam(source);
-
-  let range = [start, end];
-  while (range[0] !== -1 && range[1] !== -1) {
-    const tail = source.slice(end + 1);
-    range = rangeOfFirstBlockParam(tail);
-
-    if (range[0] !== -1 && range[1] !== -1) {
-      start = end + 1 + range[0];
-      end = end + 1 + range[1];
-    }
+  let matches = Array.from(source.matchAll(/as\s+\|[^|]+\|/g));
+  let match = matches[matches.length - 1] as any;
+  if (!match) {
+    return [-1, -1];
   }
 
-  return [start, end];
+  return [match.index, match.index + match[0].length - 1];
 }
 
 /*
