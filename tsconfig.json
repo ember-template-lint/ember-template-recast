@@ -4,6 +4,7 @@
     "declarationMap": true,
     "sourceMap": true,
     "target": "es2019",
+    "lib": ["es2019", "dom"],
     "module": "commonjs",
     "strict": true,
     "esModuleInterop": true,
