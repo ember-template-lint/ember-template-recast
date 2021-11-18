@@ -1,5 +1,18 @@
 # Changelog
 
+## v6.1.0 (2021-11-18)
+
+#### :rocket: Enhancement
+* [#653](https://github.com/ember-template-lint/ember-template-recast/pull/653) Allow updating `quoteType` and `isValueless` of AttrNodes, and `quoteType` of StringLiterals ([@courajs](https://github.com/courajs))
+
+#### :bug: Bug Fix
+* [#679](https://github.com/ember-template-lint/ember-template-recast/pull/679) Fix modifying valueless attrs ([@courajs](https://github.com/courajs))
+
+#### Committers: 2
+- Aaron Sikes ([@courajs](https://github.com/courajs))
+- Cyrille ([@dcyriller](https://github.com/dcyriller))
+
+
 ## v6.0.0 (2021-11-08)
 
 #### :boom: Breaking Change
