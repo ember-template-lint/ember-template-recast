@@ -1017,7 +1017,24 @@ export default class ParseResult {
           }
           dirtyFields.delete('quoteType');
 
+          if (dirtyFields.has('isValueless')) {
+            if (node.isValueless) {
+              equals = '';
+              quote = '';
+              valueSource = '';
+              dirtyFields.delete('isValueless');
+              dirtyFields.delete('value');
+            } else {
+              equals = '=';
+              if (node.value.type !== 'MustacheStatement' && !quote) {
+                quote = '"';
+              }
+              dirtyFields.delete('isValueless');
+            }
+          }
+
           if (dirtyFields.has('value')) {
+            equals = '=';
             // If they created a ConcatStatement node, we need to print it ourselves here.
             // Otherwise, since it has no nodeInfo, it will print using the glimmer printer
             // which hardcodes double quotes.
