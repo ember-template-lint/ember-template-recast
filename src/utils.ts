@@ -95,3 +95,43 @@ export function getLines(source: string): string[] {
 
   return result.slice(0, -1);
 }
+
+/*
+ * This function takes a string (the source of an ElementNode or a
+ * BlockStatement) and returns the range of the last possible block param's
+ * range.
+ *
+ * If the block param is not found, the function will return [-1, -1];
+ *
+ * For example:
+ * ```
+ * rangeOfBlockParam('<Component data-foo="as |foo|" as |bar|></Component>') // => [31, 38]
+ * rangeOfBlockParam('{{#BlockStatement data-foo="as |foo|" as |bar|}}{{/BlockStatement}}') // => [38, 45]
+ * ```
+ */
+export function rangeOfBlockParam(source: string): [number, number] {
+  let matches = Array.from(source.matchAll(/as\s+\|[^|]+\|/g));
+  let match = matches[matches.length - 1] as any;
+  if (!match) {
+    return [-1, -1];
+  }
+
+  return [match.index, match.index + match[0].length - 1];
+}
+
+/*
+ * This function takes a string (the source of an ElementNode or a
+ * BlockStatement) and returns its block param.
+ *
+ * If the block param is not found, the function will return "";
+ *
+ * For example:
+ * ```
+ * getBlockParams("<Component as |bar|></Component>") // => "as |bar|"
+ * getBlockParams("{{#BlockStatement as |bar|}}{{/BlockStatement}}") // => "as |bar|"
+ * ```
+ */
+export function getBlockParams(source: string): string {
+  const [indexOfAsPipe, indexOfEndPipe] = rangeOfBlockParam(source);
+  return source.substring(indexOfAsPipe, indexOfEndPipe + 1);
+}

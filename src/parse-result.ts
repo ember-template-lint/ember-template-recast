@@ -1,11 +1,11 @@
 import { preprocess, builders, print as _print, traverse, ASTv1 as AST } from '@glimmer/syntax';
-import { getLines, sortByLoc, sourceForLoc } from './utils';
 import {
   QuoteType,
   AnnotatedAttrNode,
   AnnotatedStringLiteral,
   useCustomPrinter,
 } from './custom-nodes';
+import { getLines, sortByLoc, sourceForLoc, rangeOfBlockParam, getBlockParams } from './utils';
 
 const leadingWhitespace = /(^\s+)/;
 const attrNodeParts = /(^[^=]+)(\s+)?(=)?(\s+)?(['"])?(\S+)?/;
@@ -504,13 +504,9 @@ export default class ParseResult {
           let blockParamsSource = '';
           let postBlockParamsWhitespace = '';
           if (element.blockParams.length > 0) {
-            const blockParamStartIndex = nodeInfo.source.indexOf('as |');
-            const blockParamsEndIndex = nodeInfo.source.indexOf('|', blockParamStartIndex + 4);
-            blockParamsSource = nodeInfo.source.substring(
-              blockParamStartIndex,
-              blockParamsEndIndex + 1
-            );
+            blockParamsSource = getBlockParams(nodeInfo.source);
 
+            const [, blockParamsEndIndex] = rangeOfBlockParam(nodeInfo.source);
             const closeOpenIndex = nodeInfo.source.indexOf(selfClosing ? '/>' : '>');
             postBlockParamsWhitespace = nodeInfo.source.substring(
               blockParamsEndIndex + 1,
@@ -742,14 +738,9 @@ export default class ParseResult {
               end: original.loc.end,
             });
 
-            const indexOfAsPipe = blockParamsSourceScratch.indexOf('as |');
-            const indexOfEndPipe = blockParamsSourceScratch.indexOf('|', indexOfAsPipe + 4);
+            blockParamsSource = getBlockParams(blockParamsSourceScratch);
 
-            blockParamsSource = blockParamsSourceScratch.substring(
-              indexOfAsPipe,
-              indexOfEndPipe + 1
-            );
-
+            const [, indexOfEndPipe] = rangeOfBlockParam(blockParamsSourceScratch);
             const postBlockParamsWhitespaceMatch = blockParamsSourceScratch
               .substring(indexOfEndPipe + 1)
               .match(leadingWhitespace);
@@ -771,8 +762,7 @@ export default class ParseResult {
 
             let startingOffset = 0;
             if (hadProgramBlockParams) {
-              const indexOfAsPipe = openEndSourceScratch.indexOf('as |');
-              const indexOfEndPipe = openEndSourceScratch.indexOf('|', indexOfAsPipe + 4);
+              const [, indexOfEndPipe] = rangeOfBlockParam(openEndSourceScratch);
 
               startingOffset = indexOfEndPipe + 1;
             }
