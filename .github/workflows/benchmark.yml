@@ -15,7 +15,7 @@ jobs:
     name: perf:benchmark
 
     steps:
-    - uses: actions/checkout@v2.3.4
+    - uses: actions/checkout@v2.4.0
     - uses: actions/setup-node@v2.5.0
       with:
         node-version: 16.x
