@@ -3,33 +3,22 @@ import type { ASTv1 as AST, NodeVisitor } from '@glimmer/syntax';
 import ParseResult, { NodeInfo } from './parse-result';
 import { builders } from './custom-nodes';
 
-const PARSE_RESULT_FOR = new WeakMap<AST.Node, ParseResult>();
 const NODE_INFO = new WeakMap<AST.Node, NodeInfo>();
 
 export function parse(template: string): AST.Template {
-  const result = new ParseResult(template, NODE_INFO);
-
-  PARSE_RESULT_FOR.set(result.ast, result);
-
-  return result.ast;
+  return new ParseResult(template, NODE_INFO).ast;
 }
 
 export function print(ast: AST.Node): string {
-  const parseResult = PARSE_RESULT_FOR.get(ast);
-
-  // TODO: write a test for this case
-  if (parseResult === undefined) {
-    return glimmerPrint(ast, {
-      entityEncoding: 'raw',
-      override: (ast) => {
-        if (NODE_INFO.has(ast)) {
-          return print(ast);
-        }
-      },
-    });
-  }
-
-  return parseResult.print();
+  return glimmerPrint(ast, {
+    entityEncoding: 'raw',
+    override: (ast) => {
+      let info = NODE_INFO.get(ast);
+      if (info) {
+        return info.parse_result.print(ast);
+      }
+    },
+  });
 }
 
 export interface Syntax {

@@ -115,6 +115,7 @@ export interface NodeInfo {
   node: AST.Node;
   original: AST.Node;
   source: string;
+  parse_result: ParseResult;
 
   hadHash?: boolean;
   hadParams?: boolean;
@@ -156,6 +157,7 @@ export default class ParseResult {
       node,
       original: JSON.parse(JSON.stringify(node)),
       source: this.sourceForLoc(node.loc),
+      parse_result: this,
     };
 
     this.nodeInfo.set(node, nodeInfo);
