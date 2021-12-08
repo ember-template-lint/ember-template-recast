@@ -1,5 +1,21 @@
 # Changelog
 
+
+## v6.1.1 (2021-12-08)
+
+#### :bug: Bug Fix
+* [#671](https://github.com/ember-template-lint/ember-template-recast/pull/671) Fix infinite recursion when printing sub-nodes ([@courajs](https://github.com/courajs))
+* [#95](https://github.com/ember-template-lint/ember-template-recast/pull/95) Fix the scenario where block params are on a new line ([@NullVoxPopuli](https://github.com/NullVoxPopuli))
+
+#### :house: Internal
+* [#689](https://github.com/ember-template-lint/ember-template-recast/pull/689) Update Typescript configuration ([@dcyriller](https://github.com/dcyriller))
+
+#### Committers: 3
+- Aaron Sikes ([@courajs](https://github.com/courajs))
+- Cyrille ([@dcyriller](https://github.com/dcyriller))
+- [@NullVoxPopuli](https://github.com/NullVoxPopuli)
+
+
 ## v6.1.0 (2021-11-18)
 
 #### :rocket: Enhancement
