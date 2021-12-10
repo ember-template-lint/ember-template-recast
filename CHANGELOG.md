@@ -1,6 +1,15 @@
 # Changelog
 
 
+
+## v6.1.2 (2021-12-10)
+
+#### :bug: Bug Fix
+* [#707](https://github.com/ember-template-lint/ember-template-recast/pull/707) Fix the regression on the block params ([@dcyriller](https://github.com/dcyriller))
+
+#### Committers: 1
+- Cyrille ([@dcyriller](https://github.com/dcyriller))
+
 ## v6.1.1 (2021-12-08)
 
 #### :bug: Bug Fix
