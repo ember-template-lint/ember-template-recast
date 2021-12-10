@@ -579,6 +579,44 @@ describe('ember-template-recast', function () {
 
       expect(print(ast)).toEqual(`<Foo data-test="wheee" \n as\n    |bar|></Foo>`);
     });
+
+    test('issue 706', function () {
+      let template = `<div
+  class="pt-2 pb-4 {{this.foo}}"
+>
+  {{#each this.data as |chunks|}}
+    {{#each chunks as |chunk|}}
+      {{#if (this.shouldShowImage chunk)}}
+        <p class="px-4">foo</p>
+      {{else}}
+        <p>bar</p>
+      {{/if}}
+    {{/each}}
+  {{/each}}
+</div>`;
+
+      let ast = parse(template);
+      let block1 = (ast.body[0] as AST.ElementNode).children[1] as AST.BlockStatement;
+      let block2 = block1.program.body[1] as AST.BlockStatement;
+      let block3 = block2.program.body[1] as AST.BlockStatement;
+      let element = block3.program.body[1] as AST.ElementNode;
+      let attribute = element.attributes[0] as AST.AttrNode;
+      (attribute.value as AST.TextNode).chars = 'foo';
+
+      expect(print(ast)).toEqual(`<div
+  class="pt-2 pb-4 {{this.foo}}"
+>
+  {{#each this.data as |chunks|}}
+    {{#each chunks as |chunk|}}
+      {{#if (this.shouldShowImage chunk)}}
+        <p class="foo">foo</p>
+      {{else}}
+        <p>bar</p>
+      {{/if}}
+    {{/each}}
+  {{/each}}
+</div>`);
+    });
   });
 
   describe('MustacheStatement', function () {
