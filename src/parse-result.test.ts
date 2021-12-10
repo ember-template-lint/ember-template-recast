@@ -550,34 +550,42 @@ describe('ember-template-recast', function () {
       `);
     });
 
-    test('adding attribute to ElementNode preserves block param formatting (`\\nas |foo|`)', function () {
-      let template = `<Foo\nas |bar|></Foo>`;
+    test('issue 706', function () {
+      let template = `<div
+  class="pt-2 pb-4 {{this.foo}}"
+>
+  {{#each this.data as |chunks|}}
+    {{#each chunks as |chunk|}}
+      {{#if (this.shouldShowImage chunk)}}
+        <p class="px-4">foo</p>
+      {{else}}
+        <p>bar</p>
+      {{/if}}
+    {{/each}}
+  {{/each}}
+</div>`;
 
       let ast = parse(template);
-      let element = ast.body[0] as AST.ElementNode;
-      element.attributes.push(builders.attr('data-test', builders.text('wheee')));
+      let block1 = (ast.body[0] as AST.ElementNode).children[1] as AST.BlockStatement;
+      let block2 = block1.program.body[1] as AST.BlockStatement;
+      let block3 = block2.program.body[1] as AST.BlockStatement;
+      let element = block3.program.body[1] as AST.ElementNode;
+      let attribute = element.attributes[0] as AST.AttrNode;
+      (attribute.value as AST.TextNode).chars = 'foo';
 
-      expect(print(ast)).toEqual(`<Foo data-test="wheee"\nas |bar|></Foo>`);
-    });
-
-    test('an attribute containing `as |foo|` does not confuse updates 😈', function () {
-      let template = `<Foo data-whatever="as |foo|" as |bar|></Foo>`;
-
-      let ast = parse(template);
-      let element = ast.body[0] as AST.ElementNode;
-      element.attributes.push(builders.attr('data-test', builders.text('wheee')));
-
-      expect(print(ast)).toEqual(`<Foo data-whatever="as |foo|" data-test="wheee" as |bar|></Foo>`);
-    });
-
-    test('adding attribute to ElementNode preserves block param formatting (`\n as\\n    |bar|`)', function () {
-      let template = `<Foo \n as\n    |bar|></Foo>`;
-
-      let ast = parse(template);
-      let element = ast.body[0] as AST.ElementNode;
-      element.attributes.push(builders.attr('data-test', builders.text('wheee')));
-
-      expect(print(ast)).toEqual(`<Foo data-test="wheee" \n as\n    |bar|></Foo>`);
+      expect(print(ast)).toEqual(`<div
+  class="pt-2 pb-4 {{this.foo}}"
+>
+  {{#each this.data as |chunks|}}
+    {{#each chunks as |chunk|}}
+      {{#if (this.shouldShowImage chunk)}}
+        <p class="foo">foo</p>
+      {{else}}
+        <p>bar</p>
+      {{/if}}
+    {{/each}}
+  {{/each}}
+</div>`);
     });
   });
 
@@ -1172,31 +1180,6 @@ describe('ember-template-recast', function () {
       }}
       {{/foo-bar}}
       `);
-    });
-
-    test('modifying attribute of BlockStatement preserves block param formatting (`\\n\\n          as\\n    |bar|`)', function () {
-      let template = `{{#foo-bar
-class="thing"
-
-as
-
-    |bar|
-
-        }}
-        {{/foo-bar}}`;
-
-      let ast = parse(template) as any;
-      ast.body[0].hash.pairs[0].key = '@class';
-
-      expect(print(ast)).toEqual(`{{#foo-bar
-@class="thing"
-
-as
-
-    |bar|
-
-        }}
-        {{/foo-bar}}`);
     });
   });
 

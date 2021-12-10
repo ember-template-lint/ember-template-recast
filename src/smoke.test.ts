@@ -606,33 +606,6 @@ describe('"real life" smoke tests', function () {
         <hr>
       `);
     });
-
-    test('supports block param on a new line', function () {
-      let template = stripIndent`
-        <SomeComponent @arg={{property}} as
-        |foo|>
-        </SomeComponent>
-      `;
-
-      let { code } = transform(template, (env) => {
-        let { builders: b } = env.syntax;
-        return {
-          AttrNode(node) {
-            if (node.value.type === 'MustacheStatement') {
-              node.value = b.mustache(`this.property`);
-            }
-          },
-        };
-      });
-
-      expect(code).toEqual(
-        stripIndent`
-          <SomeComponent @arg={{this.property}} as
-          |foo|>
-          </SomeComponent>
-        `
-      );
-    });
   });
 
   describe('angle-bracket-codemod mockup', function () {
