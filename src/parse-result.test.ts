@@ -550,36 +550,6 @@ describe('ember-template-recast', function () {
       `);
     });
 
-    test('adding attribute to ElementNode preserves block param formatting (`\\nas |foo|`)', function () {
-      let template = `<Foo\nas |bar|></Foo>`;
-
-      let ast = parse(template);
-      let element = ast.body[0] as AST.ElementNode;
-      element.attributes.push(builders.attr('data-test', builders.text('wheee')));
-
-      expect(print(ast)).toEqual(`<Foo data-test="wheee"\nas |bar|></Foo>`);
-    });
-
-    test('an attribute containing `as |foo|` does not confuse updates 😈', function () {
-      let template = `<Foo data-whatever="as |foo|" as |bar|></Foo>`;
-
-      let ast = parse(template);
-      let element = ast.body[0] as AST.ElementNode;
-      element.attributes.push(builders.attr('data-test', builders.text('wheee')));
-
-      expect(print(ast)).toEqual(`<Foo data-whatever="as |foo|" data-test="wheee" as |bar|></Foo>`);
-    });
-
-    test('adding attribute to ElementNode preserves block param formatting (`\n as\\n    |bar|`)', function () {
-      let template = `<Foo \n as\n    |bar|></Foo>`;
-
-      let ast = parse(template);
-      let element = ast.body[0] as AST.ElementNode;
-      element.attributes.push(builders.attr('data-test', builders.text('wheee')));
-
-      expect(print(ast)).toEqual(`<Foo data-test="wheee" \n as\n    |bar|></Foo>`);
-    });
-
     test('issue 706', function () {
       let template = `<div
   class="pt-2 pb-4 {{this.foo}}"
@@ -1210,31 +1180,6 @@ describe('ember-template-recast', function () {
       }}
       {{/foo-bar}}
       `);
-    });
-
-    test('modifying attribute of BlockStatement preserves block param formatting (`\\n\\n          as\\n    |bar|`)', function () {
-      let template = `{{#foo-bar
-class="thing"
-
-as
-
-    |bar|
-
-        }}
-        {{/foo-bar}}`;
-
-      let ast = parse(template) as any;
-      ast.body[0].hash.pairs[0].key = '@class';
-
-      expect(print(ast)).toEqual(`{{#foo-bar
-@class="thing"
-
-as
-
-    |bar|
-
-        }}
-        {{/foo-bar}}`);
     });
   });
 

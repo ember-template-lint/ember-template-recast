@@ -1,4 +1,4 @@
-import { sortByLoc, getBlockParams } from './utils';
+import { sortByLoc } from './utils';
 import { builders } from '.';
 
 describe('utils', function () {
@@ -30,36 +30,6 @@ describe('utils', function () {
       let actual = [b, a, c].sort(sortByLoc);
 
       expect(actual.map((i) => i.key)).toEqual(['a', 'c', 'b']);
-    });
-  });
-
-  describe('getBlockParams', function () {
-    describe('given an ElementNode', function () {
-      test('returns the source of a simple block param', function () {
-        const element = '<Component as |bar|></Component>';
-
-        expect(getBlockParams(element)).toEqual('as |bar|');
-      });
-
-      test('returns the source of a block param while there is a named argument containing `as |foo|`', function () {
-        const element = '<Component data-foo="as |foo|" as |bar|></Component>';
-
-        expect(getBlockParams(element)).toEqual('as |bar|');
-      });
-    });
-
-    describe('given a BlockStatement', function () {
-      test('returns the source of a block param', function () {
-        const block = '{{#BlockStatement as |bar|}}{{/BlockStatement}}';
-
-        expect(getBlockParams(block)).toEqual('as |bar|');
-      });
-
-      test('returns the source of a block param while there is a named argument containing `as |foo|`', function () {
-        const block = '{{#BlockStatement data-foo="as |foo|" as |bar|}}{{/BlockStatement}}';
-
-        expect(getBlockParams(block)).toEqual('as |bar|');
-      });
     });
   });
 });
