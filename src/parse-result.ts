@@ -1109,6 +1109,7 @@ export default class ParseResult {
         break;
       case 'BooleanLiteral':
       case 'NumberLiteral':
+      case 'NullLiteral':
         {
           let { source } = nodeInfo;
 

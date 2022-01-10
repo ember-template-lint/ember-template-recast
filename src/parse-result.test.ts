@@ -1521,6 +1521,16 @@ describe('ember-template-recast', function () {
     });
   });
 
+  describe('NullLitteral', function () {
+    test('creating void element', function () {
+      let template = `{{my-helper null}}`;
+
+      let ast = parse(template);
+
+      expect(print(ast)).toEqual(`{{my-helper null}}`);
+    });
+  });
+
   test('can remove during traversal by returning `null`', function () {
     let template = stripIndent`
     <p>here is some multiline string</p>
