@@ -37,7 +37,7 @@
     "@glimmer/syntax": "^0.83.1",
     "@glimmer/validator": "^0.83.0",
     "async-promise-queue": "^1.0.5",
-    "colors": "^1.4.0",
+    "colors": "1.4.0",
     "commander": "^8.3.0",
     "globby": "^11.0.3",
     "ora": "^5.4.0",
@@ -96,5 +96,9 @@
       "release": true,
       "tokenRef": "GITHUB_AUTH"
     }
+  },
+  "volta": {
+    "node": "12.22.8",
+    "yarn": "1.22.17"
   }
 }
