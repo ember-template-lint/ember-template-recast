@@ -12,7 +12,6 @@
     "rootDir": "./src",
     "noImplicitAny": true,
     "baseUrl": ".",
-    "types": ["jest", "node"],
 
     "paths": {
       "*": ["types/*"]

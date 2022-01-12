@@ -22,15 +22,15 @@
     "!lib/**/*.test.*"
   ],
   "scripts": {
-    "build": "npx tsc",
-    "lint": "npx npm-run-all lint:*",
-    "lint:files": "npx eslint .",
-    "lint:tsc": "npx tsc --noEmit",
+    "build": "tsc",
+    "lint": "npm-run-all lint:*",
+    "lint:files": "eslint .",
+    "lint:tsc": "tsc --noEmit",
     "perf:benchmark": "node scripts/benchmark.mjs",
-    "prepare": "npx tsc",
-    "release": "npx release-it",
-    "test": "npx npm-run-all lint test:*",
-    "test:jest": "npx jest"
+    "prepare": "tsc",
+    "release": "release-it",
+    "test": "npm-run-all lint test:*",
+    "test:jest": "jest"
   },
   "dependencies": {
     "@glimmer/reference": "^0.83.1",
@@ -46,8 +46,7 @@
     "workerpool": "^6.1.5"
   },
   "devDependencies": {
-    "@types/jest": "^27.4.0",
-    "@types/node": "^17.0.8",
+    "@types/jest": "^27.0.3",
     "@types/workerpool": "^6.1.0",
     "@typescript-eslint/eslint-plugin": "^5.6.0",
     "@typescript-eslint/parser": "^5.6.0",
