@@ -1109,20 +1109,16 @@ export default class ParseResult {
         break;
       case 'BooleanLiteral':
       case 'NumberLiteral':
+      case 'NullLiteral':
         {
           let { source } = nodeInfo;
 
           if (dirtyFields.has('value')) {
-            source = ast.value.toString();
+            source = ast.value?.toString() || '';
             dirtyFields.delete('value');
           }
 
           output.push(source);
-        }
-        break;
-      case 'NullLiteral':
-        {
-          output.push('null');
         }
         break;
       default:
