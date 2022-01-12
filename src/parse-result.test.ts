@@ -1521,7 +1521,7 @@ describe('ember-template-recast', function () {
     });
   });
 
-  describe('NullLitteral', function () {
+  describe('NullLiteral', function () {
     test('creating void element', function () {
       let template = `{{my-helper null}}`;
 
