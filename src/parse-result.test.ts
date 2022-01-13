@@ -1,11 +1,6 @@
 import { builders, parse, print, transform } from '.';
 import type { ASTv1 as AST } from '@glimmer/syntax';
 import stripIndent from 'outdent';
-import {
-  BaseNode,
-  MustacheStatement,
-  NullLiteral,
-} from '@glimmer/syntax/dist/types/lib/v1/nodes-v1';
 
 describe('ember-template-recast', function () {
   describe('ElementNode', function () {
@@ -131,20 +126,20 @@ describe('ember-template-recast', function () {
 
     test('rename element tagname', function () {
       let template = stripIndent`
-        <div data-foo='single quoted'>
-          </div>`;
+      <div data-foo='single quoted'>
+        </div>`;
 
       let ast = parse(template) as any;
       ast.body[0].tag = 'a';
 
       expect(print(ast)).toEqual(stripIndent`
-        <a data-foo='single quoted'>
-          </a>`);
+      <a data-foo='single quoted'>
+        </a>`);
     });
 
     test('rename element tagname without children', function () {
       let template = stripIndent`
-        <div></div>`;
+      <div></div>`;
 
       let ast = parse(template) as any;
       ast.body[0].tag = 'a';
@@ -203,13 +198,13 @@ describe('ember-template-recast', function () {
 
     test('adding attribute when none originally existed', function () {
       let template = stripIndent`
-        <div></div>`;
+      <div></div>`;
 
       let ast = parse(template) as any;
       ast.body[0].attributes.push(builders.attr('data-test', builders.text('wheee')));
 
       expect(print(ast)).toEqual(stripIndent`
-        <div data-test="wheee"></div>`);
+      <div data-test="wheee"></div>`);
     });
 
     test('adding attribute to ElementNode with block params', function () {
@@ -243,19 +238,19 @@ describe('ember-template-recast', function () {
 
     test('adding an attribute to existing list', function () {
       let template = stripIndent`
-        <div
-          data-foo='lol'
-          data-bar=hahaha
-        ></div>`;
+      <div
+        data-foo='lol'
+        data-bar=hahaha
+      ></div>`;
 
       let ast = parse(template) as any;
       ast.body[0].attributes.push(builders.attr('data-test', builders.text('wheee')));
 
       expect(print(ast)).toEqual(stripIndent`
-        <div
-          data-foo='lol'
-          data-bar=hahaha data-test="wheee"
-        ></div>`);
+      <div
+        data-foo='lol'
+        data-bar=hahaha data-test="wheee"
+      ></div>`);
     });
 
     test('creating an element with complex attributes', function () {
@@ -286,19 +281,19 @@ describe('ember-template-recast', function () {
 
     test('modifying an attribute name (GH#112)', function () {
       let template = stripIndent`
-          <div
-            data-foo='some thing here'
-            data-bar=hahaha
-          ></div>`;
+        <div
+          data-foo='some thing here'
+          data-bar=hahaha
+        ></div>`;
 
       let ast = parse(template) as any;
       ast.body[0].attributes[0].name = 'data-test';
 
       expect(print(ast)).toEqual(stripIndent`
-          <div
-            data-test='some thing here'
-            data-bar=hahaha
-          ></div>`);
+        <div
+          data-test='some thing here'
+          data-bar=hahaha
+        ></div>`);
     });
 
     test('modifying attribute after valueless attribute', function () {
@@ -312,19 +307,19 @@ describe('ember-template-recast', function () {
 
     test('modifying attribute after valueless attribute with special whitespace', function () {
       let template = stripIndent`
-          <Foo
-            data-foo
-            data-derp={{hmmm}}
-          />`;
+        <Foo
+          data-foo
+          data-derp={{hmmm}}
+        />`;
 
       let ast = parse(template) as any;
       ast.body[0].attributes[1].value.path = builders.path('this.hmmm');
 
       expect(print(ast)).toEqual(stripIndent`
-          <Foo
-            data-foo
-            data-derp={{this.hmmm}}
-          />`);
+        <Foo
+          data-foo
+          data-derp={{this.hmmm}}
+        />`);
     });
 
     test('adding attribute after valueless attribute', function () {
@@ -347,7 +342,7 @@ describe('ember-template-recast', function () {
 
     test('adding modifier when no open parts originally existed', function () {
       let template = stripIndent`
-        <div></div>`;
+      <div></div>`;
 
       let ast = parse(template) as any;
       ast.body[0].modifiers.push(
@@ -355,12 +350,12 @@ describe('ember-template-recast', function () {
       );
 
       expect(print(ast)).toEqual(stripIndent`
-        <div {{on "click" this.foo}}></div>`);
+      <div {{on "click" this.foo}}></div>`);
     });
 
     test('adding modifier with existing attributes', function () {
       let template = stripIndent`
-        <div class="foo"></div>`;
+      <div class="foo"></div>`;
 
       let ast = parse(template) as any;
       ast.body[0].modifiers.push(
@@ -368,7 +363,7 @@ describe('ember-template-recast', function () {
       );
 
       expect(print(ast)).toEqual(stripIndent`
-        <div class="foo" {{on "click" this.foo}}></div>`);
+      <div class="foo" {{on "click" this.foo}}></div>`);
     });
 
     // This is specifically testing the issue described in https://github.com/glimmerjs/glimmer-vm/pull/953
@@ -387,46 +382,46 @@ describe('ember-template-recast', function () {
 
     test('removing a modifier with other attributes', function () {
       let template = stripIndent`
-        <div class="foo" {{on "click" this.blah}}></div>`;
+      <div class="foo" {{on "click" this.blah}}></div>`;
 
       let ast = parse(template) as any;
       ast.body[0].modifiers.shift();
 
       expect(print(ast)).toEqual(stripIndent`
-        <div class="foo"></div>`);
+      <div class="foo"></div>`);
     });
 
     test('removing a modifier with no other attributes/comments/modifiers', function () {
       let template = stripIndent`
-        <div {{on "click" this.blah}}></div>`;
+      <div {{on "click" this.blah}}></div>`;
 
       let ast = parse(template) as any;
       ast.body[0].modifiers.shift();
 
       expect(print(ast)).toEqual(stripIndent`
-        <div></div>`);
+      <div></div>`);
     });
 
     test('adding comment when no open parts originally existed', function () {
       let template = stripIndent`
-        <div></div>`;
+      <div></div>`;
 
       let ast = parse(template) as any;
       ast.body[0].comments.push(builders.mustacheComment(' template-lint-disable '));
 
       expect(print(ast)).toEqual(stripIndent`
-        <div {{!-- template-lint-disable --}}></div>`);
+      <div {{!-- template-lint-disable --}}></div>`);
     });
 
     test('adding comment with existing attributes', function () {
       let template = stripIndent`
-        <div class="foo"></div>`;
+      <div class="foo"></div>`;
 
       let ast = parse(template) as any;
       ast.body[0].comments.push(builders.mustacheComment(' template-lint-disable '));
 
       expect(print(ast)).toEqual(stripIndent`
-        <div class="foo" {{!-- template-lint-disable --}}></div>`);
+      <div class="foo" {{!-- template-lint-disable --}}></div>`);
     });
 
     test('adding block param', function () {
@@ -449,18 +444,18 @@ describe('ember-template-recast', function () {
 
     test('removing a block param preserves formatting of "open element closing"', function () {
       let template = stripIndent`
-          <MyFoo
-            class="foo"
-            as |bar|
-          ></MyFoo>`;
+        <MyFoo
+          class="foo"
+          as |bar|
+        ></MyFoo>`;
 
       let ast = parse(template) as any;
       ast.body[0].blockParams.pop();
 
       expect(print(ast)).toEqual(stripIndent`
-        <MyFoo
-          class="foo"
-        ></MyFoo>`);
+      <MyFoo
+        class="foo"
+      ></MyFoo>`);
     });
 
     test('interleaved attributes and modifiers are not modified when unchanged', function () {
@@ -476,10 +471,10 @@ describe('ember-template-recast', function () {
 
     test('adding children to element with children', function () {
       let template = stripIndent`
-          <ul>
-            <li></li>
-          </ul>
-        `;
+        <ul>
+          <li></li>
+        </ul>
+      `;
 
       let ast = parse(template) as any;
       ast.body[0].children.splice(
@@ -490,11 +485,11 @@ describe('ember-template-recast', function () {
       );
 
       expect(print(ast)).toEqual(stripIndent`
-          <ul>
-            <li></li>
-            <li data-foo="bar"></li>
-          </ul>
-        `);
+        <ul>
+          <li></li>
+          <li data-foo="bar"></li>
+        </ul>
+      `);
     });
 
     test('adding children to an empty element', function () {
@@ -517,10 +512,10 @@ describe('ember-template-recast', function () {
 
     test('moving a child to another ElementNode', function () {
       let template = stripIndent`
-          <Foo>{{
-            special-formatting-here
-          }}</Foo>
-        `;
+        <Foo>{{
+          special-formatting-here
+        }}</Foo>
+      `;
 
       let ast = parse(template) as any;
       let child = ast.body[0].children.pop();
@@ -528,47 +523,47 @@ describe('ember-template-recast', function () {
       ast.body.unshift(child);
 
       expect(print(ast)).toEqual(stripIndent`
-          {{
-            special-formatting-here
-          }}
-          <Foo></Foo>
-        `);
+        {{
+          special-formatting-here
+        }}
+        <Foo></Foo>
+      `);
     });
 
     test('adding a new attribute to an ElementNode while preserving the existing whitespaces', function () {
       let template = stripIndent`
-          <div data-foo
-           data-bar="lol"
-                some-other-thing={{haha}}>
-          </div>
-        `;
+        <div data-foo
+         data-bar="lol"
+              some-other-thing={{haha}}>
+        </div>
+      `;
 
       let ast = parse(template);
       let element = ast.body[0] as AST.ElementNode;
       element.attributes.push(builders.attr('foo-foo', builders.text('wheee')));
 
       expect(print(ast)).toEqual(stripIndent`
-          <div data-foo
-           data-bar="lol"
-                some-other-thing={{haha}} foo-foo="wheee">
-          </div>
-        `);
+        <div data-foo
+         data-bar="lol"
+              some-other-thing={{haha}} foo-foo="wheee">
+        </div>
+      `);
     });
 
     test('issue 706', function () {
       let template = `<div
-    class="pt-2 pb-4 {{this.foo}}"
-  >
-    {{#each this.data as |chunks|}}
-      {{#each chunks as |chunk|}}
-        {{#if (this.shouldShowImage chunk)}}
-          <p class="px-4">foo</p>
-        {{else}}
-          <p>bar</p>
-        {{/if}}
-      {{/each}}
+  class="pt-2 pb-4 {{this.foo}}"
+>
+  {{#each this.data as |chunks|}}
+    {{#each chunks as |chunk|}}
+      {{#if (this.shouldShowImage chunk)}}
+        <p class="px-4">foo</p>
+      {{else}}
+        <p>bar</p>
+      {{/if}}
     {{/each}}
-  </div>`;
+  {{/each}}
+</div>`;
 
       let ast = parse(template);
       let block1 = (ast.body[0] as AST.ElementNode).children[1] as AST.BlockStatement;
@@ -579,18 +574,18 @@ describe('ember-template-recast', function () {
       (attribute.value as AST.TextNode).chars = 'foo';
 
       expect(print(ast)).toEqual(`<div
-    class="pt-2 pb-4 {{this.foo}}"
-  >
-    {{#each this.data as |chunks|}}
-      {{#each chunks as |chunk|}}
-        {{#if (this.shouldShowImage chunk)}}
-          <p class="foo">foo</p>
-        {{else}}
-          <p>bar</p>
-        {{/if}}
-      {{/each}}
+  class="pt-2 pb-4 {{this.foo}}"
+>
+  {{#each this.data as |chunks|}}
+    {{#each chunks as |chunk|}}
+      {{#if (this.shouldShowImage chunk)}}
+        <p class="foo">foo</p>
+      {{else}}
+        <p>bar</p>
+      {{/if}}
     {{/each}}
-  </div>`);
+  {{/each}}
+</div>`);
     });
   });
 
@@ -633,26 +628,26 @@ describe('ember-template-recast', function () {
 
     test('rename non-block component', function () {
       let template = stripIndent`
-        {{foo-bar
-          baz="stuff"
-          other='single quote'
-        }}`;
+      {{foo-bar
+        baz="stuff"
+        other='single quote'
+      }}`;
 
       let ast = parse(template) as any;
       ast.body[0].path = builders.path('baz-derp');
 
       expect(print(ast)).toEqual(stripIndent`
-        {{baz-derp
-          baz="stuff"
-          other='single quote'
-        }}`);
+      {{baz-derp
+        baz="stuff"
+        other='single quote'
+      }}`);
     });
 
     test('MustacheStatements retain whitespace when multiline replacements occur', function () {
       let template = stripIndent`
-          <p></p>
-          {{ other-stuff }}
-        `;
+        <p></p>
+        {{ other-stuff }}
+      `;
       let { code } = transform(template, (env) => {
         let { builders: b } = env.syntax;
 
@@ -668,38 +663,38 @@ describe('ember-template-recast', function () {
 
     test('can add param', function () {
       let template = stripIndent`
-          {{foo-bar
-            baz=(stuff
-              goes='here')
-          }}`;
+        {{foo-bar
+          baz=(stuff
+            goes='here')
+        }}`;
 
       let ast = parse(template) as any;
       ast.body[0].params.push(builders.path('zomg'));
 
       expect(print(ast)).toEqual(stripIndent`
-          {{foo-bar
-            zomg
-            baz=(stuff
-              goes='here')
-          }}`);
+        {{foo-bar
+          zomg
+          baz=(stuff
+            goes='here')
+        }}`);
     });
 
     test('can remove param', function () {
       let template = stripIndent`
-          {{foo-bar
-            hhaahahaha
-            baz=(stuff
-              goes='here')
-          }}`;
+        {{foo-bar
+          hhaahahaha
+          baz=(stuff
+            goes='here')
+        }}`;
 
       let ast = parse(template) as any;
       ast.body[0].params.pop();
 
       expect(print(ast)).toEqual(stripIndent`
-          {{foo-bar
-            baz=(stuff
-              goes='here')
-          }}`);
+        {{foo-bar
+          baz=(stuff
+            goes='here')
+        }}`);
     });
 
     test('replacing empty hash pair on MustacheStatement works', function () {
@@ -713,56 +708,56 @@ describe('ember-template-recast', function () {
 
     test('infers indentation of hash when multiple HashPairs existed', function () {
       let template = stripIndent`
-          {{foo-bar
-            baz="stuff"
-            other='single quote'
-          }}`;
+        {{foo-bar
+          baz="stuff"
+          other='single quote'
+        }}`;
       let ast = parse(template) as any;
       ast.body[0].hash.pairs.push(builders.pair('some', builders.string('other-thing')));
 
       expect(print(ast)).toEqual(stripIndent`
-          {{foo-bar
-            baz="stuff"
-            other='single quote'
-            some="other-thing"
-          }}`);
+        {{foo-bar
+          baz="stuff"
+          other='single quote'
+          some="other-thing"
+        }}`);
     });
 
     test('infers indentation of hash when no existing hash existed but params do', function () {
       let template = stripIndent`
-          {{foo-bar
-            someParam
-          }}`;
+        {{foo-bar
+          someParam
+        }}`;
       let ast = parse(template) as any;
       ast.body[0].hash.pairs.push(builders.pair('some', builders.string('other-thing')));
 
       expect(print(ast)).toEqual(stripIndent`
-          {{foo-bar
-            someParam
-            some="other-thing"
-          }}`);
+        {{foo-bar
+          someParam
+          some="other-thing"
+        }}`);
     });
 
     test('infers indentation of new HashPairs when existing hash with single entry (but no params)', function () {
       let template = stripIndent`
-          {{foo-bar
-            stuff=here
-          }}`;
+        {{foo-bar
+          stuff=here
+        }}`;
       let ast = parse(template) as any;
       ast.body[0].hash.pairs.push(builders.pair('some', builders.string('other-thing')));
 
       expect(print(ast)).toEqual(stripIndent`
-          {{foo-bar
-            stuff=here
-            some="other-thing"
-          }}`);
+        {{foo-bar
+          stuff=here
+          some="other-thing"
+        }}`);
     });
 
     test('can add literal hash pair values', function () {
       let template = stripIndent`
-          {{foo-bar
-            first=thing
-          }}`;
+        {{foo-bar
+          first=thing
+        }}`;
 
       let ast = parse(template) as any;
       ast.body[0].hash.pairs.push(builders.pair('some', builders.null()));
@@ -772,14 +767,14 @@ describe('ember-template-recast', function () {
       ast.body[0].hash.pairs.push(builders.pair('here', builders.boolean(false)));
 
       expect(print(ast)).toEqual(stripIndent`
-          {{foo-bar
-            first=thing
-            some=null
-            other=undefined
-            things=true
-            go=42
-            here=false
-          }}`);
+        {{foo-bar
+          first=thing
+          some=null
+          other=undefined
+          things=true
+          go=42
+          here=false
+        }}`);
     });
 
     test('creating new MustacheStatement with single param has correct whitespace', function () {
@@ -804,62 +799,62 @@ describe('ember-template-recast', function () {
   describe('SubExpression', function () {
     test('rename path', function () {
       let template = stripIndent`
-          {{foo-bar
-            baz=(stuff
-              goes='here')
-          }}`;
+        {{foo-bar
+          baz=(stuff
+            goes='here')
+        }}`;
 
       let ast = parse(template) as any;
       ast.body[0].hash.pairs[0].value.path = builders.path('zomg');
 
       expect(print(ast)).toEqual(stripIndent`
-          {{foo-bar
-            baz=(zomg
-              goes='here')
-          }}`);
+        {{foo-bar
+          baz=(zomg
+            goes='here')
+        }}`);
     });
 
     test('can add param', function () {
       let template = stripIndent`
-          {{foo-bar
-            baz=(stuff
-              goes='here')
-          }}`;
+        {{foo-bar
+          baz=(stuff
+            goes='here')
+        }}`;
 
       let ast = parse(template) as any;
       ast.body[0].hash.pairs[0].value.params.push(builders.path('zomg'));
 
       expect(print(ast)).toEqual(stripIndent`
-          {{foo-bar
-            baz=(stuff
-              zomg
-              goes='here')
-          }}`);
+        {{foo-bar
+          baz=(stuff
+            zomg
+            goes='here')
+        }}`);
     });
 
     test('can remove param', function () {
       let template = stripIndent`
-          {{foo-bar
-            baz=(stuff
-              hhaahahaha
-              goes='here')
-          }}`;
+        {{foo-bar
+          baz=(stuff
+            hhaahahaha
+            goes='here')
+        }}`;
 
       let ast = parse(template) as any;
       ast.body[0].hash.pairs[0].value.params.pop();
 
       expect(print(ast)).toEqual(stripIndent`
-          {{foo-bar
-            baz=(stuff
-              goes='here')
-          }}`);
+        {{foo-bar
+          baz=(stuff
+            goes='here')
+        }}`);
     });
 
     test('replacing empty hash pair', function () {
       let template = stripIndent`
-          {{foo-bar
-            baz=(stuff)
-          }}`;
+        {{foo-bar
+          baz=(stuff)
+        }}`;
 
       let ast = parse(template) as any;
       ast.body[0].hash.pairs[0].value.hash = builders.hash([
@@ -873,44 +868,44 @@ describe('ember-template-recast', function () {
   describe('BlockStatement', function () {
     test('rename block component', function () {
       let template = stripIndent`
-        {{#foo-bar
-          baz="stuff"
-        }}
-          <div data-foo='single quoted'>
-            </div>
-        {{/foo-bar}}`;
+      {{#foo-bar
+        baz="stuff"
+      }}
+        <div data-foo='single quoted'>
+          </div>
+      {{/foo-bar}}`;
 
       let ast = parse(template) as any;
       ast.body[0].path = builders.path('baz-derp');
 
       expect(print(ast)).toEqual(stripIndent`
-        {{#baz-derp
-          baz="stuff"
-        }}
-          <div data-foo='single quoted'>
-            </div>
-        {{/baz-derp}}`);
+      {{#baz-derp
+        baz="stuff"
+      }}
+        <div data-foo='single quoted'>
+          </div>
+      {{/baz-derp}}`);
     });
 
     test('rename block component from longer to shorter name', function () {
       let template = stripIndent`
-        {{#this-is-a-long-name
-          hello="world"
-        }}
-          <div data-foo='single quoted'>
-            </div>
-        {{/this-is-a-long-name}}{{someInlineComponent hello="world"}}`;
+      {{#this-is-a-long-name
+        hello="world"
+      }}
+        <div data-foo='single quoted'>
+          </div>
+      {{/this-is-a-long-name}}{{someInlineComponent hello="world"}}`;
 
       let ast = parse(template) as any;
       ast.body[0].path = builders.path('baz-derp');
 
       expect(print(ast)).toEqual(stripIndent`
-        {{#baz-derp
-          hello="world"
-        }}
-          <div data-foo='single quoted'>
-            </div>
-        {{/baz-derp}}{{someInlineComponent hello="world"}}`);
+      {{#baz-derp
+        hello="world"
+      }}
+        <div data-foo='single quoted'>
+          </div>
+      {{/baz-derp}}{{someInlineComponent hello="world"}}`);
     });
 
     test('replacing a previously empty hash', function () {
@@ -1150,41 +1145,41 @@ describe('ember-template-recast', function () {
 
     test('remove one block param of many preserves custom whitespace', function () {
       let template = stripIndent`
-          {{#foo-bar
-            as |a b|
-          }}
-          {{/foo-bar}}
-        `;
+        {{#foo-bar
+          as |a b|
+        }}
+        {{/foo-bar}}
+      `;
 
       let ast = parse(template) as any;
       ast.body[0].program.blockParams.pop();
 
       expect(print(ast)).toEqual(stripIndent`
-        {{#foo-bar
-          as |a|
-        }}
-        {{/foo-bar}}
-        `);
+      {{#foo-bar
+        as |a|
+      }}
+      {{/foo-bar}}
+      `);
     });
 
     test('remove only block param preserves custom whitespace', function () {
       let template = stripIndent`
-          {{#foo-bar
-            some=thing
-            as |a|
-          }}
-          {{/foo-bar}}
-        `;
+        {{#foo-bar
+          some=thing
+          as |a|
+        }}
+        {{/foo-bar}}
+      `;
 
       let ast = parse(template) as any;
       ast.body[0].program.blockParams.pop();
 
       expect(print(ast)).toEqual(stripIndent`
-        {{#foo-bar
-          some=thing
-        }}
-        {{/foo-bar}}
-        `);
+      {{#foo-bar
+        some=thing
+      }}
+      {{/foo-bar}}
+      `);
     });
   });
 
@@ -1303,7 +1298,10 @@ describe('ember-template-recast', function () {
     });
 
     test('mutations retain custom whitespace formatting', function () {
-      let template = '<Foo \n  bar = {{ foo }} />';
+      let template = stripIndent`
+        <Foo 
+          bar = {{ foo }} />
+      `;
 
       let ast = parse(template) as any;
       ast.body[0].attributes[0].value.path.original = 'bar';
@@ -1313,9 +1311,9 @@ describe('ember-template-recast', function () {
 
     test('mutations retain textarea whitespace formatting', function () {
       let template = stripIndent`
-          <textarea name="foo">
-          </textarea>
-        `;
+        <textarea name="foo">
+        </textarea>
+      `;
 
       let ast = parse(template);
       let element = ast.body[0] as AST.ElementNode;
@@ -1325,22 +1323,22 @@ describe('ember-template-recast', function () {
       attrValue.chars = 'bar';
 
       expect(print(ast)).toEqual(stripIndent`
-          <textarea name="bar">
-          </textarea>
-        `);
+        <textarea name="bar">
+        </textarea>
+      `);
     });
 
     test('mutations in MustacheStatements retain whitespace in AttrNode', function () {
       let template = stripIndent`
-          <div
-            class="
-              block
-              {{if this.foo "bar"}}
-            "
-          >
-            hello
-          </div>
-        `;
+        <div
+          class="
+            block
+            {{if this.foo "bar"}}
+          "
+        >
+          hello
+        </div>
+      `;
 
       let ast = parse(template) as any;
       ast.body[0].attributes[0].value.parts[1].params[1].value = 'bar';
@@ -1529,8 +1527,8 @@ describe('ember-template-recast', function () {
 
       let ast = parse(template);
 
-      const mustache = ast.body[0] as MustacheStatement;
-      const param = mustache.params[0] as BaseNode;
+      const mustache = ast.body[0] as AST.MustacheStatement;
+      const param = mustache.params[0] as AST.BaseNode;
 
       // Mark the param as dirty
       const oldType = param.type;
