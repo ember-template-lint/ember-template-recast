@@ -2,6 +2,15 @@
 
 
 
+
+## v6.1.3 (2022-01-14)
+
+#### :bug: Bug Fix
+* [#725](https://github.com/ember-template-lint/ember-template-recast/pull/725) fix(print): fix print for NullLiteral ([@VincentMolinie](https://github.com/VincentMolinie))
+
+#### Committers: 1
+- Vincent Molinié ([@VincentMolinie](https://github.com/VincentMolinie))
+
 ## v6.1.2 (2021-12-10)
 
 #### :bug: Bug Fix
