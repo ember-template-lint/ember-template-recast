@@ -1521,6 +1521,24 @@ describe('ember-template-recast', function () {
     });
   });
 
+  describe('NullLiteral', function () {
+    test('it should print correctly', function () {
+      let template = `{{contact-null\n  null\n}}`;
+
+      let ast = parse(template);
+
+      const mustache = ast.body[0] as AST.MustacheStatement;
+      const param = mustache.params[0] as AST.BaseNode;
+
+      // Mark the param as dirty
+      const oldType = param.type;
+      param.type = 'ElementNode';
+      param.type = oldType;
+
+      expect(print(ast)).toEqual(`{{contact-null\n  null\n}}`);
+    });
+  });
+
   test('can remove during traversal by returning `null`', function () {
     let template = stripIndent`
     <p>here is some multiline string</p>
