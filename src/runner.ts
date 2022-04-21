@@ -2,7 +2,7 @@ import * as http from 'http';
 import * as https from 'https';
 import { writeFileSync } from 'fs';
 import { resolve } from 'path';
-import colors from 'colors/safe';
+import colors from '@colors/colors/safe';
 import slash from 'slash';
 import globby from 'globby';
 import ora from 'ora';
