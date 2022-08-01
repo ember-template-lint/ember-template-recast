@@ -18,7 +18,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2.4.0
-    - uses: actions/setup-node@v2.5.1
+    - uses: actions/setup-node@v3.4.1
       with:
         node-version: 16.x
     - name: install dependencies
@@ -37,7 +37,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2.4.0
-    - uses: actions/setup-node@v2.5.1
+    - uses: actions/setup-node@v3.4.1
       with:
         node-version: ${{ matrix.node }}
     - run: yarn install
@@ -51,7 +51,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2.4.0
-    - uses: actions/setup-node@v2.5.1
+    - uses: actions/setup-node@v3.4.1
       with:
         node-version: '16.x'
     - run: yarn install --no-lockfile
