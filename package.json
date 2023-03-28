@@ -43,11 +43,11 @@
     "ora": "^5.4.0",
     "slash": "^3.0.0",
     "tmp": "^0.2.1",
-    "workerpool": "^6.1.5"
+    "workerpool": "^6.4.0"
   },
   "devDependencies": {
     "@types/jest": "^27.4.0",
-    "@types/workerpool": "^6.1.0",
+    "@types/workerpool": "^6.1.1",
     "@typescript-eslint/eslint-plugin": "^5.9.1",
     "@typescript-eslint/parser": "^5.9.1",
     "benchmark": "^2.1.4",
