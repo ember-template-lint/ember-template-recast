@@ -3,6 +3,16 @@
 
 
 
+
+## v6.1.4 (2023-03-28)
+
+#### :bug: Bug Fix
+* [#943](https://github.com/ember-template-lint/ember-template-recast/pull/943) Bump `@glimmer` packages to `0.84` ([@bertdeblock](https://github.com/bertdeblock))
+
+#### Committers: 1
+- Bert De Block ([@bertdeblock](https://github.com/bertdeblock))
+
+
 ## v6.1.3 (2022-01-14)
 
 #### :bug: Bug Fix
