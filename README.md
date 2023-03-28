@@ -1,11 +1,13 @@
 # ember-template-recast
 
+[![NPM version](https://img.shields.io/npm/v/ember-template-recast.svg?style=flat)](https://npmjs.org/package/ember-template-recast)
 
 With ember-template-recast, transform a template's AST and reprint it. Its
 formatting will be preserved.
 
 For instance, it is possible to change a component's property while preserving
 its formatting:
+
 ```js
 const recast = require('ember-template-recast');
 
@@ -32,12 +34,13 @@ output === `
 />
 `; // is true!
 ```
+
 ## Command Line Usage
 
 ember-template-recast comes with a binary for running a transform across multiple
 files, similar to jscodeshift.
 
-```
+```sh
 npx ember-template-recast directory/of/templates -t transform.js
 ```
 
@@ -130,6 +133,7 @@ although there are a few small extensions related to formatting
 [in `custom-nodes.ts`](src/custom-nodes.ts)
 
 Example:
+
 ```js
 const { transform } = require('ember-template-recast');
 
