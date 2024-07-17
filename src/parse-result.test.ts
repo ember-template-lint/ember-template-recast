@@ -1,4 +1,4 @@
-import { builders, parse, print, transform } from '.';
+import { builders, parse, print, transform, traverse } from '.';
 import type { ASTv1 as AST } from '@glimmer/syntax';
 import stripIndent from 'outdent';
 
@@ -548,6 +548,25 @@ describe('ember-template-recast', function () {
               some-other-thing={{haha}} foo-foo="wheee">
         </div>
       `);
+    });
+
+    test('issue can handle angle brackets in modifier argument values', function () {
+      let template = `
+        <Select
+          @placeholder={{do-something ">> Some Text Here"}}
+          @options={{this.items}}
+          as |item|
+        >
+          {{item.name}}
+        </Select>
+      `;
+      let ast = parse(template);
+      traverse(ast, {
+        ElementNode(node) {
+          node.tag = `${node.tag}`;
+        },
+      });
+      expect(print(ast)).toEqual(template);
     });
 
     test('issue 706', function () {
