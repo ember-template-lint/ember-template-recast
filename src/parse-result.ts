@@ -513,7 +513,10 @@ export default class ParseResult {
               blockParamsEndIndex + 1
             );
 
-            const closeOpenIndex = nodeInfo.source.indexOf(selfClosing ? '/>' : '>');
+            // Match closing index after start of block params to avoid closing tag if /> or > encountered in string
+            const closeOpenIndex =
+              nodeInfo.source.substring(blockParamStartIndex).indexOf(selfClosing ? '/>' : '>') +
+              blockParamStartIndex;
             postBlockParamsWhitespace = nodeInfo.source.substring(
               blockParamsEndIndex + 1,
               closeOpenIndex
