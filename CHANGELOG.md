@@ -4,6 +4,19 @@
 
 
 
+
+## v6.1.5 (2024-07-24)
+
+#### :bug: Bug Fix
+* [#996](https://github.com/ember-template-lint/ember-template-recast/pull/996) Fix parsing error when in-tag string content contains `>` ([@rgallagherab](https://github.com/rgallagherab))
+* [#943](https://github.com/ember-template-lint/ember-template-recast/pull/943) Bump `@glimmer` packages to `0.84` ([@bertdeblock](https://github.com/bertdeblock))
+
+#### Committers: 3
+- Bert De Block ([@bertdeblock](https://github.com/bertdeblock))
+- Bryan Mishkin ([@bmish](https://github.com/bmish))
+- [@rgallagherab](https://github.com/rgallagherab)
+
+
 ## v6.1.4 (2023-03-28)
 
 #### :bug: Bug Fix
