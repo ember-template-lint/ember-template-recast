@@ -18,13 +18,15 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    - uses: pnpm/action-setup@v4
     - uses: actions/setup-node@v4
       with:
         node-version: '18.x'
+        cache: 'pnpm'
     - name: install dependencies
-      run: yarn install
+      run: pnpm install
     - name: linting
-      run: yarn lint
+      run: pnpm lint
 
   test:
     name: "Node ${{ matrix.node }}: ${{ matrix.os }}"
@@ -37,13 +39,15 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    - uses: pnpm/action-setup@v4
     - uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node }}
-    - run: yarn install
-    - run: yarn build
+        cache: 'pnpm'
+    - run: pnpm install
+    - run: pnpm build
     - name: test
-      run: yarn npm-run-all test:*
+      run: pnpm npm-run-all test:*
 
   floating-test:
     name: Floating dependencies
@@ -51,10 +55,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    - uses: pnpm/action-setup@v4
     - uses: actions/setup-node@v4
       with:
         node-version: '18.x'
-    - run: yarn install --no-lockfile
-    - run: yarn build
+        cache: 'pnpm'
+    - run: pnpm install --no-lockfile
+    - run: pnpm build
     - name: test
-      run: yarn test:jest
+      run: pnpm test:jest
