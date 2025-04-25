@@ -16,15 +16,17 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    - uses: pnpm/action-setup@v4
     - uses: actions/setup-node@v4
       with:
         node-version: 18.x
+        cache: 'pnpm'
 
     - name: Install dependencies
-      run: yarn install
+      run: pnpm install
 
     - name: Build project
-      run: yarn build
+      run: pnpm build
 
     - name: Run script
-      run: yarn perf:benchmark
+      run: pnpm perf:benchmark
