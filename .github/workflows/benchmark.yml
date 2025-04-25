@@ -15,10 +15,10 @@ jobs:
     name: perf:benchmark
 
     steps:
-    - uses: actions/checkout@v3.3.0
-    - uses: actions/setup-node@v3.6.0
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
       with:
-        node-version: 16.x
+        node-version: 18.x
 
     - name: Install dependencies
       run: yarn install
