@@ -17,10 +17,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3.3.0
-    - uses: actions/setup-node@v3.6.0
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
       with:
-        node-version: 16.x
+        node-version: '18.x'
     - name: install dependencies
       run: yarn install
     - name: linting
@@ -32,12 +32,12 @@ jobs:
 
     strategy:
       matrix:
-        node: ['12', '14', '16', '17']
+        node: [18, 20, 22]
         os: [ubuntu, windows]
 
     steps:
-    - uses: actions/checkout@v3.3.0
-    - uses: actions/setup-node@v3.6.0
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node }}
     - run: yarn install
@@ -50,10 +50,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3.3.0
-    - uses: actions/setup-node@v3.6.0
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
       with:
-        node-version: '16.x'
+        node-version: '18.x'
     - run: yarn install --no-lockfile
     - run: yarn build
     - name: test
