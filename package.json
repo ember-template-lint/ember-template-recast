@@ -36,6 +36,7 @@
     "@glimmer/reference": "^0.84.3",
     "@glimmer/syntax": ">= 0.84.3",
     "@glimmer/validator": "^0.84.3",
+    "@types/tmp": "^0.2.6",
     "async-promise-queue": "^1.0.5",
     "colors": "^1.4.0",
     "commander": "^8.3.0",
@@ -72,6 +73,17 @@
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
+  },
+  "pnpm": {
+    "override-nodes": [
+      "@glimmer/* pinned for typescript reasons",
+      "TODO: We should test against a range of @glimmer/syntaxes -- or bump to 1.0"
+    ],
+    "overrides": {
+      "@glimmer/syntax": "0.84.3",
+      "@glimmer/reference": "0.84.3",
+      "@glimmer/validator": "0.84.3"
+    }
   },
   "changelog": {
     "repo": "ember-template-lint/ember-template-recast",
