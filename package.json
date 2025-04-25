@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "@glimmer/reference": "^0.84.3",
-    "@glimmer/syntax": "^0.84.3",
+    "@glimmer/syntax": ">= 0.84.3",
     "@glimmer/validator": "^0.84.3",
     "async-promise-queue": "^1.0.5",
     "colors": "^1.4.0",
