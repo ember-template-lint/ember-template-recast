@@ -7,6 +7,7 @@
 npm-debug.log*
 yarn-error.log
 /.vscode
+/.log/
 
 # compiled output
 /lib
