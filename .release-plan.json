@@ -1,0 +1,26 @@
+{
+  "solution": {
+    "ember-template-recast": {
+      "impact": "major",
+      "oldVersion": "6.1.5",
+      "newVersion": "7.0.0",
+      "tagName": "latest",
+      "constraints": [
+        {
+          "impact": "major",
+          "reason": "Appears in changelog section :boom: Breaking Change"
+        },
+        {
+          "impact": "patch",
+          "reason": "Appears in changelog section :bug: Bug Fix"
+        },
+        {
+          "impact": "patch",
+          "reason": "Appears in changelog section :house: Internal"
+        }
+      ],
+      "pkgJSONPath": "./package.json"
+    }
+  },
+  "description": "## Release (2025-05-21)\n\n* ember-template-recast 7.0.0 (major)\n\n#### :boom: Breaking Change\n* `ember-template-recast`\n  * [#1000](https://github.com/ember-template-lint/ember-template-recast/pull/1000) Drop support for node < 18.12 ([@NullVoxPopuli](https://github.com/NullVoxPopuli))\n\n#### :bug: Bug Fix\n* `ember-template-recast`\n  * [#1004](https://github.com/ember-template-lint/ember-template-recast/pull/1004) Move @glimmer/reference and @glimmer/validator out of dependencies ([@NullVoxPopuli](https://github.com/NullVoxPopuli))\n  * [#998](https://github.com/ember-template-lint/ember-template-recast/pull/998) Widen glimmer syntax range ([@kiwiupover](https://github.com/kiwiupover))\n\n#### :house: Internal\n* `ember-template-recast`\n  * [#1002](https://github.com/ember-template-lint/ember-template-recast/pull/1002) Setup release-plan ([@NullVoxPopuli](https://github.com/NullVoxPopuli))\n  * [#1001](https://github.com/ember-template-lint/ember-template-recast/pull/1001) Migrate to pnpm ([@NullVoxPopuli](https://github.com/NullVoxPopuli))\n\n#### Committers: 2\n- Dave Laird ([@kiwiupover](https://github.com/kiwiupover))\n- [@NullVoxPopuli](https://github.com/NullVoxPopuli)\n"
+}
