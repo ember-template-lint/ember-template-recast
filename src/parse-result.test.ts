@@ -1738,6 +1738,19 @@ describe('ember-template-recast', function () {
       expect(print(ast)).toEqual('Bar');
     });
 
+    test('updating also adjust loc', function () {
+      let template = `short`;
+
+      let ast = parse(template) as any;
+
+      const body = ast.body[0];
+      body.chars = 'much longer';
+
+      expect(body.loc.end.column).toEqual(11);
+
+      expect(print(ast)).toEqual('much longer');
+    });
+
     test('can be updated as value of AttrNode', function () {
       let template = `<div class="lol"></div>`;
 
