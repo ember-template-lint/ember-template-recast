@@ -13,13 +13,7 @@ importers:
 
   .:
     dependencies:
-      '@glimmer/reference':
-        specifier: 0.84.3
-        version: 0.84.3
       '@glimmer/syntax':
-        specifier: 0.84.3
-        version: 0.84.3
-      '@glimmer/validator':
         specifier: 0.84.3
         version: 0.84.3
       '@types/tmp':
@@ -50,6 +44,12 @@ importers:
         specifier: ^6.4.0
         version: 6.5.1
     devDependencies:
+      '@glimmer/reference':
+        specifier: 0.84.3
+        version: 0.84.3
+      '@glimmer/validator':
+        specifier: 0.84.3
+        version: 0.84.3
       '@types/jest':
         specifier: ^27.4.0
         version: 27.5.2
