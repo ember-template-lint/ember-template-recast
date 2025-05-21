@@ -32,7 +32,7 @@
     "test:jest": "jest"
   },
   "dependencies": {
-    "@glimmer/reference": "^0.84.3",
+    "@glimmer/syntax": ">= 0.84.3",
     "@types/tmp": "^0.2.6",
     "async-promise-queue": "^1.0.5",
     "colors": "^1.4.0",
@@ -46,7 +46,7 @@
   "devDependencies": {
     "@types/jest": "^27.4.0",
     "@types/workerpool": "^6.1.1",
-    "@glimmer/syntax": ">= 0.84.3",
+    "@glimmer/reference": "^0.84.3",
     "@glimmer/validator": "^0.84.3",
     "@typescript-eslint/eslint-plugin": "^5.9.1",
     "@typescript-eslint/parser": "^5.9.1",
